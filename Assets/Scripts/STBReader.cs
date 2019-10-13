@@ -22,7 +22,8 @@ public class STBReader : MonoBehaviour
 
     public string path;
     private string  ElementShape, xElementKind, ElementShapeType;
-    private int NodeID, NodeIndex_i, NodeIndex_j, NodeIndex_k, NodeIndex_l, NodeIndexStart, NodeIndexEnd,
+    private int NodeID, 
+    NodeIndex_i, NodeIndex_j, NodeIndex_k, NodeIndex_l, NodeIndexStart, NodeIndexEnd,
                 xNodeStart, xNodeEnd, xElementIdSection,
                 StbSecIndex,  ElementIdSection;
     private float xPos, yPos, zPos, ElementAngleY, ElementAngleZ, ElementHight, ElementWidth;
@@ -74,7 +75,7 @@ public class STBReader : MonoBehaviour
         // StbSlabs の取得
         var xSlabs = xdoc.Root.Descendants("StbSlab");
         int SlabNum = 0;
-        GameObject Slabs = new GameObject("Slabs");
+        GameObject Slabs = new GameObject("StbSlabs");
         foreach (var xSlab in xSlabs) {
             var vertices = new List<Vector3>();
             var triangles = new List<int>();
@@ -185,8 +186,12 @@ public class STBReader : MonoBehaviour
         GetStbSteelSection(xdoc, "StbSecRoll-L", "L");
         GetStbSteelSection(xdoc, "StbSecRoll-Bar", "Bar");
 
-        // 柱の断面の生成
-        UnityColumns = MakeElementMesh(xdoc, "StbColumn", "Column");
+        // 断面の生成
+        MakeElementMesh(xdoc, "StbColumn", "Column");
+        MakeElementMesh(xdoc, "StbGirder", "Beam");
+        MakeElementMesh(xdoc, "StbPost", "Column");
+        MakeElementMesh(xdoc, "StbBeam", "Beam");
+        MakeElementMesh(xdoc, "StbBrace", "Brace");
     }
 
     // Update is called once per frame
@@ -225,10 +230,12 @@ public class STBReader : MonoBehaviour
         }
     }
 
-    Mesh[] MakeElementMesh(XDocument xdoc, string xDateTag, string ElementStructureType) {
+    void MakeElementMesh(XDocument xdoc, string xDateTag, string ElementStructureType) {
         ElementShapeMesh.Clear();
 
         var xElements = xdoc.Root.Descendants(xDateTag);
+        int ElementNum = 0;
+        GameObject Elements = new GameObject(xDateTag + "s");
         foreach (var xElement in xElements) {
             if (ElementStructureType == "Beam" || ElementStructureType == "Brace") {
                 xNodeStart = (int)xElement.Attribute("idNode_start");
@@ -251,13 +258,13 @@ public class STBReader : MonoBehaviour
                 // 断面形状名（shape) と 断面形状（HxB）の取得の取得
                 if (ElementStructureType == "Beam") {
                     StbSecIndex = xSecRcBeamId.IndexOf(xElementIdSection);
-                    ElementHight = xSecRcBeamDepth[StbSecIndex];
-                    ElementWidth = xSecRcBeamWidth[StbSecIndex];
+                    ElementHight = xSecRcBeamDepth[StbSecIndex] / 1000;
+                    ElementWidth = xSecRcBeamWidth[StbSecIndex] / 1000;
                 }
                 else if (ElementStructureType == "Column") {
                     StbSecIndex = xSecRcColumnId.IndexOf(xElementIdSection);
-                    ElementHight = xSecRcColumnDepth[StbSecIndex];
-                    ElementWidth = xSecRcColumnWidth[StbSecIndex];
+                    ElementHight = xSecRcColumnDepth[StbSecIndex] / 1000;
+                    ElementWidth = xSecRcColumnWidth[StbSecIndex] / 1000;
                 }
 
                 if (ElementWidth == 0) {
@@ -283,18 +290,20 @@ public class STBReader : MonoBehaviour
                 }
                 // 断面形状（HxB）の取得の取得
                 StbSecIndex = xStbSecSteelName.IndexOf(ElementShape);
-                ElementHight = xStbSecSteelParamA[StbSecIndex];
-                ElementWidth = xStbSecSteelParamB[StbSecIndex];
+                ElementHight = xStbSecSteelParamA[StbSecIndex] / 1000;
+                ElementWidth = xStbSecSteelParamB[StbSecIndex] / 1000;
                 ElementShapeType = xStbSecSteelType[StbSecIndex];
             }
 
             // 始点と終点から梁断面サーフェスの作成
-            ElementShapeMesh = MakeElementsMeshFromVertex(NodeStart, NodeEnd, ElementHight, ElementWidth, ElementShapeType, ElementStructureType);
+            ElementShapeMesh = MakeElementsMeshFromVertex(NodeStart, NodeEnd, ElementHight, ElementWidth, ElementShapeType, ElementStructureType, ElementNum, Elements);
+            ElementNum = ElementNum + 1;
         }
-        ElementShapeMeshArray = Brep.JoinBreps(ElementShapeMesh, GH_Component.DocumentTolerance());
-        return ElementShapeMeshArray;
+        // ElementShapeMeshArray = ElementShapeMesh.ToArray;
+        // return ElementShapeMeshArray;
     } 
-    public List<Mesh> MakeElementsMeshFromVertex(Vector3 NodeStart, Vector3 NodeEnd, float ElementHight, float ElementWidth, string ElementShapeType, string ElementStructureType) {
+
+    public List<Mesh> MakeElementsMeshFromVertex(Vector3 NodeStart, Vector3 NodeEnd, float ElementHight, float ElementWidth, string ElementShapeType, string ElementStructureType, int ElementNum, GameObject Elements) {
 
             // 部材のアングルの確認
             ElementAngleY = -1 * (float)Math.Atan((NodeEnd.y - NodeStart.y) / (NodeEnd.x - NodeStart.x));
@@ -307,78 +316,78 @@ public class STBReader : MonoBehaviour
             //  ^        |    |    |  
             //  o >  X   S1 - S2 - S3
             if (ElementStructureType == "Beam") {
-                VertexS1 = new Vector3(NodeStart.x + (ElementWidth / 2) * (float)Math.Sin(ElementAngleY),
-                                       NodeStart.y + (ElementWidth / 2) * (float)Math.Cos(ElementAngleY),
-                                       NodeStart.z - ElementHight
+                VertexS1 = new Vector3(NodeStart.x + (ElementWidth / 2) * (float)Math.Sin(ElementAngleZ),
+                                       NodeStart.y - ElementHight,
+                                       NodeStart.z + (ElementWidth / 2) * (float)Math.Cos(ElementAngleZ)
                                        );
                 VertexS2 = new Vector3(NodeStart.x,
-                                       NodeStart.y,
-                                       NodeStart.z - ElementHight
-                                       );
-                VertexS3 = new Vector3(NodeStart.x - (ElementWidth / 2) * (float)Math.Sin(ElementAngleY),
-                                       NodeStart.y - (ElementWidth / 2) * (float)Math.Cos(ElementAngleY),
-                                       NodeStart.z - ElementHight
-                                       );
-                VertexS4 = new Vector3(NodeStart.x + (ElementWidth / 2) * (float)Math.Sin(ElementAngleY),
-                                       NodeStart.y + (ElementWidth / 2) * (float)Math.Cos(ElementAngleY),
+                                       NodeStart.y - ElementHight,
                                        NodeStart.z
+                                       );
+                VertexS3 = new Vector3(NodeStart.x - (ElementWidth / 2) * (float)Math.Sin(ElementAngleZ),
+                                       NodeStart.y - ElementHight,
+                                       NodeStart.z - (ElementWidth / 2) * (float)Math.Cos(ElementAngleZ)
+                                       );
+                VertexS4 = new Vector3(NodeStart.x + (ElementWidth / 2) * (float)Math.Sin(ElementAngleZ),
+                                       NodeStart.y,
+                                       NodeStart.z + (ElementWidth / 2) * (float)Math.Cos(ElementAngleZ)
                                        );
                 VertexS5 = NodeStart;
-                VertexS6 = new Vector3(NodeStart.x - (ElementWidth / 2) * (float)Math.Sin(ElementAngleY),
-                                       NodeStart.y - (ElementWidth / 2) * (float)Math.Cos(ElementAngleY),
-                                       NodeStart.z
+                VertexS6 = new Vector3(NodeStart.x - (ElementWidth / 2) * (float)Math.Sin(ElementAngleZ),
+                                       NodeStart.y,
+                                       NodeStart.z - (ElementWidth / 2) * (float)Math.Cos(ElementAngleZ)
                                        );
             }
             else if (ElementStructureType == "Column") {
-                VertexS1 = new Vector3(NodeStart.x - (ElementWidth / 2) * (float)Math.Sin(ElementAngleZ),
-                                       NodeStart.y - (ElementHight / 2),
-                                       NodeStart.z - (ElementWidth / 2) * (float)Math.Cos(ElementAngleZ)
+                VertexS1 = new Vector3(NodeStart.x - (ElementWidth / 2) * (float)Math.Sin(ElementAngleY),
+                                       NodeStart.y - (ElementWidth / 2) * (float)Math.Cos(ElementAngleY),
+                                       NodeStart.z - (ElementHight / 2)
                                        );
                 VertexS2 = new Vector3(NodeStart.x,
-                                       NodeStart.y + (ElementHight / 2),
-                                       NodeStart.z
+                                       NodeStart.y,
+                                       NodeStart.z + (ElementHight / 2)
                                        );
-                VertexS3 = new Vector3(NodeStart.x + (ElementWidth / 2) * (float)Math.Sin(ElementAngleZ),
-                                       NodeStart.y - (ElementHight / 2),
-                                       NodeStart.z + (ElementWidth / 2) * (float)Math.Cos(ElementAngleZ)
+                VertexS3 = new Vector3(NodeStart.x + (ElementWidth / 2) * (float)Math.Sin(ElementAngleY),
+                                       NodeStart.y + (ElementWidth / 2) * (float)Math.Cos(ElementAngleY),
+                                       NodeStart.z - (ElementHight / 2)
                                        );
-                VertexS4 = new Vector3(NodeStart.x - (ElementWidth / 2) * (float)Math.Sin(ElementAngleZ),
-                                       NodeStart.y + (ElementHight / 2),
-                                       NodeStart.z - (ElementWidth / 2) * (float)Math.Cos(ElementAngleZ)
+                VertexS4 = new Vector3(NodeStart.x - (ElementWidth / 2) * (float)Math.Sin(ElementAngleY),
+                                       NodeStart.y - (ElementWidth / 2) * (float)Math.Cos(ElementAngleY),
+                                       NodeStart.z + (ElementHight / 2)
                                        );
                 VertexS5 = new Vector3(NodeStart.x,
-                                       NodeStart.y - (ElementHight / 2),
-                                       NodeStart.z
+                                       NodeStart.y,
+                                       NodeStart.z - (ElementHight / 2)
                                        );
-                VertexS6 = new Vector3(NodeStart.x + (ElementWidth / 2) * (float)Math.Sin(ElementAngleZ),
-                                       NodeStart.y + (ElementHight / 2),
-                                       NodeStart.z + (ElementWidth / 2) * (float)Math.Cos(ElementAngleZ)
+                VertexS6 = new Vector3(NodeStart.x + (ElementWidth / 2) * (float)Math.Sin(ElementAngleY),
+                                       NodeStart.y + (ElementWidth / 2) * (float)Math.Cos(ElementAngleY),
+                                       NodeStart.z + (ElementHight / 2)
                                        );
             }
             else if (ElementStructureType == "Brace") {
-                VertexS1 = new Vector3(NodeStart.x + (ElementWidth / 2) * (float)Math.Sin(ElementAngleY),
-                                       NodeStart.y + (ElementWidth / 2) * (float)Math.Cos(ElementAngleY),
-                                       NodeStart.z - (ElementWidth / 2)
+                VertexS1 = new Vector3(NodeStart.x + (ElementWidth / 2) * (float)Math.Sin(ElementAngleZ),
+                                       NodeStart.y - (ElementWidth / 2),
+                                       NodeStart.z + (ElementWidth / 2) * (float)Math.Cos(ElementAngleZ)
                                        );
                 VertexS2 = new Vector3(NodeStart.x,
-                                       NodeStart.y,
-                                       NodeStart.z - (ElementWidth / 2)
+                                       NodeStart.y - (ElementWidth / 2),
+                                       NodeStart.z
                                        );
-                VertexS3 = new Vector3(NodeStart.x - (ElementWidth / 2) * (float)Math.Sin(ElementAngleY),
-                                       NodeStart.y - (ElementWidth / 2) * (float)Math.Cos(ElementAngleY),
-                                       NodeStart.z - (ElementWidth / 2)
+                VertexS3 = new Vector3(NodeStart.x - (ElementWidth / 2) * (float)Math.Sin(ElementAngleZ),
+                                       NodeStart.y - (ElementWidth / 2),
+                                       NodeStart.z - (ElementWidth / 2) * (float)Math.Cos(ElementAngleZ)
                                        );
-                VertexS4 = new Vector3(NodeStart.x + (ElementWidth / 2) * (float)Math.Sin(ElementAngleY),
-                                       NodeStart.y + (ElementWidth / 2) * (float)Math.Cos(ElementAngleY),
-                                       NodeStart.z + (ElementWidth / 2)
+                VertexS4 = new Vector3(NodeStart.x + (ElementWidth / 2) * (float)Math.Sin(ElementAngleZ),
+                                       NodeStart.y + (ElementWidth / 2),
+                                       NodeStart.z + (ElementWidth / 2) * (float)Math.Cos(ElementAngleZ)
                                        );
                 VertexS5 = new Vector3(NodeStart.x,
-                                       NodeStart.y,
-                                       NodeStart.z + (ElementWidth / 2)
+                                       NodeStart.y + (ElementWidth / 2),
+                                       NodeStart.z
                                        );
-                VertexS6 = new Vector3(NodeStart.x - (ElementWidth / 2) * (float)Math.Sin(ElementAngleY),
-                                       NodeStart.y - (ElementWidth / 2) * (float)Math.Cos(ElementAngleY),
-                                       NodeStart.z + (ElementWidth / 2)
+                VertexS6 = new Vector3(NodeStart.x - (ElementWidth / 2) * (float)Math.Sin(ElementAngleZ),
+                                       NodeStart.y + (ElementWidth / 2),
+                                       NodeStart.z - (ElementWidth / 2) * (float)Math.Cos(ElementAngleZ)
                                        );
             }
             // NodeEnd側
@@ -386,83 +395,84 @@ public class STBReader : MonoBehaviour
             //  ^        |    |    |
             //  o >  X   E1 - E2 - E3
             if (ElementStructureType == "Beam") {
-                VertexE1 = new Vector3(NodeEnd.x + (ElementWidth / 2) * (float)Math.Sin(ElementAngleY),
-                                       NodeEnd.y + (ElementWidth / 2) * (float)Math.Cos(ElementAngleY),
-                                       NodeEnd.z - ElementHight
+                VertexE1 = new Vector3(NodeEnd.x + (ElementWidth / 2) * (float)Math.Sin(ElementAngleZ),
+                                       NodeEnd.y - ElementHight,
+                                       NodeEnd.z + (ElementWidth / 2) * (float)Math.Cos(ElementAngleZ)
                                        );
                 VertexE2 = new Vector3(NodeEnd.x,
-                                       NodeEnd.y,
-                                       NodeEnd.z - ElementHight
-                                       );
-                VertexE3 = new Vector3(NodeEnd.x - (ElementWidth / 2) * (float)Math.Sin(ElementAngleY),
-                                       NodeEnd.y - (ElementWidth / 2) * (float)Math.Cos(ElementAngleY),
-                                       NodeEnd.z - ElementHight
-                                       );
-                VertexE4 = new Vector3(NodeEnd.x + (ElementWidth / 2) * (float)Math.Sin(ElementAngleY),
-                                       NodeEnd.y + (ElementWidth / 2) * (float)Math.Cos(ElementAngleY),
+                                       NodeEnd.y - ElementHight,
                                        NodeEnd.z
+                                       );
+                VertexE3 = new Vector3(NodeEnd.x - (ElementWidth / 2) * (float)Math.Sin(ElementAngleZ),
+                                       NodeEnd.y - ElementHight,
+                                       NodeEnd.z - (ElementWidth / 2) * (float)Math.Cos(ElementAngleZ)
+                                       );
+                VertexE4 = new Vector3(NodeEnd.x + (ElementWidth / 2) * (float)Math.Sin(ElementAngleZ),
+                                       NodeEnd.y,
+                                       NodeEnd.z + (ElementWidth / 2) * (float)Math.Cos(ElementAngleZ)
                                        );
                 VertexE5 = NodeEnd;
-                VertexE6 = new Vector3(NodeEnd.x - (ElementWidth / 2) * (float)Math.Sin(ElementAngleY),
-                                       NodeEnd.y - (ElementWidth / 2) * (float)Math.Cos(ElementAngleY),
-                                       NodeEnd.z
+                VertexE6 = new Vector3(NodeEnd.x - (ElementWidth / 2) * (float)Math.Sin(ElementAngleZ),
+                                       NodeEnd.y,
+                                       NodeEnd.z - (ElementWidth / 2) * (float)Math.Cos(ElementAngleZ)
                                        );
             }
             else if (ElementStructureType == "Column") {
-                VertexE1 = new Vector3(NodeEnd.x - (ElementWidth / 2) * (float)Math.Sin(ElementAngleZ),
-                                       NodeEnd.y - (ElementHight / 2),
-                                       NodeEnd.z - (ElementWidth / 2) * (float)Math.Cos(ElementAngleZ)
+                VertexE1 = new Vector3(NodeEnd.x - (ElementWidth / 2) * (float)Math.Sin(ElementAngleY),
+                                       NodeEnd.y - (ElementWidth / 2) * (float)Math.Cos(ElementAngleY),
+                                       NodeEnd.z - (ElementHight / 2)
                                        );
                 VertexE2 = new Vector3(NodeEnd.x,
-                                       NodeEnd.y + (ElementHight / 2),
-                                       NodeEnd.z
+                                       NodeEnd.y,
+                                       NodeEnd.z + (ElementHight / 2)
                                        );
-                VertexE3 = new Vector3(NodeEnd.x + (ElementWidth / 2) * (float)Math.Sin(ElementAngleZ),
-                                       NodeEnd.y - (ElementHight / 2),
-                                       NodeEnd.z + (ElementWidth / 2) * (float)Math.Cos(ElementAngleZ)
+                VertexE3 = new Vector3(NodeEnd.x + (ElementWidth / 2) * (float)Math.Sin(ElementAngleY),
+                                       NodeEnd.y + (ElementWidth / 2) * (float)Math.Cos(ElementAngleY),
+                                       NodeEnd.z - (ElementHight / 2)
                                        );
-                VertexE4 = new Vector3(NodeEnd.x - (ElementWidth / 2) * (float)Math.Sin(ElementAngleZ),
-                                       NodeEnd.y + (ElementHight / 2),
-                                       NodeEnd.z - (ElementWidth / 2) * (float)Math.Cos(ElementAngleZ)
+                VertexE4 = new Vector3(NodeEnd.x - (ElementWidth / 2) * (float)Math.Sin(ElementAngleY),
+                                       NodeEnd.y - (ElementWidth / 2) * (float)Math.Cos(ElementAngleY),
+                                       NodeEnd.z + (ElementHight / 2)
                                        );
                 VertexE5 = new Vector3(NodeEnd.x,
-                                       NodeEnd.y - (ElementHight / 2),
-                                       NodeEnd.z
+                                       NodeEnd.y,
+                                       NodeEnd.z - (ElementHight / 2)
                                        );
-                VertexE6 = new Vector3(NodeEnd.x + (ElementWidth / 2) * (float)Math.Sin(ElementAngleZ),
-                                       NodeEnd.y + (ElementHight / 2),
-                                       NodeEnd.z + (ElementWidth / 2) * (float)Math.Cos(ElementAngleZ)
+                VertexE6 = new Vector3(NodeEnd.x + (ElementWidth / 2) * (float)Math.Sin(ElementAngleY),
+                                       NodeEnd.y + (ElementWidth / 2) * (float)Math.Cos(ElementAngleY),
+                                       NodeEnd.z + (ElementHight / 2)
                                        );
             }
             else if (ElementStructureType == "Brace") {
-                VertexE1 = new Vector3(NodeEnd.x + (ElementWidth / 2) * (float)Math.Sin(ElementAngleY),
-                                       NodeEnd.y + (ElementWidth / 2) * (float)Math.Cos(ElementAngleY),
-                                       NodeEnd.z - (ElementWidth / 2)
+                VertexE1 = new Vector3(NodeEnd.x + (ElementWidth / 2) * (float)Math.Sin(ElementAngleZ),
+                                       NodeEnd.y - (ElementWidth / 2),
+                                       NodeEnd.z + (ElementWidth / 2) * (float)Math.Cos(ElementAngleZ)
                                        );
                 VertexE2 = new Vector3(NodeEnd.x,
-                                       NodeEnd.y,
-                                       NodeEnd.z - (ElementWidth / 2)
+                                       NodeEnd.y - (ElementWidth / 2),
+                                       NodeEnd.z
                                        );
-                VertexE3 = new Vector3(NodeEnd.x - (ElementWidth / 2) * (float)Math.Sin(ElementAngleY),
-                                       NodeEnd.y - (ElementWidth / 2) * (float)Math.Cos(ElementAngleY),
-                                       NodeEnd.z - (ElementWidth / 2)
+                VertexE3 = new Vector3(NodeEnd.x - (ElementWidth / 2) * (float)Math.Sin(ElementAngleZ),
+                                       NodeEnd.y - (ElementWidth / 2),
+                                       NodeEnd.z - (ElementWidth / 2) * (float)Math.Cos(ElementAngleZ)
                                        );
-                VertexE4 = new Vector3(NodeEnd.x + (ElementWidth / 2) * (float)Math.Sin(ElementAngleY),
-                                       NodeEnd.y + (ElementWidth / 2) * (float)Math.Cos(ElementAngleY),
-                                       NodeEnd.z + (ElementWidth / 2)
+                VertexE4 = new Vector3(NodeEnd.x + (ElementWidth / 2) * (float)Math.Sin(ElementAngleZ),
+                                       NodeEnd.y + (ElementWidth / 2),
+                                       NodeEnd.z + (ElementWidth / 2) * (float)Math.Cos(ElementAngleZ)
                                        );
                 VertexE5 = new Vector3(NodeEnd.x,
-                                       NodeEnd.y,
-                                       NodeEnd.z + (ElementWidth / 2)
+                                       NodeEnd.y + (ElementWidth / 2),
+                                       NodeEnd.z
                                        );
-                VertexE6 = new Vector3(NodeEnd.x - (ElementWidth / 2) * (float)Math.Sin(ElementAngleY),
-                                       NodeEnd.y - (ElementWidth / 2) * (float)Math.Cos(ElementAngleY),
-                                       NodeEnd.z + (ElementWidth / 2)
+                VertexE6 = new Vector3(NodeEnd.x - (ElementWidth / 2) * (float)Math.Sin(ElementAngleZ),
+                                       NodeEnd.y + (ElementWidth / 2),
+                                       NodeEnd.z - (ElementWidth / 2) * (float)Math.Cos(ElementAngleZ)
                                        );
             }
 
             var vertices = new List<Vector3>();
             var triangles = new List<int>();
+            Mesh meshObj = new Mesh();
             if (this.ElementShapeType == "H") {
                 // make upper flange
                 vertices.Add(VertexS4);
@@ -479,6 +489,16 @@ public class STBReader : MonoBehaviour
                 vertices.Add(VertexS2);
                 vertices.Add(VertexE2);
                 vertices.Add(VertexE5);
+
+                for(int i = 1; i < 4; ++i){
+                    triangles.Add(4*i-4);
+                    triangles.Add(4*i-3);
+                    triangles.Add(4*i-2);
+                    triangles.Add(4*i-2);
+                    triangles.Add(4*i-1);
+                    triangles.Add(4*i-4);
+                }
+
             }
             else if (this.ElementShapeType == "BOX") {
                 // make upper flange
@@ -501,8 +521,18 @@ public class STBReader : MonoBehaviour
                 vertices.Add(VertexS3);
                 vertices.Add(VertexE3);
                 vertices.Add(VertexE6);
+
+                for(int i = 1; i < 5; ++i){
+                    triangles.Add(4*i-4);
+                    triangles.Add(4*i-3);
+                    triangles.Add(4*i-2);
+                    triangles.Add(4*i-2);
+                    triangles.Add(4*i-1);
+                    triangles.Add(4*i-4);
+                }
             }
             else if (this.ElementShapeType == "Pipe") {
+                Debug.Log("Pipe is not supported");
                 // LineCurve PipeCurve = new LineCurve(NodeStart, NodeEnd);
                 // ElementShapeMesh.Add(Brep.CreatePipe(PipeCurve, ElementHight / 2.0, false, 0, false, GH_Component.DocumentTolerance(), GH_Component.DocumentAngleTolerance())[0]);
             }
@@ -517,9 +547,30 @@ public class STBReader : MonoBehaviour
                 vertices.Add(VertexS3);
                 vertices.Add(VertexE3);
                 vertices.Add(VertexE6);
+
+                for(int i = 1; i < 3; ++i){
+                    triangles.Add(4*i-4);
+                    triangles.Add(4*i-3);
+                    triangles.Add(4*i-2);
+                    triangles.Add(4*i-2);
+                    triangles.Add(4*i-1);
+                    triangles.Add(4*i-4);
+                }
             }
             else {
             }
+            
+            meshObj.vertices = vertices.ToArray();
+            meshObj.triangles = triangles.ToArray();
+            
+            meshObj.RecalculateNormals();
+            
+            string ElementName = string.Format(ElementStructureType + "{0}", ElementNum);
+            GameObject Element = new GameObject(ElementName);
+            Element.AddComponent<MeshFilter>().mesh = meshObj;
+            Element.AddComponent<MeshRenderer>().material = material;
+            Element.transform.parent = Elements.transform;
+
             return ElementShapeMesh;
         }
 }
