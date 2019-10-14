@@ -9,8 +9,9 @@ using System.Text;
 using System.Threading;
 using System;
 
+using SFB;
+
 using UnityEngine;
-using UnityEngine.UI;
 
 public class STBReader : MonoBehaviour
 {
@@ -49,15 +50,21 @@ public class STBReader : MonoBehaviour
     private List<float> xStbSecSteelParamA = new List<float>();
     private List<float> xStbSecSteelParamB = new List<float>();
     private List<string> xStbSecSteelType = new List<string>();
-    // private List<Brep> RhinoSlabs = new List<Brep>();
     private List<Mesh> ElementShapeMesh = new List<Mesh>();
     private Mesh[] ElementShapeMeshArray;
-    // private Brep[] RhinoColumns, RhinoGirders, RhinoPosts, RhinoBeams, SteelBraces, ElementShapeBrepArray;
     
     // Start is called before the first frame update
     void Start() {
 
-        var xdoc = XDocument.Load(path);
+        // Open file with filter
+        var extensions = new[] {
+            new ExtensionFilter("ST-Bridge Files", "stb", "STB" ),
+            new ExtensionFilter("All Files", "*" ),
+        };
+        var paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, true)[0];
+
+        var xdoc = XDocument.Load(paths);
+        //var xdoc = XDocument.Load("D:/Document/unity/StbUnity/StbUnity/Assets/StbData/S.STB");
 
         // StbNode の取得
         var xNodes = xdoc.Root.Descendants("StbNode");
