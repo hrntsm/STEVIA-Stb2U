@@ -1,15 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Xml;
+﻿using System.Collections.Generic;
 using System.Xml.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
 using System;
-
-using SFB;
 
 using UnityEngine;
 
@@ -83,8 +74,6 @@ public partial class STBReader : MonoBehaviour {
             ElementShapeMesh = MakeElementsMeshFromVertex(NodeStart, NodeEnd, ElementHight, ElementWidth, ElementShapeType, ElementStructureType, ElementNum, Elements);
             ElementNum = ElementNum + 1;
         }
-        // ElementShapeMeshArray = ElementShapeMesh.ToArray;
-        // return ElementShapeMeshArray;
     }
 
     public List<Mesh> MakeElementsMeshFromVertex(Vector3 NodeStart, Vector3 NodeEnd, float ElementHight, float ElementWidth, string ElementShapeType, string ElementStructureType, int ElementNum, GameObject Elements) {
@@ -257,7 +246,9 @@ public partial class STBReader : MonoBehaviour {
         var vertices = new List<Vector3>();
         var triangles = new List<int>();
         Mesh meshObj = new Mesh();
+        int LoopLength = new int();
         if (this.ElementShapeType == "H") {
+            LoopLength = 4;
             // make upper flange
             vertices.Add(VertexS4);
             vertices.Add(VertexS6);
@@ -273,18 +264,9 @@ public partial class STBReader : MonoBehaviour {
             vertices.Add(VertexS2);
             vertices.Add(VertexE2);
             vertices.Add(VertexE5);
-
-            for (int i = 1; i < 4; ++i) {
-                triangles.Add(4 * i - 4);
-                triangles.Add(4 * i - 3);
-                triangles.Add(4 * i - 2);
-                triangles.Add(4 * i - 2);
-                triangles.Add(4 * i - 1);
-                triangles.Add(4 * i - 4);
-            }
-
         }
         else if (this.ElementShapeType == "BOX") {
+            LoopLength = 5;
             // make upper flange
             vertices.Add(VertexS4);
             vertices.Add(VertexS6);
@@ -305,22 +287,12 @@ public partial class STBReader : MonoBehaviour {
             vertices.Add(VertexS3);
             vertices.Add(VertexE3);
             vertices.Add(VertexE6);
-
-            for (int i = 1; i < 5; ++i) {
-                triangles.Add(4 * i - 4);
-                triangles.Add(4 * i - 3);
-                triangles.Add(4 * i - 2);
-                triangles.Add(4 * i - 2);
-                triangles.Add(4 * i - 1);
-                triangles.Add(4 * i - 4);
-            }
         }
         else if (this.ElementShapeType == "Pipe") {
             Debug.Log("Pipe is not supported");
-            // LineCurve PipeCurve = new LineCurve(NodeStart, NodeEnd);
-            // ElementShapeMesh.Add(Brep.CreatePipe(PipeCurve, ElementHight / 2.0, false, 0, false, GH_Component.DocumentTolerance(), GH_Component.DocumentAngleTolerance())[0]);
         }
         else if (this.ElementShapeType == "L") {
+            LoopLength = 3;
             // make bottom flange
             vertices.Add(VertexS1);
             vertices.Add(VertexS3);
@@ -331,22 +303,21 @@ public partial class STBReader : MonoBehaviour {
             vertices.Add(VertexS3);
             vertices.Add(VertexE3);
             vertices.Add(VertexE6);
-
-            for (int i = 1; i < 3; ++i) {
-                triangles.Add(4 * i - 4);
-                triangles.Add(4 * i - 3);
-                triangles.Add(4 * i - 2);
-                triangles.Add(4 * i - 2);
-                triangles.Add(4 * i - 1);
-                triangles.Add(4 * i - 4);
-            }
         }
         else {
         }
 
+        for (int i = 1; i < LoopLength; ++i) {
+            triangles.Add(4 * i - 4);
+            triangles.Add(4 * i - 3);
+            triangles.Add(4 * i - 2);
+            triangles.Add(4 * i - 2);
+            triangles.Add(4 * i - 1);
+            triangles.Add(4 * i - 4);
+        }
+
         meshObj.vertices = vertices.ToArray();
         meshObj.triangles = triangles.ToArray();
-
         meshObj.RecalculateNormals();
 
         string ElementName = string.Format(ElementStructureType + "{0}", ElementNum);
