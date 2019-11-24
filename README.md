@@ -13,8 +13,8 @@ Quote from [building SMART Japan Structural Design Subcommittee](https://en.buil
 
 ## Environment
 
-+ Unity 2018.4.10f1
-+ ST-Bridge 1.4 (ver2.x is not supported)
++ Unity 2018.4
++ For ST-Bridge 1.4 (ver2.x is not supported)
 
 ## Contact information
 
