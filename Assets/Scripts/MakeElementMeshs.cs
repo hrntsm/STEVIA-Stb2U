@@ -5,6 +5,58 @@ using System;
 using UnityEngine;
 
 public partial class STBReader : MonoBehaviour {
+    void MakeSlabObjs(XDocument xdoc) {
+        int[] NodeIndex = new int[4];
+        string SlabName;
+        int SlabNum = 0;
+        var xSlabs = xdoc.Root.Descendants("StbSlab");
+        GameObject Slabs = new GameObject("StbSlabs");
+
+        foreach (var xSlab in xSlabs) {
+            List<int> xSlabNodeIDs = new List<int>();
+            var vertices = new List<Vector3>();
+            var triangles = new List<int>();
+            int CountNode = 0;
+            Mesh meshObj = new Mesh();
+
+            var xNodeids = xSlab.Element("StbNodeid_List").Elements("StbNodeid");
+            foreach (var xNodeid in xNodeids) {
+                xSlabNodeIDs.Add((int)xNodeid.Attribute("id"));
+                CountNode++;
+            }
+
+            int i = 0;
+            while (i < 4) {
+                // 頂点座標の取得
+                NodeIndex[i] = VertexIDs.IndexOf(xSlabNodeIDs[i]);
+                // Unityでの頂点座標の生成
+                vertices.Add(StbNodes[NodeIndex[i]]);
+                i++;
+            }
+
+            // Unityでの三角形メッシュの生成
+            triangles.Add(CountNode - 4);
+            triangles.Add(CountNode - 3);
+            triangles.Add(CountNode - 2);
+            triangles.Add(CountNode - 2);
+            triangles.Add(CountNode - 1);
+            triangles.Add(CountNode - 4);
+
+            meshObj.vertices = vertices.ToArray();
+            meshObj.triangles = triangles.ToArray();
+            meshObj.RecalculateNormals();
+
+            SlabName = string.Format("Slab{0}", SlabNum);
+            GameObject Slab = new GameObject(SlabName);
+            Slab.AddComponent<MeshFilter>().mesh = meshObj;
+            Slab.AddComponent<MeshRenderer>().material = material;
+            Slab.transform.parent = Slabs.transform;
+
+            SlabNum++;
+            xSlabNodeIDs.Clear(); // foreachごとでListにAddし続けてるのでここで値をClear
+        }
+    }
+
     void MakeElementMesh(XDocument xdoc, string xDateTag, string ElementStructureType) {
         ElementShapeMesh.Clear();
 

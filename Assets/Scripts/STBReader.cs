@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Xml.Linq;
-
 using SFB;
-
 using UnityEngine;
 
-public partial class STBReader : MonoBehaviour{
+public partial class STBReader:MonoBehaviour {
     // Unity 関連の引数定義
     // メッシュ表示コンポーネント
     private MeshRenderer meshRenderer;
@@ -13,18 +11,17 @@ public partial class STBReader : MonoBehaviour{
     public Material material;
 
     public string path;
-    private string  ElementShape, xElementKind, ElementShapeType;
-    private int NodeID, 
-                NodeIndex_i, NodeIndex_j, NodeIndex_k, NodeIndex_l, NodeIndexStart, NodeIndexEnd,
+    private string ElementShape, xElementKind, ElementShapeType;
+    private int NodeID,
+                NodeIndexStart, NodeIndexEnd,
                 xNodeStart, xNodeEnd, xElementIdSection,
-                StbSecIndex,  ElementIdSection;
+                StbSecIndex, ElementIdSection;
     private float xPos, yPos, zPos, ElementAngleY, ElementAngleZ, ElementHight, ElementWidth;
-    private Vector3 NodeStart, NodeEnd, 
+    private Vector3 NodeStart, NodeEnd,
                      VertexS1, VertexS2, VertexS3, VertexS4, VertexS5, VertexS6,
                      VertexE1, VertexE2, VertexE3, VertexE4, VertexE5, VertexE6;
     private List<Vector3> StbNodes = new List<Vector3>();
     private List<int> VertexIDs = new List<int>();
-    private List<int> xSlabNodeIDs = new List<int>();
     private List<int> xSecRcColumnId = new List<int>();
     private List<int> xSecRcColumnDepth = new List<int>();
     private List<int> xSecRcColumnWidth = new List<int>();
@@ -43,7 +40,7 @@ public partial class STBReader : MonoBehaviour{
     private List<string> xStbSecSteelType = new List<string>();
     private List<Mesh> ElementShapeMesh = new List<Mesh>();
     private Mesh[] ElementShapeMeshArray;
-    
+
     // Start is called before the first frame update
     void Start() {
 
@@ -55,70 +52,22 @@ public partial class STBReader : MonoBehaviour{
         var paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, true)[0];
 
         var xdoc = XDocument.Load(paths);
-        //var xdoc = XDocument.Load("D:/Document/unity/StbUnity/StbUnity/Assets/StbData/S.STB");
 
         // StbNode の取得
         var xNodes = xdoc.Root.Descendants("StbNode");
         foreach (var xNode in xNodes) {
             // unity は 1 が 1m なので1000で割ってる
-            xPos = (float)xNode.Attribute("x")/1000;
-            yPos = (float)xNode.Attribute("z")/1000; // unityは Z-Up
-            zPos = (float)xNode.Attribute("y")/1000;
+            xPos = (float)xNode.Attribute("x") / 1000;
+            yPos = (float)xNode.Attribute("z") / 1000; // unityは Z-Up
+            zPos = (float)xNode.Attribute("y") / 1000;
             NodeID = (int)xNode.Attribute("id");
-            
+
             StbNodes.Add(new Vector3(xPos, yPos, zPos));
             VertexIDs.Add(NodeID);
         }
-        
-        // StbSlabs の取得
-        var xSlabs = xdoc.Root.Descendants("StbSlab");
-        int SlabNum = 0;
-        GameObject Slabs = new GameObject("StbSlabs");
-        foreach (var xSlab in xSlabs) {
-            var vertices = new List<Vector3>();
-            var triangles = new List<int>();
-            int CountNode = 0;
-            Mesh meshObj = new Mesh();
 
-            var xNodeids = xSlab.Element("StbNodeid_List")
-                                .Elements("StbNodeid");
-            foreach (var xNodeid in xNodeids) {
-                xSlabNodeIDs.Add((int)xNodeid.Attribute("id"));
-                CountNode = CountNode + 1;
-            }
-
-            NodeIndex_i = VertexIDs.IndexOf(xSlabNodeIDs[0]);
-            NodeIndex_j = VertexIDs.IndexOf(xSlabNodeIDs[1]);
-            NodeIndex_k = VertexIDs.IndexOf(xSlabNodeIDs[2]);
-            NodeIndex_l = VertexIDs.IndexOf(xSlabNodeIDs[3]);
-
-            xSlabNodeIDs.Clear(); // foreachごとでListにAddし続けてるのでここで値をClear
-
-            // Unityでの頂点座標の生成
-            vertices.Add(StbNodes[NodeIndex_i]);
-            vertices.Add(StbNodes[NodeIndex_j]);
-            vertices.Add(StbNodes[NodeIndex_k]);
-            vertices.Add(StbNodes[NodeIndex_l]);
-            // Unityでの三角形メッシュの生成
-            triangles.Add(CountNode-4);
-            triangles.Add(CountNode-3);
-            triangles.Add(CountNode-2);
-            triangles.Add(CountNode-2);
-            triangles.Add(CountNode-1);
-            triangles.Add(CountNode-4);
-
-            meshObj.vertices = vertices.ToArray();
-            meshObj.triangles = triangles.ToArray();
-
-            meshObj.RecalculateNormals();
-
-            string SlabName = string.Format("Slab{0}", SlabNum);
-            SlabNum = SlabNum + 1;
-            GameObject Slab = new GameObject(SlabName);
-            Slab.AddComponent<MeshFilter>().mesh = meshObj;
-            Slab.AddComponent<MeshRenderer>().material = material;
-            Slab.transform.parent = Slabs.transform;
-        }
+        // StbSlabs の取得とスラブの作成
+        MakeSlabObjs(xdoc);
 
         // StbSecColumn_RC の取得
         var xSecRcColumns = xdoc.Root.Descendants("StbSecColumn_RC");
@@ -133,7 +82,7 @@ public partial class STBReader : MonoBehaviour{
             }
             else {
                 xSecRcColumnDepth.Add((int)xSecFigure.Element("StbSecCircle").Attribute("D"));
-                xSecRcColumnWidth.Add( 0 ); // Circle と判定用に width は 0
+                xSecRcColumnWidth.Add(0); // Circle と判定用に width は 0
             }
         }
 
@@ -149,12 +98,12 @@ public partial class STBReader : MonoBehaviour{
         foreach (var xSecRcBeam in xSecRcBeams) {
             xSecRcBeamId.Add((int)xSecRcBeam.Attribute("id"));
             var xSecFigure = xSecRcBeam.Element("StbSecFigure");
-            
+
             // 子要素が StbSecHaunch か StbSecStraight を判定
             if (xSecFigure.Element("StbSecHaunch") != null) {
                 xSecRcBeamDepth.Add((int)xSecFigure.Element("StbSecHaunch").Attribute("depth_center"));
                 xSecRcBeamWidth.Add((int)xSecFigure.Element("StbSecHaunch").Attribute("width_center"));
-            } 
+            }
             else {
                 xSecRcBeamDepth.Add((int)xSecFigure.Element("StbSecStraight").Attribute("depth"));
                 xSecRcBeamWidth.Add((int)xSecFigure.Element("StbSecStraight").Attribute("width"));
@@ -174,7 +123,7 @@ public partial class STBReader : MonoBehaviour{
             xSecSBraceId.Add((int)xSecSBrace.Attribute("id"));
             xSecSBraceShape.Add((string)xSecSBrace.Element("StbSecSteelBrace").Attribute("shape"));
         }
-        
+
         // S断面形状の取得
         GetStbSteelSection(xdoc, "StbSecRoll-H", "H");
         GetStbSteelSection(xdoc, "StbSecBuild-H", "H");
