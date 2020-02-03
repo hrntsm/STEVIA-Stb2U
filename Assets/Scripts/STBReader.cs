@@ -5,12 +5,9 @@ using UnityEngine;
 
 public partial class STBReader:MonoBehaviour {
     // Unity 関連の引数定義
-    // メッシュ表示コンポーネント
     private MeshRenderer meshRenderer;
-    // メッシュに設定するマテリアル
     public Material material;
 
-    public string path;
     private string ElementShape, xElementKind, ElementShapeType;
     private int NodeID,
                 NodeIndexStart, NodeIndexEnd,
@@ -45,13 +42,7 @@ public partial class STBReader:MonoBehaviour {
     void Start() {
 
         // Open file with filter
-        var extensions = new[] {
-            new ExtensionFilter("ST-Bridge Files", "stb", "STB" ),
-            new ExtensionFilter("All Files", "*" ),
-        };
-        var paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, true)[0];
-
-        var xdoc = XDocument.Load(paths);
+        XDocument xdoc = GetStbFileData();
 
         // StbNode の取得
         var xNodes = xdoc.Root.Descendants("StbNode");
@@ -139,5 +130,15 @@ public partial class STBReader:MonoBehaviour {
         MakeElementMesh(xdoc, "StbPost", "Column");
         MakeElementMesh(xdoc, "StbBeam", "Beam");
         MakeElementMesh(xdoc, "StbBrace", "Brace");
+    }
+
+    XDocument GetStbFileData() {
+        var extensions = new[] {
+            new ExtensionFilter("ST-Bridge Files", "stb", "STB" ),
+            new ExtensionFilter("All Files", "*" ),
+        };
+        string paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, true)[0];
+        XDocument xdoc = XDocument.Load(paths);
+        return (xdoc);
     }
 }
