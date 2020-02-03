@@ -9,7 +9,7 @@ public partial class STBReader:MonoBehaviour {
     public Material material;
 
     private string ElementShape, xElementKind, ElementShapeType;
-    private int NodeID,
+    private int i, NodeID,
                 NodeIndexStart, NodeIndexEnd,
                 xNodeStart, xNodeEnd, xElementIdSection,
                 StbSecIndex, ElementIdSection;
@@ -116,20 +116,20 @@ public partial class STBReader:MonoBehaviour {
         }
 
         // S断面形状の取得
-        GetStbSteelSection(xdoc, "StbSecRoll-H", "H");
-        GetStbSteelSection(xdoc, "StbSecBuild-H", "H");
-        GetStbSteelSection(xdoc, "StbSecRoll-BOX", "BOX");
-        GetStbSteelSection(xdoc, "StbSecBuild-BOX", "BOX");
-        GetStbSteelSection(xdoc, "StbSecPipe", "Pipe");
-        GetStbSteelSection(xdoc, "StbSecRoll-L", "L");
-        GetStbSteelSection(xdoc, "StbSecRoll-Bar", "Bar");
+        i = 0;
+        string[,] SteelSecName = GetSteelSecNameArray();
+        while (i < SteelSecName.GetLength(0)) {
+            GetStbSteelSection(xdoc, SteelSecName[i, 0], SteelSecName[i, 1]);
+            i++;
+        } 
 
         // 断面の生成
-        MakeElementMesh(xdoc, "StbColumn", "Column");
-        MakeElementMesh(xdoc, "StbGirder", "Beam");
-        MakeElementMesh(xdoc, "StbPost", "Column");
-        MakeElementMesh(xdoc, "StbBeam", "Beam");
-        MakeElementMesh(xdoc, "StbBrace", "Brace");
+        i = 0;
+        string[,] MemberName = GetMemberNameArray();
+        while (i < MemberName.GetLength(0)) {
+            MakeElementMesh(xdoc, MemberName[i, 0], MemberName[i, 1]);
+            i++;
+        }
     }
 
     XDocument GetStbFileData() {
@@ -140,5 +140,29 @@ public partial class STBReader:MonoBehaviour {
         string paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, true)[0];
         XDocument xdoc = XDocument.Load(paths);
         return (xdoc);
+    }
+
+    string[,] GetSteelSecNameArray() {
+        string[,] SteelSecNameArray = new string[7, 2] {
+            {"StbSecRoll-H", "H"},
+            {"StbSecBuild-H", "H"},
+            {"StbSecRoll-BOX", "BOX"},
+            {"StbSecBuild-BOX", "BOX"},
+            {"StbSecPipe", "Pipe"},
+            {"StbSecRoll-L", "L"},
+            {"StbSecRoll-Bar", "Bar"}
+        };
+        return (SteelSecNameArray);
+    }
+
+    string[,] GetMemberNameArray() {
+        string[,] MemberNameArray = new string[5, 2] {
+            {"StbColumn", "Column"},
+            {"StbGirder", "Beam"},
+            {"StbPost", "Column"},
+            {"StbBeam", "Beam"},
+            {"StbBrace", "Brace"}
+        };
+        return (MemberNameArray);
     }
 }
