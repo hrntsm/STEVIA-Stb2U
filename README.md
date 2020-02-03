@@ -1,4 +1,4 @@
-# StbToUnity
+# Stb2Unity
 
 Read ST-Bridge file(.stb) and display its model to Unity
 
