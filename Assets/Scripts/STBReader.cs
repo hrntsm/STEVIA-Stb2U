@@ -5,7 +5,6 @@ using UnityEngine;
 
 public partial class STBReader:MonoBehaviour {
     // Unity 関連の引数定義
-    private MeshRenderer meshRenderer;
     public Material material;
 
     private string ElementShape, xElementKind, ElementShapeType;
