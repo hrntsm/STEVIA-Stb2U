@@ -5,6 +5,10 @@ using System;
 using UnityEngine;
 
 public partial class STBReader : MonoBehaviour {
+    /// <summary>
+    /// Make Slab GameObjects
+    /// </summary>
+    /// <param name="xdoc">stbdata</param>
     void MakeSlabObjs(XDocument xdoc) {
         int[] NodeIndex = new int[4];
         string SlabName;
@@ -85,13 +89,13 @@ public partial class STBReader : MonoBehaviour {
                 // 断面形状名（shape) と 断面形状（HxB）の取得の取得
                 if (ElementStructureType == "Beam") {
                     StbSecIndex = xSecRcBeamId.IndexOf(xElementIdSection);
-                    ElementHight = xSecRcBeamDepth[StbSecIndex] / 1000;
-                    ElementWidth = xSecRcBeamWidth[StbSecIndex] / 1000;
+                    ElementHight = xSecRcBeamDepth[StbSecIndex] / 1000f;
+                    ElementWidth = xSecRcBeamWidth[StbSecIndex] / 1000f;
                 }
                 else if (ElementStructureType == "Column") {
                     StbSecIndex = xSecRcColumnId.IndexOf(xElementIdSection);
-                    ElementHight = xSecRcColumnDepth[StbSecIndex] / 1000;
-                    ElementWidth = xSecRcColumnWidth[StbSecIndex] / 1000;
+                    ElementHight = xSecRcColumnDepth[StbSecIndex] / 1000f;
+                    ElementWidth = xSecRcColumnWidth[StbSecIndex] / 1000f;
                 }
 
                 if (ElementWidth == 0) {
@@ -117,8 +121,8 @@ public partial class STBReader : MonoBehaviour {
                 }
                 // 断面形状（HxB）の取得の取得
                 StbSecIndex = xStbSecSteelName.IndexOf(ElementShape);
-                ElementHight = xStbSecSteelParamA[StbSecIndex] / 1000;
-                ElementWidth = xStbSecSteelParamB[StbSecIndex] / 1000;
+                ElementHight = xStbSecSteelParamA[StbSecIndex] / 1000f;
+                ElementWidth = xStbSecSteelParamB[StbSecIndex] / 1000f;
                 ElementShapeType = xStbSecSteelType[StbSecIndex];
             }
 
