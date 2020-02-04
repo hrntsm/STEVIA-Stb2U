@@ -20,27 +20,19 @@ public partial class STBReader : MonoBehaviour {
             List<int> xSlabNodeIDs = new List<int>();
             var vertices = new List<Vector3>();
             var triangles = new List<int>();
-            int CountNode = 0;
             Mesh meshObj = new Mesh();
 
             var xNodeids = xSlab.Element("StbNodeid_List").Elements("StbNodeid");
             foreach (var xNodeid in xNodeids) {
                 xSlabNodeIDs.Add((int)xNodeid.Attribute("id"));
-                CountNode++;
             }
-
             int i = 0;
             while (i < 4) {
-                // 頂点座標の取得
                 NodeIndex[i] = VertexIDs.IndexOf(xSlabNodeIDs[i]);
-                // Unityでの頂点座標の生成
                 vertices.Add(StbNodes[NodeIndex[i]]);
                 i++;
             }
-
-            // Unityでの三角形メッシュ情報の頂点情報生成
             triangles = GetTriangles(triangles, 1);
-
             meshObj.vertices = vertices.ToArray();
             meshObj.triangles = triangles.ToArray();
             meshObj.RecalculateNormals();
@@ -303,65 +295,28 @@ public partial class STBReader : MonoBehaviour {
         var vertices = new List<Vector3>();
         var triangles = new List<int>();
         Mesh meshObj = new Mesh();
-        int MeshNum = new int();
-        if (this.ElementShapeType == "H") {
+        int MeshNum = 0;
+        if (ElementShapeType == "H") {
             MeshNum = 3;
-            // make upper flange
-            vertices.Add(VertexS[3]);
-            vertices.Add(VertexS[5]);
-            vertices.Add(VertexE[5]);
-            vertices.Add(VertexE[3]);
-            // make bottom flange
-            vertices.Add(VertexS[0]);
-            vertices.Add(VertexS[2]);
-            vertices.Add(VertexE[2]);
-            vertices.Add(VertexE[0]);
-            // make web 
-            vertices.Add(VertexS[4]);
-            vertices.Add(VertexS[1]);
-            vertices.Add(VertexE[1]);
-            vertices.Add(VertexE[4]);
+            AddUpperFlangeVertices(vertices, VertexS, VertexE);
+            AddBottomFlangeVertices(vertices, VertexS, VertexE);
+            AddCenterWebVertices(vertices, VertexS, VertexE);
         }
-        else if (this.ElementShapeType == "BOX") {
+        else if (ElementShapeType == "BOX") {
             MeshNum = 4;
-            // make upper flange
-            vertices.Add(VertexS[3]);
-            vertices.Add(VertexS[5]);
-            vertices.Add(VertexE[5]);
-            vertices.Add(VertexE[3]);
-            // make bottom flange
-            vertices.Add(VertexS[0]);
-            vertices.Add(VertexS[2]);
-            vertices.Add(VertexE[2]);
-            vertices.Add(VertexE[0]);
-            // make web 1
-            vertices.Add(VertexS[3]);
-            vertices.Add(VertexS[0]);
-            vertices.Add(VertexE[0]);
-            vertices.Add(VertexE[3]);
-            // make web 2
-            vertices.Add(VertexS[5]);
-            vertices.Add(VertexS[2]);
-            vertices.Add(VertexE[2]);
-            vertices.Add(VertexE[5]);
+            AddUpperFlangeVertices(vertices, VertexS, VertexE);
+            AddBottomFlangeVertices(vertices, VertexS, VertexE);
+            AddSide1WebVertices(vertices, VertexS, VertexE);
+            AddSide2WebVertices(vertices, VertexS, VertexE);
         }
-        else if (this.ElementShapeType == "Pipe") {
+        else if (ElementShapeType == "Pipe") {
             Debug.Log("Pipe is not supported");
         }
-        else if (this.ElementShapeType == "L") {
+        else if (ElementShapeType == "L") {
             MeshNum = 2;
-            // make bottom flange
-            vertices.Add(VertexS[0]);
-            vertices.Add(VertexS[2]);
-            vertices.Add(VertexE[2]);
-            vertices.Add(VertexE[0]);
-            // make web
-            vertices.Add(VertexS[5]);
-            vertices.Add(VertexS[2]);
-            vertices.Add(VertexE[2]);
-            vertices.Add(VertexE[5]);
+            AddBottomFlangeVertices(vertices, VertexS, VertexE);
+            AddSide2WebVertices(vertices, VertexS, VertexE);
         }
-
         triangles = GetTriangles(triangles, MeshNum);
         meshObj.vertices = vertices.ToArray();
         meshObj.triangles = triangles.ToArray();
@@ -375,6 +330,7 @@ public partial class STBReader : MonoBehaviour {
 
         return ElementShapeMesh;
     }
+
     /// <summary>
     /// Get triangles vertex infomation
     /// </summary>
@@ -390,5 +346,41 @@ public partial class STBReader : MonoBehaviour {
             triangles.Add(4 * i - 4);
         }
         return (triangles);
+    }
+
+    List<Vector3> AddUpperFlangeVertices(List<Vector3> vertices, Vector3[] VertexS, Vector3[] VertexE) {
+        vertices.Add(VertexS[3]);
+        vertices.Add(VertexS[5]);
+        vertices.Add(VertexE[5]);
+        vertices.Add(VertexE[3]);
+        return (vertices);
+    }
+    List<Vector3> AddBottomFlangeVertices(List<Vector3> vertices, Vector3[] VertexS, Vector3[] VertexE) {
+        vertices.Add(VertexS[0]);
+        vertices.Add(VertexS[2]);
+        vertices.Add(VertexE[2]);
+        vertices.Add(VertexE[0]);
+        return (vertices);
+    }
+    List<Vector3> AddCenterWebVertices(List<Vector3> vertices, Vector3[] VertexS, Vector3[] VertexE) {
+        vertices.Add(VertexS[4]);
+        vertices.Add(VertexS[1]);
+        vertices.Add(VertexE[1]);
+        vertices.Add(VertexE[4]);
+        return (vertices);
+    }
+    List<Vector3> AddSide1WebVertices(List<Vector3> vertices, Vector3[] VertexS, Vector3[] VertexE) {
+        vertices.Add(VertexS[3]);
+        vertices.Add(VertexS[0]);
+        vertices.Add(VertexE[0]);
+        vertices.Add(VertexE[3]);
+        return (vertices);
+    }
+    List<Vector3> AddSide2WebVertices(List<Vector3> vertices, Vector3[] VertexS, Vector3[] VertexE) {
+        vertices.Add(VertexS[5]);
+        vertices.Add(VertexS[2]);
+        vertices.Add(VertexE[2]);
+        vertices.Add(VertexE[5]);
+        return (vertices);
     }
 }
