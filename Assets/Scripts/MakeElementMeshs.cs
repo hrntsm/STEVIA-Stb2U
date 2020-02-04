@@ -9,7 +9,7 @@ public partial class STBReader : MonoBehaviour {
     /// Make Slab GameObjects
     /// </summary>
     /// <param name="xdoc">stbdata</param>
-    void MakeSlabObjs(XDocument xdoc) {
+    static void MakeSlabObjs(XDocument xdoc) {
         int[] NodeIndex = new int[4];
         string SlabName;
         int SlabNum = 0;
@@ -40,7 +40,9 @@ public partial class STBReader : MonoBehaviour {
             SlabName = string.Format("Slab{0}", SlabNum);
             GameObject Slab = new GameObject(SlabName);
             Slab.AddComponent<MeshFilter>().mesh = meshObj;
-            Slab.AddComponent<MeshRenderer>().material = material;
+            Slab.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
+                color = new Color(1.0f, 1.0f, 1.0f, 1.0f)
+            };
             Slab.transform.parent = Slabs.transform;
 
             SlabNum++;
@@ -48,7 +50,7 @@ public partial class STBReader : MonoBehaviour {
         }
     }
 
-    void MakeElementMesh(XDocument xdoc, string xDateTag, string ElementStructureType) {
+    static void MakeElementMesh(XDocument xdoc, string xDateTag, string ElementStructureType) {
         Vector3 NodeStart, NodeEnd;
         float   ElementHight = 0;
         float   ElementWidth = 0;
@@ -128,7 +130,7 @@ public partial class STBReader : MonoBehaviour {
         ElementShapeMesh.Clear();
     }
 
-    public List<Mesh> MakeElementsMeshFromVertex(Vector3 NodeStart, Vector3 NodeEnd, float ElementHight, float ElementWidth, string ElementShapeType, string ElementStructureType, int ElementNum, GameObject Elements) {
+    static public List<Mesh> MakeElementsMeshFromVertex(Vector3 NodeStart, Vector3 NodeEnd, float ElementHight, float ElementWidth, string ElementShapeType, string ElementStructureType, int ElementNum, GameObject Elements) {
         float ElementAngleY, ElementAngleZ;
         Vector3[] VertexS = new Vector3[6];
         Vector3[] VertexE = new Vector3[6];
@@ -331,7 +333,9 @@ public partial class STBReader : MonoBehaviour {
         string ElementName = string.Format(ElementStructureType + "{0}", ElementNum);
         GameObject Element = new GameObject(ElementName);
         Element.AddComponent<MeshFilter>().mesh = meshObj;
-        Element.AddComponent<MeshRenderer>().material = material;
+        Element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
+            color = new Color(1.0f, 1.0f, 1.0f, 1.0f)
+        }; ;
         Element.transform.parent = Elements.transform;
 
         return ElementShapeMesh;
@@ -342,7 +346,7 @@ public partial class STBReader : MonoBehaviour {
     /// </summary>
     /// <param name="triangles"></param>
     /// <param name="LoopLength"></param>
-    List<int> GetTriangles(List<int> triangles, int MeshNum) {
+    static List<int> GetTriangles(List<int> triangles, int MeshNum) {
         for (int i = 1; i <= MeshNum; ++i) {
             triangles.Add(4 * i - 4);
             triangles.Add(4 * i - 3);
@@ -354,35 +358,35 @@ public partial class STBReader : MonoBehaviour {
         return (triangles);
     }
 
-    List<Vector3> AddUpperFlangeVertices(List<Vector3> vertices, Vector3[] VertexS, Vector3[] VertexE) {
+    static List<Vector3> AddUpperFlangeVertices(List<Vector3> vertices, Vector3[] VertexS, Vector3[] VertexE) {
         vertices.Add(VertexS[3]);
         vertices.Add(VertexS[5]);
         vertices.Add(VertexE[5]);
         vertices.Add(VertexE[3]);
         return (vertices);
     }
-    List<Vector3> AddBottomFlangeVertices(List<Vector3> vertices, Vector3[] VertexS, Vector3[] VertexE) {
+    static List<Vector3> AddBottomFlangeVertices(List<Vector3> vertices, Vector3[] VertexS, Vector3[] VertexE) {
         vertices.Add(VertexS[0]);
         vertices.Add(VertexS[2]);
         vertices.Add(VertexE[2]);
         vertices.Add(VertexE[0]);
         return (vertices);
     }
-    List<Vector3> AddCenterWebVertices(List<Vector3> vertices, Vector3[] VertexS, Vector3[] VertexE) {
+    static List<Vector3> AddCenterWebVertices(List<Vector3> vertices, Vector3[] VertexS, Vector3[] VertexE) {
         vertices.Add(VertexS[4]);
         vertices.Add(VertexS[1]);
         vertices.Add(VertexE[1]);
         vertices.Add(VertexE[4]);
         return (vertices);
     }
-    List<Vector3> AddSide1WebVertices(List<Vector3> vertices, Vector3[] VertexS, Vector3[] VertexE) {
+    static List<Vector3> AddSide1WebVertices(List<Vector3> vertices, Vector3[] VertexS, Vector3[] VertexE) {
         vertices.Add(VertexS[3]);
         vertices.Add(VertexS[0]);
         vertices.Add(VertexE[0]);
         vertices.Add(VertexE[3]);
         return (vertices);
     }
-    List<Vector3> AddSide2WebVertices(List<Vector3> vertices, Vector3[] VertexS, Vector3[] VertexE) {
+    static List<Vector3> AddSide2WebVertices(List<Vector3> vertices, Vector3[] VertexS, Vector3[] VertexE) {
         vertices.Add(VertexS[5]);
         vertices.Add(VertexS[2]);
         vertices.Add(VertexE[2]);

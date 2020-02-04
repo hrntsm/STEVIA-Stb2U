@@ -4,7 +4,7 @@ using UnityEngine;
 
 public partial class STBReader : MonoBehaviour {
 
-    void GetStbSteelSection(XDocument xdoc, string xDateTag, string SectionType) {
+    static void GetStbSteelSection(XDocument xdoc, string xDateTag, string SectionType) {
         if (SectionType == "Pipe") {
             var xSteelSections = xdoc.Root.Descendants(xDateTag);
             foreach (var xSteelSection in xSteelSections) {

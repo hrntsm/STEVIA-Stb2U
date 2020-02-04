@@ -2,33 +2,34 @@
 using System.Xml.Linq;
 using SFB;
 using UnityEngine;
+using UnityEditor;
 
+[ExecuteInEditMode]
 public partial class STBReader:MonoBehaviour {
-    public Material material;
-    private List<Vector3> StbNodes = new List<Vector3>();
-    private List<int> VertexIDs = new List<int>();
-    private int i;
+    static List<Vector3> StbNodes = new List<Vector3>();
+    static List<int> VertexIDs = new List<int>();
+    static int i;
 
-    private List<int> xSecRcColumnId = new List<int>();
-    private List<int> xSecRcColumnDepth = new List<int>();
-    private List<int> xSecRcColumnWidth = new List<int>();
-    private List<int> xSecSColumnId = new List<int>();
-    private List<string> xSecSColumnShape = new List<string>();
-    private List<int> xSecRcBeamId = new List<int>();
-    private List<int> xSecRcBeamDepth = new List<int>();
-    private List<int> xSecRcBeamWidth = new List<int>();
-    private List<int> xSecSBeamId = new List<int>();
-    private List<string> xSecSBeamShape = new List<string>();
-    private List<int> xSecSBraceId = new List<int>();
-    private List<string> xSecSBraceShape = new List<string>();
-    private List<string> xStbSecSteelName = new List<string>();
-    private List<float> xStbSecSteelParamA = new List<float>();
-    private List<float> xStbSecSteelParamB = new List<float>();
-    private List<string> xStbSecSteelType = new List<string>();
-    private List<Mesh> ElementShapeMesh = new List<Mesh>();
+    static List<int> xSecRcColumnId = new List<int>();
+    static List<int> xSecRcColumnDepth = new List<int>();
+    static List<int> xSecRcColumnWidth = new List<int>();
+    static List<int> xSecSColumnId = new List<int>();
+    static List<string> xSecSColumnShape = new List<string>();
+    static List<int> xSecRcBeamId = new List<int>();
+    static List<int> xSecRcBeamDepth = new List<int>();
+    static List<int> xSecRcBeamWidth = new List<int>();
+    static List<int> xSecSBeamId = new List<int>();
+    static List<string> xSecSBeamShape = new List<string>();
+    static List<int> xSecSBraceId = new List<int>();
+    static List<string> xSecSBraceShape = new List<string>();
+    static List<string> xStbSecSteelName = new List<string>();
+    static List<float> xStbSecSteelParamA = new List<float>();
+    static List<float> xStbSecSteelParamB = new List<float>();
+    static List<string> xStbSecSteelType = new List<string>();
+    static List<Mesh> ElementShapeMesh = new List<Mesh>();
 
-    // Start is called before the first frame update
-    void Start() {
+    [MenuItem("Stb2U/Open .stb File")]
+    public static void StbUI() {
         XDocument xdoc = GetStbFileData();
         GetStbNodes(xdoc, StbNodes, VertexIDs);
         MakeSlabObjs(xdoc);
@@ -98,7 +99,7 @@ public partial class STBReader:MonoBehaviour {
         }
     }
 
-    XDocument GetStbFileData() {
+    static XDocument GetStbFileData() {
         var extensions = new[] {
             new ExtensionFilter("ST-Bridge Files", "stb", "STB" ),
             new ExtensionFilter("All Files", "*" ),
@@ -108,7 +109,7 @@ public partial class STBReader:MonoBehaviour {
         return (xdoc);
     }
 
-    void GetStbNodes(XDocument xdoc, List<Vector3> StbNodes, List<int> VertexIDs) {
+    static void GetStbNodes(XDocument xdoc, List<Vector3> StbNodes, List<int> VertexIDs) {
         float xPos, yPos, zPos;
         int NodeID;
         var xNodes = xdoc.Root.Descendants("StbNode");
@@ -125,7 +126,7 @@ public partial class STBReader:MonoBehaviour {
         }
     }
 
-    string[,] GetSteelSecNameArray() {
+    static string[,] GetSteelSecNameArray() {
         string[,] SteelSecNameArray = new string[7, 2] {
             {"StbSecRoll-H", "H"},
             {"StbSecBuild-H", "H"},
@@ -138,7 +139,7 @@ public partial class STBReader:MonoBehaviour {
         return (SteelSecNameArray);
     }
 
-    string[,] GetMemberNameArray() {
+    static string[,] GetMemberNameArray() {
         string[,] MemberNameArray = new string[5, 2] {
             {"StbColumn", "Column"},
             {"StbGirder", "Beam"},
