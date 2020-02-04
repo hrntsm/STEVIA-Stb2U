@@ -4,20 +4,21 @@ using SFB;
 using UnityEngine;
 
 public partial class STBReader:MonoBehaviour {
-    // Unity 関連の引数定義
+    // 確認済みのここで定義すべき引数
     public Material material;
+    private List<Vector3> StbNodes = new List<Vector3>();
+    private List<int> VertexIDs = new List<int>();
+    private int i;
 
+    // ここで定義すべきか未確認の引数
     private string ElementShape, xElementKind, ElementShapeType;
-    private int i, NodeID,
-                NodeIndexStart, NodeIndexEnd,
+    private int NodeIndexStart, NodeIndexEnd,
                 xNodeStart, xNodeEnd, xElementIdSection,
                 StbSecIndex, ElementIdSection;
-    private float xPos, yPos, zPos, ElementAngleY, ElementAngleZ, ElementHight, ElementWidth;
+    private float ElementAngleY, ElementAngleZ, ElementHight, ElementWidth;
     private Vector3 NodeStart, NodeEnd,
                      VertexS1, VertexS2, VertexS3, VertexS4, VertexS5, VertexS6,
                      VertexE1, VertexE2, VertexE3, VertexE4, VertexE5, VertexE6;
-    private List<Vector3> StbNodes = new List<Vector3>();
-    private List<int> VertexIDs = new List<int>();
     private List<int> xSecRcColumnId = new List<int>();
     private List<int> xSecRcColumnDepth = new List<int>();
     private List<int> xSecRcColumnWidth = new List<int>();
@@ -39,22 +40,11 @@ public partial class STBReader:MonoBehaviour {
 
     // Start is called before the first frame update
     void Start() {
-
         // Open file with filter
         XDocument xdoc = GetStbFileData();
 
         // StbNode の取得
-        var xNodes = xdoc.Root.Descendants("StbNode");
-        foreach (var xNode in xNodes) {
-            // unity は 1 が 1m なので1000で割ってる
-            xPos = (float)xNode.Attribute("x") / 1000;
-            yPos = (float)xNode.Attribute("z") / 1000; // unityは Z-Up
-            zPos = (float)xNode.Attribute("y") / 1000;
-            NodeID = (int)xNode.Attribute("id");
-
-            StbNodes.Add(new Vector3(xPos, yPos, zPos));
-            VertexIDs.Add(NodeID);
-        }
+        GetStbNodes(xdoc, StbNodes, VertexIDs);
 
         // StbSlabs の取得とスラブの作成
         MakeSlabObjs(xdoc);
@@ -139,6 +129,23 @@ public partial class STBReader:MonoBehaviour {
         string paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, true)[0];
         XDocument xdoc = XDocument.Load(paths);
         return (xdoc);
+    }
+
+    void GetStbNodes(XDocument xdoc, List<Vector3> StbNodes, List<int> VertexIDs) {
+        float xPos, yPos, zPos;
+        int NodeID;
+        var xNodes = xdoc.Root.Descendants("StbNode");
+
+        foreach (var xNode in xNodes) {
+            // unity は 1 が 1m なので1000で割ってる
+            xPos = (float) xNode.Attribute("x") / 1000;
+            yPos = (float) xNode.Attribute("z") / 1000; // unityは Z-Up
+            zPos = (float) xNode.Attribute("y") / 1000;
+            NodeID = (int) xNode.Attribute("id");
+
+            StbNodes.Add(new Vector3(xPos, yPos, zPos));
+            VertexIDs.Add(NodeID);
+        }
     }
 
     string[,] GetSteelSecNameArray() {
