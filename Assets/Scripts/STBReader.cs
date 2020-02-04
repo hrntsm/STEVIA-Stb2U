@@ -32,7 +32,6 @@ public partial class STBReader:MonoBehaviour {
     private List<float> xStbSecSteelParamB = new List<float>();
     private List<string> xStbSecSteelType = new List<string>();
     private List<Mesh> ElementShapeMesh = new List<Mesh>();
-    private Mesh[] ElementShapeMeshArray;
 
     // Start is called before the first frame update
     void Start() {
