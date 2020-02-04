@@ -293,7 +293,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   material: {fileID: 2100000, guid: d2e69c6d641bcf3468f427589e480c1e, type: 2}
-  path: D:/Document/unity/StbUnity/StbUnity/Assets/StbData/S.STB
 --- !u!4 &1921808707
 Transform:
   m_ObjectHideFlags: 0
