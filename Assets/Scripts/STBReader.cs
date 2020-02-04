@@ -4,17 +4,11 @@ using SFB;
 using UnityEngine;
 
 public partial class STBReader:MonoBehaviour {
-    // 確認済みのここで定義すべき引数
     public Material material;
     private List<Vector3> StbNodes = new List<Vector3>();
     private List<int> VertexIDs = new List<int>();
     private int i;
 
-    // ここで定義すべきか未確認の引数
-    private string ElementShape, xElementKind, ElementShapeType;
-    private int NodeIndexStart, NodeIndexEnd,
-                xNodeStart, xNodeEnd, xElementIdSection,
-                StbSecIndex, ElementIdSection;
     private List<int> xSecRcColumnId = new List<int>();
     private List<int> xSecRcColumnDepth = new List<int>();
     private List<int> xSecRcColumnWidth = new List<int>();
@@ -35,15 +29,9 @@ public partial class STBReader:MonoBehaviour {
 
     // Start is called before the first frame update
     void Start() {
-        // Open file with filter
         XDocument xdoc = GetStbFileData();
-
-        // StbNode の取得
         GetStbNodes(xdoc, StbNodes, VertexIDs);
-
-        // StbSlabs の取得とスラブの作成
         MakeSlabObjs(xdoc);
-
         // StbSecColumn_RC の取得
         var xSecRcColumns = xdoc.Root.Descendants("StbSecColumn_RC");
         foreach (var xSecRcColumn in xSecRcColumns) {
@@ -60,14 +48,12 @@ public partial class STBReader:MonoBehaviour {
                 xSecRcColumnWidth.Add(0); // Circle と判定用に width は 0
             }
         }
-
         // StbSecColumn_S の取得
         var xSecSColumns = xdoc.Root.Descendants("StbSecColumn_S");
         foreach (var xSecSColumn in xSecSColumns) {
             xSecSColumnId.Add((int)xSecSColumn.Attribute("id"));
             xSecSColumnShape.Add((string)xSecSColumn.Element("StbSecSteelColumn").Attribute("shape"));
         }
-
         // StbSecBeam_RC の取得
         var xSecRcBeams = xdoc.Root.Descendants("StbSecBeam_RC");
         foreach (var xSecRcBeam in xSecRcBeams) {
@@ -84,21 +70,18 @@ public partial class STBReader:MonoBehaviour {
                 xSecRcBeamWidth.Add((int)xSecFigure.Element("StbSecStraight").Attribute("width"));
             }
         }
-
         // StbSecBeam_S の取得
         var xSecSBeams = xdoc.Root.Descendants("StbSecBeam_S");
         foreach (var xSecSBeam in xSecSBeams) {
             xSecSBeamId.Add((int)xSecSBeam.Attribute("id"));
             xSecSBeamShape.Add((string)xSecSBeam.Element("StbSecSteelBeam").Attribute("shape"));
         }
-
         // StbSecBrace_S の取得
         var xSecSBraces = xdoc.Root.Descendants("StbSecBrace_S");
         foreach (var xSecSBrace in xSecSBraces) {
             xSecSBraceId.Add((int)xSecSBrace.Attribute("id"));
             xSecSBraceShape.Add((string)xSecSBrace.Element("StbSecSteelBrace").Attribute("shape"));
         }
-
         // S断面形状の取得
         i = 0;
         string[,] SteelSecName = GetSteelSecNameArray();
@@ -106,7 +89,6 @@ public partial class STBReader:MonoBehaviour {
             GetStbSteelSection(xdoc, SteelSecName[i, 0], SteelSecName[i, 1]);
             i++;
         } 
-
         // 断面の生成
         i = 0;
         string[,] MemberName = GetMemberNameArray();

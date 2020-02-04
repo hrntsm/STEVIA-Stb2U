@@ -53,7 +53,11 @@ public partial class STBReader : MonoBehaviour {
         float   ElementHight = 0;
         float   ElementWidth = 0;
         int     ElementNum = 0;
+        int     NodeIndexStart, NodeIndexEnd, xNodeStart, xNodeEnd, xElementIdSection,
+                StbSecIndex, ElementIdSection;
         var     xElements = xdoc.Root.Descendants(xDateTag);
+        string  ElementShape, xElementKind;
+        string  ElementShapeType = "";
 
         GameObject Elements = new GameObject(xDateTag + "s");
         foreach (var xElement in xElements) {
@@ -108,6 +112,8 @@ public partial class STBReader : MonoBehaviour {
                     ElementIdSection = xSecSBraceId.IndexOf(xElementIdSection);
                     ElementShape = xSecSBraceShape[ElementIdSection];
                 }
+                else
+                    ElementShape = "";
                 // 断面形状（HxB）の取得の取得
                 StbSecIndex = xStbSecSteelName.IndexOf(ElementShape);
                 ElementHight = xStbSecSteelParamA[StbSecIndex] / 1000f;
