@@ -38,13 +38,8 @@ public partial class STBReader : MonoBehaviour {
                 i++;
             }
 
-            // Unityでの三角形メッシュの生成
-            triangles.Add(CountNode - 4);
-            triangles.Add(CountNode - 3);
-            triangles.Add(CountNode - 2);
-            triangles.Add(CountNode - 2);
-            triangles.Add(CountNode - 1);
-            triangles.Add(CountNode - 4);
+            // Unityでの三角形メッシュ情報の頂点情報生成
+            triangles = GetTriangles(triangles, 1);
 
             meshObj.vertices = vertices.ToArray();
             meshObj.triangles = triangles.ToArray();
@@ -308,9 +303,9 @@ public partial class STBReader : MonoBehaviour {
         var vertices = new List<Vector3>();
         var triangles = new List<int>();
         Mesh meshObj = new Mesh();
-        int LoopLength = new int();
+        int MeshNum = new int();
         if (this.ElementShapeType == "H") {
-            LoopLength = 4;
+            MeshNum = 3;
             // make upper flange
             vertices.Add(VertexS[3]);
             vertices.Add(VertexS[5]);
@@ -328,7 +323,7 @@ public partial class STBReader : MonoBehaviour {
             vertices.Add(VertexE[4]);
         }
         else if (this.ElementShapeType == "BOX") {
-            LoopLength = 5;
+            MeshNum = 4;
             // make upper flange
             vertices.Add(VertexS[3]);
             vertices.Add(VertexS[5]);
@@ -354,7 +349,7 @@ public partial class STBReader : MonoBehaviour {
             Debug.Log("Pipe is not supported");
         }
         else if (this.ElementShapeType == "L") {
-            LoopLength = 3;
+            MeshNum = 2;
             // make bottom flange
             vertices.Add(VertexS[0]);
             vertices.Add(VertexS[2]);
@@ -366,18 +361,8 @@ public partial class STBReader : MonoBehaviour {
             vertices.Add(VertexE[2]);
             vertices.Add(VertexE[5]);
         }
-        else {
-        }
 
-        for (int i = 1; i < LoopLength; ++i) {
-            triangles.Add(4 * i - 4);
-            triangles.Add(4 * i - 3);
-            triangles.Add(4 * i - 2);
-            triangles.Add(4 * i - 2);
-            triangles.Add(4 * i - 1);
-            triangles.Add(4 * i - 4);
-        }
-
+        triangles = GetTriangles(triangles, MeshNum);
         meshObj.vertices = vertices.ToArray();
         meshObj.triangles = triangles.ToArray();
         meshObj.RecalculateNormals();
@@ -389,5 +374,21 @@ public partial class STBReader : MonoBehaviour {
         Element.transform.parent = Elements.transform;
 
         return ElementShapeMesh;
+    }
+    /// <summary>
+    /// Get triangles vertex infomation
+    /// </summary>
+    /// <param name="triangles"></param>
+    /// <param name="LoopLength"></param>
+    List<int> GetTriangles(List<int> triangles, int MeshNum) {
+        for (int i = 1; i <= MeshNum; ++i) {
+            triangles.Add(4 * i - 4);
+            triangles.Add(4 * i - 3);
+            triangles.Add(4 * i - 2);
+            triangles.Add(4 * i - 2);
+            triangles.Add(4 * i - 1);
+            triangles.Add(4 * i - 4);
+        }
+        return (triangles);
     }
 }
