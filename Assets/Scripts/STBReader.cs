@@ -15,10 +15,6 @@ public partial class STBReader:MonoBehaviour {
     private int NodeIndexStart, NodeIndexEnd,
                 xNodeStart, xNodeEnd, xElementIdSection,
                 StbSecIndex, ElementIdSection;
-    private float ElementAngleY, ElementAngleZ, ElementHight, ElementWidth;
-    private Vector3 NodeStart, NodeEnd,
-                     VertexS1, VertexS2, VertexS3, VertexS4, VertexS5, VertexS6,
-                     VertexE1, VertexE2, VertexE3, VertexE4, VertexE5, VertexE6;
     private List<int> xSecRcColumnId = new List<int>();
     private List<int> xSecRcColumnDepth = new List<int>();
     private List<int> xSecRcColumnWidth = new List<int>();
