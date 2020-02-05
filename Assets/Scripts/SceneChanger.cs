@@ -8,4 +8,7 @@ public class SceneChanger : MonoBehaviour
     public void Scene2StbOpen() {
         SceneManager.LoadScene("Stb2Unity");
     }
+    public void Scene2Start() {
+        SceneManager.LoadScene("Start");
+    }
 }
