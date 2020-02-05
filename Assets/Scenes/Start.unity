@@ -360,7 +360,7 @@ GameObject:
   - component: {fileID: 175996295}
   - component: {fileID: 175996294}
   m_Layer: 5
-  m_Name: Color S
+  m_Name: ColorS
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -815,7 +815,7 @@ GameObject:
   - component: {fileID: 415125753}
   - component: {fileID: 415125752}
   m_Layer: 5
-  m_Name: Color RC
+  m_Name: ColorRC
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
