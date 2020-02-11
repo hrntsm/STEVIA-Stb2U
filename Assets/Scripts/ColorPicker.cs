@@ -12,6 +12,7 @@ public class ColorPicker : MonoBehaviour
     public int ImageHeight = 100;
     public int x = 100;
     public int y = 100;
+    string ObjName;
 
     void OnGUI() {
         GameObject obj;
@@ -25,5 +26,10 @@ public class ColorPicker : MonoBehaviour
             obj.GetComponent<Image>().color = col;
             Debug.Log(col);
         }
+    }
+
+    public void GetObjName() {
+        ObjName = gameObject.name;
+        Debug.Log(ObjName);
     }
 }
