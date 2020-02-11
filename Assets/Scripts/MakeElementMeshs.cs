@@ -40,7 +40,9 @@ public partial class STBReader : MonoBehaviour {
             SlabName = string.Format("Slab{0}", SlabNum);
             GameObject Slab = new GameObject(SlabName);
             Slab.AddComponent<MeshFilter>().mesh = meshObj;
-            Slab.AddComponent<MeshRenderer>().material = material;
+            Slab.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
+                color = GetMemberColor("RC", "Slab")
+            };
             Slab.transform.parent = Slabs.transform;
 
             SlabNum++;
@@ -61,7 +63,7 @@ public partial class STBReader : MonoBehaviour {
 
         GameObject Elements = new GameObject(xDateTag + "s");
         foreach (var xElement in xElements) {
-            if (ElementStructureType == "Beam" || ElementStructureType == "Brace") {
+            if (ElementStructureType == "Girder" || ElementStructureType == "Beam" || ElementStructureType == "Brace") {
                 xNodeStart = (int)xElement.Attribute("idNode_start");
                 xNodeEnd = (int)xElement.Attribute("idNode_end");
             }
@@ -80,12 +82,12 @@ public partial class STBReader : MonoBehaviour {
 
             if (xElementKind == "RC") {
                 // 断面形状名（shape) と 断面形状（HxB）の取得の取得
-                if (ElementStructureType == "Beam") {
+                if (ElementStructureType == "Girder" || ElementStructureType == "Beam") {
                     StbSecIndex = xSecRcBeamId.IndexOf(xElementIdSection);
                     ElementHight = xSecRcBeamDepth[StbSecIndex] / 1000f;
                     ElementWidth = xSecRcBeamWidth[StbSecIndex] / 1000f;
                 }
-                else if (ElementStructureType == "Column") {
+                else if (ElementStructureType == "Column" || ElementStructureType == "Post") {
                     StbSecIndex = xSecRcColumnId.IndexOf(xElementIdSection);
                     ElementHight = xSecRcColumnDepth[StbSecIndex] / 1000f;
                     ElementWidth = xSecRcColumnWidth[StbSecIndex] / 1000f;
@@ -100,11 +102,11 @@ public partial class STBReader : MonoBehaviour {
             }
             else if (xElementKind == "S") {
                 // 断面形状名（shape）の取得の取得
-                if (ElementStructureType == "Beam") {
+                if (ElementStructureType == "Girder" || ElementStructureType == "Beam") {
                     ElementIdSection = xSecSBeamId.IndexOf(xElementIdSection);
                     ElementShape = xSecSBeamShape[ElementIdSection];
                 }
-                else if (ElementStructureType == "Column") {
+                else if (ElementStructureType == "Column" || ElementStructureType == "Post") {
                     ElementIdSection = xSecSColumnId.IndexOf(xElementIdSection);
                     ElementShape = xSecSColumnShape[ElementIdSection];
                 }
@@ -122,13 +124,13 @@ public partial class STBReader : MonoBehaviour {
             }
 
             // 始点と終点から梁断面サーフェスの作成
-            ElementShapeMesh = MakeElementsMeshFromVertex(NodeStart, NodeEnd, ElementHight, ElementWidth, ElementShapeType, ElementStructureType, ElementNum, Elements);
+            ElementShapeMesh = MakeElementsMeshFromVertex(NodeStart, NodeEnd, ElementHight, ElementWidth, ElementShapeType, ElementStructureType, ElementNum, Elements, xElementKind);
             ElementNum++;
         }
         ElementShapeMesh.Clear();
     }
 
-    public List<Mesh> MakeElementsMeshFromVertex(Vector3 NodeStart, Vector3 NodeEnd, float ElementHight, float ElementWidth, string ElementShapeType, string ElementStructureType, int ElementNum, GameObject Elements) {
+    public List<Mesh> MakeElementsMeshFromVertex(Vector3 NodeStart, Vector3 NodeEnd, float ElementHight, float ElementWidth, string ElementShapeType, string ElementStructureType, int ElementNum, GameObject Elements, string ElementKind) {
         float ElementAngleY, ElementAngleZ;
         Vector3[] VertexS = new Vector3[6];
         Vector3[] VertexE = new Vector3[6];
@@ -143,7 +145,7 @@ public partial class STBReader : MonoBehaviour {
         //  Y        S3 - S4 - S5 
         //  ^        |    |    |  
         //  o >  X   S0 - S1 - S2
-        if (ElementStructureType == "Beam") {
+        if (ElementStructureType == "Girder" || ElementStructureType == "Beam") {
             VertexS[0] = new Vector3(NodeStart.x + (ElementWidth / 2) * (float)Math.Sin(ElementAngleZ),
                                      NodeStart.y - ElementHight,
                                      NodeStart.z + (ElementWidth / 2) * (float)Math.Cos(ElementAngleZ)
@@ -166,7 +168,7 @@ public partial class STBReader : MonoBehaviour {
                                      NodeStart.z - (ElementWidth / 2) * (float)Math.Cos(ElementAngleZ)
                                      );
         }
-        else if (ElementStructureType == "Column") {
+        else if (ElementStructureType == "Column" || ElementStructureType == "Post") {
             VertexS[0] = new Vector3(NodeStart.x - (ElementWidth / 2) * (float)Math.Sin(ElementAngleY),
                                      NodeStart.y - (ElementWidth / 2) * (float)Math.Cos(ElementAngleY),
                                      NodeStart.z - (ElementHight / 2)
@@ -222,7 +224,7 @@ public partial class STBReader : MonoBehaviour {
         //  Y        E3 - E4 - E5
         //  ^        |    |    |
         //  o >  X   E0 - E1 - E2
-        if (ElementStructureType == "Beam") {
+        if (ElementStructureType == "Girder" || ElementStructureType == "Beam") {
             VertexE[0] = new Vector3(NodeEnd.x + (ElementWidth / 2) * (float)Math.Sin(ElementAngleZ),
                                      NodeEnd.y - ElementHight,
                                      NodeEnd.z + (ElementWidth / 2) * (float)Math.Cos(ElementAngleZ)
@@ -245,7 +247,7 @@ public partial class STBReader : MonoBehaviour {
                                      NodeEnd.z - (ElementWidth / 2) * (float)Math.Cos(ElementAngleZ)
                                      );
         }
-        else if (ElementStructureType == "Column") {
+        else if (ElementStructureType == "Column" || ElementStructureType == "Post") {
             VertexE[0] = new Vector3(NodeEnd.x - (ElementWidth / 2) * (float)Math.Sin(ElementAngleY),
                                      NodeEnd.y - (ElementWidth / 2) * (float)Math.Cos(ElementAngleY),
                                      NodeEnd.z - (ElementHight / 2)
@@ -331,7 +333,9 @@ public partial class STBReader : MonoBehaviour {
         string ElementName = string.Format(ElementStructureType + "{0}", ElementNum);
         GameObject Element = new GameObject(ElementName);
         Element.AddComponent<MeshFilter>().mesh = meshObj;
-        Element.AddComponent<MeshRenderer>().material = material;
+        Element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
+            color = GetMemberColor(ElementKind, ElementStructureType)
+        };
         Element.transform.parent = Elements.transform;
 
         return ElementShapeMesh;
@@ -388,5 +392,28 @@ public partial class STBReader : MonoBehaviour {
         vertices.Add(VertexE[2]);
         vertices.Add(VertexE[5]);
         return (vertices);
+    }
+
+    Color GetMemberColor(string ElemKind, string ElemStructType) {
+        Color unexpectedColor = new Color(1, 0, 1, 1);
+
+        if (ElemKind == "RC") {
+            if (ElemStructType == "Column") return ColorInput.memberColor[0];
+            else if (ElemStructType == "Post") return ColorInput.memberColor[1];
+            else if (ElemStructType == "Girder") return ColorInput.memberColor[2];
+            else if (ElemStructType == "Beam") return ColorInput.memberColor[3];
+            else if (ElemStructType == "Brace") return ColorInput.memberColor[4];
+            else if (ElemStructType == "Slab") return ColorInput.memberColor[5];
+            else return unexpectedColor;
+        }
+        else if (ElemKind == "S") {
+            if (ElemStructType == "Column") return ColorInput.memberColor[6];
+            else if (ElemStructType == "Post") return ColorInput.memberColor[7];
+            else if (ElemStructType == "Girder") return ColorInput.memberColor[8];
+            else if (ElemStructType == "Beam") return ColorInput.memberColor[9];
+            else if (ElemStructType == "Brace") return ColorInput.memberColor[10];
+            else return unexpectedColor;
+        }
+        else return unexpectedColor;
     }
 }

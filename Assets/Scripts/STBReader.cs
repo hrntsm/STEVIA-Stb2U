@@ -141,8 +141,8 @@ public partial class STBReader:MonoBehaviour {
     string[,] GetMemberNameArray() {
         string[,] MemberNameArray = new string[5, 2] {
             {"StbColumn", "Column"},
-            {"StbGirder", "Beam"},
-            {"StbPost", "Column"},
+            {"StbGirder", "Girder"},
+            {"StbPost", "Post"},
             {"StbBeam", "Beam"},
             {"StbBrace", "Brace"}
         };
