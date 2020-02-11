@@ -50,4 +50,8 @@ crashlytics-build.properties
 # add
 Assets/Plugins/GitHub
 Assets/StbData/
+Assets/sky5X/
+Assets/Standard Assets/
+sky5X.meta
+Standard Assets.meta
 StbData.meta
