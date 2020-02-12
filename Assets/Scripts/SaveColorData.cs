@@ -6,10 +6,8 @@ public class SaveColorData: MonoBehaviour{
     public const string _SaveKey = "UserColorData";
 
     public void Save() {
-        string json = JsonUtility.ToJson(ColorInput.sCol);
+        string json = JsonUtility.ToJson(ColorInput.saveColor);
         PlayerPrefs.SetString(_SaveKey, json);
-        Debug.Log("Saved");
-        print(json);
     }
 }
 
