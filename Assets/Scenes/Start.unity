@@ -262,7 +262,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Stb2U stand-alone
+  m_Text: Stb2U/sa
 --- !u!222 &64552890
 CanvasRenderer:
   m_ObjectHideFlags: 0
