@@ -6,6 +6,7 @@ public class ColorInit : MonoBehaviour {
     void Start() {
         if (PlayerPrefs.HasKey("UserColorData"))
             InitMemberColor(true);
+            //InitMemberColor(false);
         else
             InitMemberColor(false);
     }
@@ -14,6 +15,7 @@ public class ColorInit : MonoBehaviour {
         int i = 0;
         if (init) {
             string json = PlayerPrefs.GetString(SaveColorData._SaveKey);
+            print(json);
             SaveColor loadColor = JsonUtility.FromJson<SaveColor>(json);
             while (i < 11) {
                 string inputText = loadColor.rgba[i];
