@@ -48,20 +48,24 @@ public partial class STBReader:MonoBehaviour {
         float Width = 0;
         int elementNum = 0;
         int nodeIndexStart, nodeIndexEnd, xNodeStart, xNodeEnd, xElementIdSection,
-                stbSecIndex, idSection;
+            stbSecIndex, idSection;
         var xElements = xDoc.Root.Descendants(xDateTag);
         string shape, xKind;
         string shapeType = "";
 
         GameObject elements = new GameObject(xDateTag + "s");
         foreach (var xElement in xElements) {
-            if (structType == "Girder" || structType == "Beam" || structType == "Brace") {
-                xNodeStart = (int)xElement.Attribute("idNode_start");
-                xNodeEnd = (int)xElement.Attribute("idNode_end");
-            }
-            else {
-                xNodeStart = (int)xElement.Attribute("idNode_bottom");
-                xNodeEnd = (int)xElement.Attribute("idNode_top");
+            switch (structType) {
+                case "Girder":
+                case "Beam":
+                case "Brace":
+                    xNodeStart = (int)xElement.Attribute("idNode_start");
+                    xNodeEnd = (int)xElement.Attribute("idNode_end");
+                    break;
+                default:
+                    xNodeStart = (int)xElement.Attribute("idNode_bottom");
+                    xNodeEnd = (int)xElement.Attribute("idNode_top");
+                    break;
             }
             xElementIdSection = (int)xElement.Attribute("id_section");
             xKind = (string)xElement.Attribute("kind_structure");
@@ -73,42 +77,47 @@ public partial class STBReader:MonoBehaviour {
             nodeEnd = m_stbNodes[nodeIndexEnd];
 
             if (xKind == "RC") {
-                // 断面形状名（shape) と 断面形状（HxB）の取得の取得
-                if (structType == "Girder" || structType == "Beam") {
-                    stbSecIndex = m_xRcBeamId.IndexOf(xElementIdSection);
-                    hight = m_xRcBeamDepth[stbSecIndex] / 1000f;
-                    Width = m_xRcBeamWidth[stbSecIndex] / 1000f;
+                switch (structType) {
+                    case "Girder":
+                    case "Beam":
+                        stbSecIndex = m_xRcBeamId.IndexOf(xElementIdSection);
+                        hight = m_xRcBeamDepth[stbSecIndex] / 1000f;
+                        Width = m_xRcBeamWidth[stbSecIndex] / 1000f;
+                        break;
+                    case "Column":
+                    case "Post":
+                        stbSecIndex = m_xRcColumnId.IndexOf(xElementIdSection);
+                        hight = m_xRcColumnDepth[stbSecIndex] / 1000f;
+                        Width = m_xRcColumnWidth[stbSecIndex] / 1000f;
+                        break;
+                    default:
+                        break;
                 }
-                else if (structType == "Column" || structType == "Post") {
-                    stbSecIndex = m_xRcColumnId.IndexOf(xElementIdSection);
-                    hight = m_xRcColumnDepth[stbSecIndex] / 1000f;
-                    Width = m_xRcColumnWidth[stbSecIndex] / 1000f;
-                }
-
-                if (Width == 0) {
+                if (Width == 0)
                     shapeType = "Pipe";
-                }
-                else {
+                else
                     shapeType = "BOX";
-                }
             }
             else if (xKind == "S") {
-                // 断面形状名（shape）の取得の取得
-                if (structType == "Girder" || structType == "Beam") {
-                    idSection = m_xStBeamId.IndexOf(xElementIdSection);
-                    shape = m_xStBeamShape[idSection];
+                switch (structType) {
+                    case "Girder":
+                    case "Beam":
+                        idSection = m_xStBeamId.IndexOf(xElementIdSection);
+                        shape = m_xStBeamShape[idSection];
+                        break;
+                    case "Column":
+                    case "Post":
+                        idSection = m_xStColumnId.IndexOf(xElementIdSection);
+                        shape = m_xStColumnShape[idSection];
+                        break;
+                    case "Brace":
+                        idSection = m_xStBraceId.IndexOf(xElementIdSection);
+                        shape = m_xStBraceShape[idSection];
+                        break;
+                    default:
+                        shape = "";
+                        break;
                 }
-                else if (structType == "Column" || structType == "Post") {
-                    idSection = m_xStColumnId.IndexOf(xElementIdSection);
-                    shape = m_xStColumnShape[idSection];
-                }
-                else if (structType == "Brace") {
-                    idSection = m_xStBraceId.IndexOf(xElementIdSection);
-                    shape = m_xStBraceShape[idSection];
-                }
-                else
-                    shape = "";
-                // 断面形状（HxB）の取得の取得
                 stbSecIndex = m_xStName.IndexOf(shape);
                 hight = m_xStParamA[stbSecIndex] / 1000f;
                 Width = m_xStParamB[stbSecIndex] / 1000f;
@@ -177,21 +186,25 @@ public partial class STBReader:MonoBehaviour {
         Color unexpected = new Color(1, 0, 1, 1);
 
         if (kind == "RC") {
-            if (structType == "Column") return ColorInput.m_memberColor[0];
-            else if (structType == "Post") return ColorInput.m_memberColor[1];
-            else if (structType == "Girder") return ColorInput.m_memberColor[2];
-            else if (structType == "Beam") return ColorInput.m_memberColor[3];
-            else if (structType == "Brace") return ColorInput.m_memberColor[4];
-            else if (structType == "Slab") return ColorInput.m_memberColor[5];
-            else return unexpected;
+            switch (structType) {
+                case "Column": return ColorInput.m_memberColor[0];
+                case "Post": return ColorInput.m_memberColor[1];
+                case "Girder": return ColorInput.m_memberColor[2];
+                case "Beam": return ColorInput.m_memberColor[3];
+                case "Brace": return ColorInput.m_memberColor[4];
+                case "Slab": return ColorInput.m_memberColor[5];
+                default: return unexpected;
+            }
         }
         else if (kind == "S") {
-            if (structType == "Column") return ColorInput.m_memberColor[6];
-            else if (structType == "Post") return ColorInput.m_memberColor[7];
-            else if (structType == "Girder") return ColorInput.m_memberColor[8];
-            else if (structType == "Beam") return ColorInput.m_memberColor[9];
-            else if (structType == "Brace") return ColorInput.m_memberColor[10];
-            else return unexpected;
+            switch (structType) {
+                case "Column": return ColorInput.m_memberColor[6];
+                case "Post": return ColorInput.m_memberColor[7];
+                case "Girder": return ColorInput.m_memberColor[8];
+                case "Beam": return ColorInput.m_memberColor[9];
+                case "Brace": return ColorInput.m_memberColor[10];
+                default: return unexpected;
+            }
         }
         else return unexpected;
     }
