@@ -6,8 +6,7 @@ using UnityEngine;
 public partial class STBReader:MonoBehaviour {
     private List<Vector3> m_stbNodes = new List<Vector3>();
     private List<int> m_vertexIDs = new List<int>();
-    private int i;
-
+    
     private List<int> m_xRcColumnId = new List<int>();
     private List<int> m_xRcColumnDepth = new List<int>();
     private List<int> m_xRcColumnWidth = new List<int>();
@@ -20,66 +19,67 @@ public partial class STBReader:MonoBehaviour {
     private List<string> m_xStBeamShape = new List<string>();
     private List<int> m_xStBraceId = new List<int>();
     private List<string> m_xStBraceShape = new List<string>();
-    private List<string> m_xSteelName = new List<string>();
-    private List<float> m_xSteelParamA = new List<float>();
-    private List<float> m_xSteelParamB = new List<float>();
-    private List<string> m_xSteelType = new List<string>();
+    private List<string> m_xStName = new List<string>();
+    private List<float> m_xStParamA = new List<float>();
+    private List<float> m_xStParamB = new List<float>();
+    private List<string> m_xStType = new List<string>();
     private List<Mesh> m_shapeMesh = new List<Mesh>();
 
     // Start is called before the first frame update
     void Start() {
+        int i = 0;
         XDocument xDoc = GetStbFileData();
         GetStbNodes(xDoc, m_stbNodes, m_vertexIDs);
         MakeSlabObjs(xDoc);
         // StbSecColumn_RC の取得
-        var xSecRcColumns = xDoc.Root.Descendants("StbSecColumn_RC");
-        foreach (var xSecRcColumn in xSecRcColumns) {
-            m_xRcColumnId.Add((int)xSecRcColumn.Attribute("id"));
-            var xSecFigure = xSecRcColumn.Element("StbSecFigure");
+        var xRcColumns = xDoc.Root.Descendants("StbSecColumn_RC");
+        foreach (var xRcColumn in xRcColumns) {
+            m_xRcColumnId.Add((int)xRcColumn.Attribute("id"));
+            var xFigure = xRcColumn.Element("StbSecFigure");
 
             // 子要素が StbSecRect か StbSecCircle を判定
-            if (xSecFigure.Element("StbSecRect") != null) {
-                m_xRcColumnDepth.Add((int)xSecFigure.Element("StbSecRect").Attribute("DY"));
-                m_xRcColumnWidth.Add((int)xSecFigure.Element("StbSecRect").Attribute("DX"));
+            if (xFigure.Element("StbSecRect") != null) {
+                m_xRcColumnDepth.Add((int)xFigure.Element("StbSecRect").Attribute("DY"));
+                m_xRcColumnWidth.Add((int)xFigure.Element("StbSecRect").Attribute("DX"));
             }
             else {
-                m_xRcColumnDepth.Add((int)xSecFigure.Element("StbSecCircle").Attribute("D"));
+                m_xRcColumnDepth.Add((int)xFigure.Element("StbSecCircle").Attribute("D"));
                 m_xRcColumnWidth.Add(0); // Circle と判定用に width は 0
             }
         }
         // StbSecColumn_S の取得
-        var xSecSColumns = xDoc.Root.Descendants("StbSecColumn_S");
-        foreach (var xSecSColumn in xSecSColumns) {
+        var xStColumns = xDoc.Root.Descendants("StbSecColumn_S");
+        foreach (var xSecSColumn in xStColumns) {
             m_xStColumnId.Add((int)xSecSColumn.Attribute("id"));
             m_xStColumnShape.Add((string)xSecSColumn.Element("StbSecSteelColumn").Attribute("shape"));
         }
         // StbSecBeam_RC の取得
-        var xSecRcBeams = xDoc.Root.Descendants("StbSecBeam_RC");
-        foreach (var xSecRcBeam in xSecRcBeams) {
-            m_xRcBeamId.Add((int)xSecRcBeam.Attribute("id"));
-            var xSecFigure = xSecRcBeam.Element("StbSecFigure");
+        var xRcBeams = xDoc.Root.Descendants("StbSecBeam_RC");
+        foreach (var xRcBeam in xRcBeams) {
+            m_xRcBeamId.Add((int)xRcBeam.Attribute("id"));
+            var xFigure = xRcBeam.Element("StbSecFigure");
 
             // 子要素が StbSecHaunch か StbSecStraight を判定
-            if (xSecFigure.Element("StbSecHaunch") != null) {
-                m_xRcBeamDepth.Add((int)xSecFigure.Element("StbSecHaunch").Attribute("depth_center"));
-                m_xRcBeamWidth.Add((int)xSecFigure.Element("StbSecHaunch").Attribute("width_center"));
+            if (xFigure.Element("StbSecHaunch") != null) {
+                m_xRcBeamDepth.Add((int)xFigure.Element("StbSecHaunch").Attribute("depth_center"));
+                m_xRcBeamWidth.Add((int)xFigure.Element("StbSecHaunch").Attribute("width_center"));
             }
             else {
-                m_xRcBeamDepth.Add((int)xSecFigure.Element("StbSecStraight").Attribute("depth"));
-                m_xRcBeamWidth.Add((int)xSecFigure.Element("StbSecStraight").Attribute("width"));
+                m_xRcBeamDepth.Add((int)xFigure.Element("StbSecStraight").Attribute("depth"));
+                m_xRcBeamWidth.Add((int)xFigure.Element("StbSecStraight").Attribute("width"));
             }
         }
         // StbSecBeam_S の取得
-        var xSecSBeams = xDoc.Root.Descendants("StbSecBeam_S");
-        foreach (var xSecSBeam in xSecSBeams) {
-            m_xStBeamId.Add((int)xSecSBeam.Attribute("id"));
-            m_xStBeamShape.Add((string)xSecSBeam.Element("StbSecSteelBeam").Attribute("shape"));
+        var xStBeams = xDoc.Root.Descendants("StbSecBeam_S");
+        foreach (var xStBeam in xStBeams) {
+            m_xStBeamId.Add((int)xStBeam.Attribute("id"));
+            m_xStBeamShape.Add((string)xStBeam.Element("StbSecSteelBeam").Attribute("shape"));
         }
         // StbSecBrace_S の取得
-        var xSecSBraces = xDoc.Root.Descendants("StbSecBrace_S");
-        foreach (var xSecSBrace in xSecSBraces) {
-            m_xStBraceId.Add((int)xSecSBrace.Attribute("id"));
-            m_xStBraceShape.Add((string)xSecSBrace.Element("StbSecSteelBrace").Attribute("shape"));
+        var xStBraces = xDoc.Root.Descendants("StbSecBrace_S");
+        foreach (var xStBrace in xStBraces) {
+            m_xStBraceId.Add((int)xStBrace.Attribute("id"));
+            m_xStBraceShape.Add((string)xStBrace.Element("StbSecSteelBrace").Attribute("shape"));
         }
         // S断面形状の取得
         i = 0;
@@ -90,9 +90,9 @@ public partial class STBReader:MonoBehaviour {
         } 
         // 断面の生成
         i = 0;
-        string[,] MemberName = GetMemberNameArray();
-        while (i < MemberName.GetLength(0)) {
-            MakeElementMesh(xDoc, MemberName[i, 0], MemberName[i, 1]);
+        string[,] memberName = GetMemberNameArray();
+        while (i < memberName.GetLength(0)) {
+            MakeElementMesh(xDoc, memberName[i, 0], memberName[i, 1]);
             i++;
         }
     }
@@ -107,25 +107,25 @@ public partial class STBReader:MonoBehaviour {
         return (xDoc);
     }
 
-    void GetStbNodes(XDocument xdoc, List<Vector3> StbNodes, List<int> VertexIDs) {
+    void GetStbNodes(XDocument xDoc, List<Vector3> stbNodes, List<int> vertexIds) {
         float xPos, yPos, zPos;
-        int nodeID;
-        var xNodes = xdoc.Root.Descendants("StbNode");
+        int nodeId;
+        var xNodes = xDoc.Root.Descendants("StbNode");
 
         foreach (var xNode in xNodes) {
             // unity は 1 が 1m なので1000で割ってる
             xPos = (float) xNode.Attribute("x") / 1000;
             yPos = (float) xNode.Attribute("z") / 1000; // unityは Z-Up
             zPos = (float) xNode.Attribute("y") / 1000;
-            nodeID = (int) xNode.Attribute("id");
+            nodeId = (int) xNode.Attribute("id");
 
-            StbNodes.Add(new Vector3(xPos, yPos, zPos));
-            VertexIDs.Add(nodeID);
+            stbNodes.Add(new Vector3(xPos, yPos, zPos));
+            vertexIds.Add(nodeId);
         }
     }
 
     string[,] GetSteelSecNameArray() {
-        string[,] SteelSecNameArray = new string[7, 2] {
+        string[,] steelSecNameArray = new string[7, 2] {
             {"StbSecRoll-H", "H"},
             {"StbSecBuild-H", "H"},
             {"StbSecRoll-BOX", "BOX"},
@@ -134,17 +134,17 @@ public partial class STBReader:MonoBehaviour {
             {"StbSecRoll-L", "L"},
             {"StbSecRoll-Bar", "Bar"}
         };
-        return (SteelSecNameArray);
+        return (steelSecNameArray);
     }
 
     string[,] GetMemberNameArray() {
-        string[,] MemberNameArray = new string[5, 2] {
+        string[,] memberNameArray = new string[5, 2] {
             {"StbColumn", "Column"},
             {"StbGirder", "Girder"},
             {"StbPost", "Post"},
             {"StbBeam", "Beam"},
             {"StbBrace", "Brace"}
         };
-        return (MemberNameArray);
+        return (memberNameArray);
     }
 }
