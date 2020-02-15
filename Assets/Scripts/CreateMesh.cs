@@ -74,7 +74,7 @@ public class CreateMesh : MonoBehaviour {
         return (meshObj);
     }
 
-    public static Mesh Pipe(int divNum, float radious, Vector3 startPoint, Vector3 endPoint, bool isCap = false) {
+    public static Mesh Pipe(Vector3 startPoint, Vector3 endPoint, float radious, int divNum = 36, bool isCap = false) {
         List<Vector3> vertices = new List<Vector3>();
         List<int> triangles = new List<int>();
         Mesh meshObj = new Mesh();

@@ -301,7 +301,7 @@ public partial class STBReader : MonoBehaviour {
                 meshObj = CreateMesh.BOX(vertexS, vertexE);
                 break;
             case "Pipe":
-                Debug.Log("Pipe is not supported.");
+                meshObj = CreateMesh.Pipe(nodeStart, nodeEnd, hight / 2);
                 break;
             case "L":
                 meshObj = CreateMesh.L(vertexS, vertexE);
