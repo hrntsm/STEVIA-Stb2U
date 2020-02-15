@@ -9,6 +9,7 @@ public class CameraSettings : MonoBehaviour{
     void Start() {
         m_inputField = GetComponent<InputField>();
     }
+
     public void SetLensLength() {
         Camera cam = Camera.main;
         cam.focalLength = float.Parse(m_inputField.text);

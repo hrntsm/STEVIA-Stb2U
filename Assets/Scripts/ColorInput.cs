@@ -5,25 +5,26 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class ColorInput:MonoBehaviour {
-    InputField inputField;
-    public int num;
-    public static Color[] memberColor = new Color[11];
-    public static SaveColor saveColor = new SaveColor();
+    InputField m_inputField;
+    public int m_num;
+    public static Color[] m_memberColor = new Color[11];
+    public static SaveColor m_saveColor = new SaveColor();
+
     void Start() {
-        inputField = GetComponent<InputField>();
+        m_inputField = GetComponent<InputField>();
 
         if (PlayerPrefs.HasKey("UserColorData")) {
             string json = PlayerPrefs.GetString(SaveColorData._SaveKey);
             SaveColor loadColor = JsonUtility.FromJson<SaveColor>(json);
-            inputField.GetComponent<Image>().color = GetMemberColor(loadColor.rgba[num]);
+            m_inputField.GetComponent<Image>().color = GetMemberColor(loadColor.rgba[m_num]);
         }
     }
 
     public void ChangeColor(int i) {
-        memberColor[i] = GetMemberColor(inputField.text);
-        inputField.GetComponent<Image>().color = memberColor[i];
-        saveColor.num[i] = i;
-        saveColor.rgba[i] = inputField.text;
+        m_memberColor[i] = GetMemberColor(m_inputField.text);
+        m_inputField.GetComponent<Image>().color = m_memberColor[i];
+        m_saveColor.num[i] = i;
+        m_saveColor.rgba[i] = m_inputField.text;
     }
 
     public static Color GetMemberColor(string inputText) {
