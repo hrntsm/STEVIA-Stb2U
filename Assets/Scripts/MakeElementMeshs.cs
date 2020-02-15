@@ -4,7 +4,7 @@ using System;
 
 using UnityEngine;
 
-public partial class STBReader : MonoBehaviour {
+public partial class STBReader:MonoBehaviour {
     /// <summary>
     /// Make Slab GameObjects
     /// </summary>
@@ -44,14 +44,14 @@ public partial class STBReader : MonoBehaviour {
 
     void MakeElementMesh(XDocument xDoc, string xDateTag, string structType) {
         Vector3 nodeStart, nodeEnd;
-        float   hight = 0;
-        float   Width = 0;
-        int     elementNum = 0;
-        int     nodeIndexStart, nodeIndexEnd, xNodeStart, xNodeEnd, xElementIdSection,
+        float hight = 0;
+        float Width = 0;
+        int elementNum = 0;
+        int nodeIndexStart, nodeIndexEnd, xNodeStart, xNodeEnd, xElementIdSection,
                 stbSecIndex, idSection;
-        var     xElements = xDoc.Root.Descendants(xDateTag);
-        string  shape, xKind;
-        string  shapeType = "";
+        var xElements = xDoc.Root.Descendants(xDateTag);
+        string shape, xKind;
+        string shapeType = "";
 
         GameObject elements = new GameObject(xDateTag + "s");
         foreach (var xElement in xElements) {
@@ -126,188 +126,40 @@ public partial class STBReader : MonoBehaviour {
         float angleY, angleZ;
         Vector3[] vertexS = new Vector3[6];
         Vector3[] vertexE = new Vector3[6];
+        Mesh meshObj = new Mesh();
 
         // 部材のアングルの確認
         angleY = -1 * (float)Math.Atan((nodeEnd.y - nodeStart.y) / (nodeEnd.x - nodeStart.x));
         angleZ = -1 * (float)Math.Atan((nodeEnd.z - nodeStart.z) / (nodeEnd.x - nodeStart.x));
 
-        // 描画用点の作成
         // 梁は部材天端の中心が起点に対して、柱・ブレースは部材芯が起点なので場合分け
-        // NodeStart側   
-        //  Y        S3 - S4 - S5 
-        //  ^        |    |    |  
-        //  o >  X   S0 - S1 - S2
-        if (structType == "Girder" || structType == "Beam") {
-            vertexS[0] = new Vector3(nodeStart.x + (width / 2) * (float)Math.Sin(angleZ),
-                                     nodeStart.y - hight,
-                                     nodeStart.z + (width / 2) * (float)Math.Cos(angleZ)
-                                     );
-            vertexS[1] = new Vector3(nodeStart.x,
-                                     nodeStart.y - hight,
-                                     nodeStart.z
-                                     );
-            vertexS[2] = new Vector3(nodeStart.x - (width / 2) * (float)Math.Sin(angleZ),
-                                     nodeStart.y - hight,
-                                     nodeStart.z - (width / 2) * (float)Math.Cos(angleZ)
-                                     );
-            vertexS[3] = new Vector3(nodeStart.x + (width / 2) * (float)Math.Sin(angleZ),
-                                     nodeStart.y,
-                                     nodeStart.z + (width / 2) * (float)Math.Cos(angleZ)
-                                     );
-            vertexS[4] = nodeStart;
-            vertexS[5] = new Vector3(nodeStart.x - (width / 2) * (float)Math.Sin(angleZ),
-                                     nodeStart.y,
-                                     nodeStart.z - (width / 2) * (float)Math.Cos(angleZ)
-                                     );
+        switch (structType) {
+            case "Girder":
+            case "Beam":
+                vertexS = GetGirderVertex(nodeStart, width, hight, angleZ);
+                vertexE = GetGirderVertex(nodeEnd, width, hight, angleZ);
+                break;
+            case "Column":
+            case "Post":
+                vertexS = GetColumnVertex(nodeStart, width, hight, angleY);
+                vertexE = GetColumnVertex(nodeEnd, width, hight, angleY);
+                break;
+            case "Brace":
+                vertexS = GetBraceVertex(nodeStart, width, hight, angleZ);
+                vertexE = GetBraceVertex(nodeEnd, width, hight, angleZ);
+                break;
+            default: break;
         }
-        else if (structType == "Column" || structType == "Post") {
-            vertexS[0] = new Vector3(nodeStart.x - (width / 2) * (float)Math.Sin(angleY),
-                                     nodeStart.y - (width / 2) * (float)Math.Cos(angleY),
-                                     nodeStart.z - (hight / 2)
-                                     );
-            vertexS[1] = new Vector3(nodeStart.x,
-                                     nodeStart.y,
-                                     nodeStart.z + (hight / 2)
-                                     );
-            vertexS[2] = new Vector3(nodeStart.x + (width / 2) * (float)Math.Sin(angleY),
-                                     nodeStart.y + (width / 2) * (float)Math.Cos(angleY),
-                                     nodeStart.z - (hight / 2)
-                                     );
-            vertexS[3] = new Vector3(nodeStart.x - (width / 2) * (float)Math.Sin(angleY),
-                                     nodeStart.y - (width / 2) * (float)Math.Cos(angleY),
-                                     nodeStart.z + (hight / 2)
-                                     );
-            vertexS[4] = new Vector3(nodeStart.x,
-                                     nodeStart.y,
-                                     nodeStart.z - (hight / 2)
-                                     );
-            vertexS[5] = new Vector3(nodeStart.x + (width / 2) * (float)Math.Sin(angleY),
-                                     nodeStart.y + (width / 2) * (float)Math.Cos(angleY),
-                                     nodeStart.z + (hight / 2)
-                                     );
-        }
-        else if (structType == "Brace") {
-            vertexS[0] = new Vector3(nodeStart.x + (width / 2) * (float)Math.Sin(angleZ),
-                                     nodeStart.y - (width / 2),
-                                     nodeStart.z + (width / 2) * (float)Math.Cos(angleZ)
-                                     );
-            vertexS[1] = new Vector3(nodeStart.x,
-                                     nodeStart.y - (width / 2),
-                                     nodeStart.z
-                                     );
-            vertexS[2] = new Vector3(nodeStart.x - (width / 2) * (float)Math.Sin(angleZ),
-                                     nodeStart.y - (width / 2),
-                                     nodeStart.z - (width / 2) * (float)Math.Cos(angleZ)
-                                     );
-            vertexS[3] = new Vector3(nodeStart.x + (width / 2) * (float)Math.Sin(angleZ),
-                                     nodeStart.y + (width / 2),
-                                     nodeStart.z + (width / 2) * (float)Math.Cos(angleZ)
-                                     );
-            vertexS[4] = new Vector3(nodeStart.x,
-                                     nodeStart.y + (width / 2),
-                                     nodeStart.z
-                                     );
-            vertexS[5] = new Vector3(nodeStart.x - (width / 2) * (float)Math.Sin(angleZ),
-                                     nodeStart.y + (width / 2),
-                                     nodeStart.z - (width / 2) * (float)Math.Cos(angleZ)
-                                     );
-        }
-        // NodeEnd側
-        //  Y        E3 - E4 - E5
-        //  ^        |    |    |
-        //  o >  X   E0 - E1 - E2
-        if (structType == "Girder" || structType == "Beam") {
-            vertexE[0] = new Vector3(nodeEnd.x + (width / 2) * (float)Math.Sin(angleZ),
-                                     nodeEnd.y - hight,
-                                     nodeEnd.z + (width / 2) * (float)Math.Cos(angleZ)
-                                     );
-            vertexE[1] = new Vector3(nodeEnd.x,
-                                     nodeEnd.y - hight,
-                                     nodeEnd.z
-                                     );
-            vertexE[2] = new Vector3(nodeEnd.x - (width / 2) * (float)Math.Sin(angleZ),
-                                     nodeEnd.y - hight,
-                                     nodeEnd.z - (width / 2) * (float)Math.Cos(angleZ)
-                                     );
-            vertexE[3] = new Vector3(nodeEnd.x + (width / 2) * (float)Math.Sin(angleZ),
-                                     nodeEnd.y,
-                                     nodeEnd.z + (width / 2) * (float)Math.Cos(angleZ)
-                                     );
-            vertexE[4] = nodeEnd;
-            vertexE[5] = new Vector3(nodeEnd.x - (width / 2) * (float)Math.Sin(angleZ),
-                                     nodeEnd.y,
-                                     nodeEnd.z - (width / 2) * (float)Math.Cos(angleZ)
-                                     );
-        }
-        else if (structType == "Column" || structType == "Post") {
-            vertexE[0] = new Vector3(nodeEnd.x - (width / 2) * (float)Math.Sin(angleY),
-                                     nodeEnd.y - (width / 2) * (float)Math.Cos(angleY),
-                                     nodeEnd.z - (hight / 2)
-                                     );
-            vertexE[1] = new Vector3(nodeEnd.x,
-                                     nodeEnd.y,
-                                     nodeEnd.z + (hight / 2)
-                                     );
-            vertexE[2] = new Vector3(nodeEnd.x + (width / 2) * (float)Math.Sin(angleY),
-                                     nodeEnd.y + (width / 2) * (float)Math.Cos(angleY),
-                                     nodeEnd.z - (hight / 2)
-                                     );
-            vertexE[3] = new Vector3(nodeEnd.x - (width / 2) * (float)Math.Sin(angleY),
-                                     nodeEnd.y - (width / 2) * (float)Math.Cos(angleY),
-                                     nodeEnd.z + (hight / 2)
-                                     );
-            vertexE[4] = new Vector3(nodeEnd.x,
-                                     nodeEnd.y,
-                                     nodeEnd.z - (hight / 2)
-                                     );
-            vertexE[5] = new Vector3(nodeEnd.x + (width / 2) * (float)Math.Sin(angleY),
-                                     nodeEnd.y + (width / 2) * (float)Math.Cos(angleY),
-                                     nodeEnd.z + (hight / 2)
-                                     );
-        }
-        else if (structType == "Brace") {
-            vertexE[0] = new Vector3(nodeEnd.x + (width / 2) * (float)Math.Sin(angleZ),
-                                     nodeEnd.y - (width / 2),
-                                     nodeEnd.z + (width / 2) * (float)Math.Cos(angleZ)
-                                     );
-            vertexE[1] = new Vector3(nodeEnd.x,
-                                     nodeEnd.y - (width / 2),
-                                     nodeEnd.z
-                                     );
-            vertexE[2] = new Vector3(nodeEnd.x - (width / 2) * (float)Math.Sin(angleZ),
-                                     nodeEnd.y - (width / 2),
-                                     nodeEnd.z - (width / 2) * (float)Math.Cos(angleZ)
-                                     );
-            vertexE[3] = new Vector3(nodeEnd.x + (width / 2) * (float)Math.Sin(angleZ),
-                                     nodeEnd.y + (width / 2),
-                                     nodeEnd.z + (width / 2) * (float)Math.Cos(angleZ)
-                                     );
-            vertexE[4] = new Vector3(nodeEnd.x,
-                                     nodeEnd.y + (width / 2),
-                                     nodeEnd.z
-                                     );
-            vertexE[5] = new Vector3(nodeEnd.x - (width / 2) * (float)Math.Sin(angleZ),
-                                     nodeEnd.y + (width / 2),
-                                     nodeEnd.z - (width / 2) * (float)Math.Cos(angleZ)
-                                     );
-        }
-
-        Mesh meshObj = new Mesh();
         switch (shapeType) {
             case "H":
-                meshObj = CreateMesh.H(vertexS, vertexE);
-                break;
+                meshObj = CreateMesh.H(vertexS, vertexE); break;
             case "BOX":
-                meshObj = CreateMesh.BOX(vertexS, vertexE);
-                break;
+                meshObj = CreateMesh.BOX(vertexS, vertexE); break;
             case "Pipe":
-                meshObj = CreateMesh.Pipe(nodeStart, nodeEnd, hight / 2);
-                break;
+                meshObj = CreateMesh.Pipe(nodeStart, nodeEnd, hight / 2); break;
             case "L":
-                meshObj = CreateMesh.L(vertexS, vertexE);
-                break;
-            default:
-                break;
+                meshObj = CreateMesh.L(vertexS, vertexE); break;
+            default: break;
         }
 
         string name = string.Format(structType + "{0}", elementNum);
@@ -342,5 +194,101 @@ public partial class STBReader : MonoBehaviour {
             else return unexpected;
         }
         else return unexpected;
+    }
+
+    Vector3[] GetGirderVertex(Vector3 node, float width, float hight, float angle) {
+        //  Y        3 - 4 - 5 
+        //  ^        |   |   |  
+        //  o >  X   0 - 1 - 2
+        Vector3[] vertex = new Vector3[6];
+
+        vertex[0] = new Vector3(node.x + width / 2 * (float)Math.Sin(angle),
+                                node.y - hight,
+                                node.z + width / 2 * (float)Math.Cos(angle)
+                                );
+        vertex[1] = new Vector3(node.x,
+                                node.y - hight,
+                                node.z
+                                );
+        vertex[2] = new Vector3(node.x - width / 2 * (float)Math.Sin(angle),
+                                node.y - hight,
+                                node.z - width / 2 * (float)Math.Cos(angle)
+                                );
+        vertex[3] = new Vector3(node.x + width / 2 * (float)Math.Sin(angle),
+                                node.y,
+                                node.z + width / 2 * (float)Math.Cos(angle)
+                                );
+        vertex[4] = node;
+        vertex[5] = new Vector3(node.x - width / 2 * (float)Math.Sin(angle),
+                                node.y,
+                                node.z - width / 2 * (float)Math.Cos(angle)
+                                );
+        return (vertex);
+    }
+
+    Vector3[] GetColumnVertex(Vector3 node, float width, float hight, float angle) {
+        //  Y        3 - 4 - 5 
+        //  ^        |   |   |  
+        //  o >  X   0 - 1 - 2
+        Vector3[] vertex = new Vector3[6];
+
+        vertex[0] = new Vector3(node.x - width / 2 * (float)Math.Sin(angle),
+                                node.y - width / 2 * (float)Math.Cos(angle),
+                                node.z - hight / 2
+                                );
+        vertex[1] = new Vector3(node.x,
+                                node.y,
+                                node.z + hight / 2
+                                );
+        vertex[2] = new Vector3(node.x + width / 2 * (float)Math.Sin(angle),
+                                node.y + width / 2 * (float)Math.Cos(angle),
+                                node.z - hight / 2
+                                );
+        vertex[3] = new Vector3(node.x - width / 2 * (float)Math.Sin(angle),
+                                node.y - width / 2 * (float)Math.Cos(angle),
+                                node.z + hight / 2
+                                );
+        vertex[4] = new Vector3(node.x,
+                                node.y,
+                                node.z - hight / 2
+                                );
+        vertex[5] = new Vector3(node.x + width / 2 * (float)Math.Sin(angle),
+                                node.y + width / 2 * (float)Math.Cos(angle),
+                                node.z + hight / 2
+                                );
+        return (vertex);
+    }
+
+    Vector3[] GetBraceVertex(Vector3 node, float width, float hight, float angle) {
+        //  Y        3 - 4 - 5 
+        //  ^        |   |   |  
+        //  o >  X   0 - 1 - 2
+        Vector3[] vertex = new Vector3[6];
+
+        vertex[0] = new Vector3(node.x + width / 2 * (float)Math.Sin(angle),
+                                node.y - width / 2,
+                                node.z + width / 2 * (float)Math.Cos(angle)
+                                );
+        vertex[1] = new Vector3(node.x,
+                                node.y - width / 2,
+                                node.z
+                                );
+        vertex[2] = new Vector3(node.x - width / 2 * (float)Math.Sin(angle),
+                                node.y - width / 2,
+                                node.z - width / 2 * (float)Math.Cos(angle)
+                                );
+        vertex[3] = new Vector3(node.x + width / 2 * (float)Math.Sin(angle),
+                                node.y + width / 2,
+                                node.z + width / 2 * (float)Math.Cos(angle)
+                                );
+        vertex[4] = new Vector3(node.x,
+                                node.y + width / 2,
+                                node.z
+                                );
+        vertex[5] = new Vector3(node.x - width / 2 * (float)Math.Sin(angle),
+                                node.y + width / 2,
+                                node.z - width / 2 * (float)Math.Cos(angle)
+                                );
+        return (vertex);
     }
 }
