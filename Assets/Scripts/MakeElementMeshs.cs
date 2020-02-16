@@ -33,7 +33,8 @@ public partial class STBReader:MonoBehaviour {
             GameObject slab = new GameObject(slabName);
             slab.AddComponent<MeshFilter>().mesh = meshObj;
             slab.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
-                color = GetMemberColor("RC", "Slab")
+                //color = GetMemberColor("RC", "Slab")
+                color = new Color(1, 1, 1, 1)
             };
             slab.transform.parent = slabs.transform;
 
@@ -175,7 +176,8 @@ public partial class STBReader:MonoBehaviour {
         GameObject element = new GameObject(name);
         element.AddComponent<MeshFilter>().mesh = meshObj;
         element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
-            color = GetMemberColor(kind, structType)
+                //color = GetMemberColor(kind, structType)
+                color = new Color(1, 1, 1, 1)
         };
         element.transform.parent = elements.transform;
 

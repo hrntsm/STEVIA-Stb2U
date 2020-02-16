@@ -4,6 +4,7 @@ using SFB;
 using UnityEngine;
 
 public partial class STBReader:MonoBehaviour {
+    public Material material;
     private List<Vector3> m_stbNodes = new List<Vector3>();
     private List<int> m_vertexIDs = new List<int>();
     
