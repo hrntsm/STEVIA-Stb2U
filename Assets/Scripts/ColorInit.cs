@@ -29,9 +29,9 @@ public class ColorInit : MonoBehaviour {
         }
         else {
             while (i < 11) {
-                ColorInput.m_memberColor[i] = new Color(1, 1, 1, 1);
+                ColorInput.m_memberColor[i] = new Color(0.5f, 0.5f, 0.5f, 1);
                 ColorInput.m_saveColor.num[i] = i;
-                ColorInput.m_saveColor.rgba[i] = "1,1,1,1";
+                ColorInput.m_saveColor.rgba[i] = "0.5,0.5,0.5,1";
                 i++;
             }
         }
