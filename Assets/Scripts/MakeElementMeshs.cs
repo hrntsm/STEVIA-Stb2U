@@ -18,13 +18,19 @@ public partial class STBReader:MonoBehaviour {
         foreach (var xSlab in xSlabs) {
             List<int> xSlabNodeIds = new List<int>();
             Mesh meshObj = new Mesh();
+            int countNode = 0;
 
             var xNodeIds = xSlab.Element("StbNodeid_List").Elements("StbNodeid");
-            foreach (var xNodeId in xNodeIds)
+            foreach (var xNodeId in xNodeIds) {
                 xSlabNodeIds.Add((int)xNodeId.Attribute("id"));
+                countNode++;
+            }
             int i = 0;
             while (i < 4) {
-                nodeIndex[i] = m_vertexIDs.IndexOf(xSlabNodeIds[i]);
+                if (countNode == 4)
+                    nodeIndex[i] = m_vertexIDs.IndexOf(xSlabNodeIds[i]);
+                else if (i == 3) // triangle slab
+                    break;
                 i++;
             }
             meshObj = CreateMesh.Slab(m_stbNodes, nodeIndex);
