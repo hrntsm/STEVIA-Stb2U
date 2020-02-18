@@ -50,4 +50,7 @@ crashlytics-build.properties
 # add
 Assets/Plugins/GitHub
 Assets/StbData/
+Archive/
+Assets/SkySerie Freebie
 StbData.meta
+SkySerie Freebie.meta
