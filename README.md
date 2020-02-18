@@ -8,7 +8,7 @@ You can easily check frames and present!!
 
 Quote from [building SMART Japan Structural Design Subcommittee](https://en.building-smart.or.jp/meeting/buildall/structural-design/) doing making specifications of ST-Bridge.
 
-> ST Bridge is the standardized format for data sharing in Japanfs structural engineering industry.
+> ST Bridge is the standardized format for data sharing in Japan's structural engineering industry.
 > + Simpler to use than IFC due to the clearly defined the range of use
 > + Integrate Japanese original methods of drawing methodology (Grids, part placement and section annotations, reinforcement information)
 > + Aim for coordination between domestic structural applications, building skeleton surveying applications, 3D Object CAD
