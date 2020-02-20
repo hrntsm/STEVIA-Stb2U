@@ -374,10 +374,10 @@ public partial class STBReader:MonoBehaviour {
             vertex[4] = vertex[0];
 
             for (int j = 0; j < 4; j++) {
-                Mesh meshObj = CreateMesh.Pipe(vertex[j], vertex[j + 1], bandD / 2f);
+                Mesh meshObj = CreateMesh.Pipe(vertex[j], vertex[j + 1], bandD / 2f, 12, true);
                 GameObject element = new GameObject("band");
                 element.AddComponent<MeshFilter>().mesh = meshObj;
-                element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Standard")) {
+                element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
                     color = new Color(1, 0, 1, 1)
                 };
             }
