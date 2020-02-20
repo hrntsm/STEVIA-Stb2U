@@ -363,19 +363,19 @@ public partial class STBReader:MonoBehaviour {
     }
 
     void MakeBand(Vector3[,] cornerPoint, float bandD, float pit) {
-        float length;
+        float distance;
         Vector3[] vertex = new Vector3[5];
-        length = Vector3.Distance(cornerPoint[0, 0], cornerPoint[1, 0]);
+        distance = Vector3.Distance(cornerPoint[0, 0], cornerPoint[1, 0]);
         int i = 0;
 
-        while ((pit * i) / length < 1) {
+        while ((pit * i) / distance < 1) {
             for (int j = 0; j < 4; j++)
-                vertex[j] = Vector3.Lerp(cornerPoint[0, j + 1], cornerPoint[1, j + 1], (pit * i) / length);
+                vertex[j] = Vector3.Lerp(cornerPoint[0, j + 1], cornerPoint[1, j + 1], (pit * i) / distance);
             vertex[4] = vertex[0];
 
             for (int j = 0; j < 4; j++) {
                 Mesh meshObj = CreateMesh.Pipe(vertex[j], vertex[j + 1], bandD / 2f, 12, true);
-                GameObject element = new GameObject("band");
+                GameObject element = new GameObject("hoop");
                 element.AddComponent<MeshFilter>().mesh = meshObj;
                 element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
                     color = new Color(1, 0, 1, 1)
