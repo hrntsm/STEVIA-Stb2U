@@ -51,10 +51,10 @@ public partial class STBReader:MonoBehaviour {
     void MakeElementMesh(XDocument xDoc, string xDateTag, string structType) {
         Vector3 nodeStart, nodeEnd;
         float hight = 0;
-        float Width = 0;
+        float width = 0;
         int elementNum = 0;
-        int nodeIndexStart, nodeIndexEnd, xNodeStart, xNodeEnd, xElementIdSection,
-            stbSecIndex, idSection;
+        int stbSecIndex = 0;
+        int nodeIndexStart, nodeIndexEnd, xNodeStart, xNodeEnd, xElementIdSection, idSection;
         var xElements = xDoc.Root.Descendants(xDateTag);
         string shape, xKind;
         string shapeType = "";
@@ -68,9 +68,14 @@ public partial class STBReader:MonoBehaviour {
                     xNodeStart = (int)xElement.Attribute("idNode_start");
                     xNodeEnd = (int)xElement.Attribute("idNode_end");
                     break;
-                default:
+                case "Column":
+                case "Post":
                     xNodeStart = (int)xElement.Attribute("idNode_bottom");
                     xNodeEnd = (int)xElement.Attribute("idNode_top");
+                    break;
+                default:
+                    xNodeStart = 0;
+                    xNodeEnd = 0;
                     break;
             }
             xElementIdSection = (int)xElement.Attribute("id_section");
@@ -88,18 +93,18 @@ public partial class STBReader:MonoBehaviour {
                     case "Beam":
                         stbSecIndex = m_xRcBeamId.IndexOf(xElementIdSection);
                         hight = m_xRcBeamDepth[stbSecIndex] / 1000f;
-                        Width = m_xRcBeamWidth[stbSecIndex] / 1000f;
+                        width = m_xRcBeamWidth[stbSecIndex] / 1000f;
                         break;
                     case "Column":
                     case "Post":
                         stbSecIndex = m_xRcColumnId.IndexOf(xElementIdSection);
                         hight = m_xRcColumnDepth[stbSecIndex] / 1000f;
-                        Width = m_xRcColumnWidth[stbSecIndex] / 1000f;
+                        width = m_xRcColumnWidth[stbSecIndex] / 1000f;
                         break;
                     default:
                         break;
                 }
-                if (Width == 0)
+                if (width == 0)
                     shapeType = "Pipe";
                 else
                     shapeType = "BOX";
@@ -126,12 +131,15 @@ public partial class STBReader:MonoBehaviour {
                 }
                 stbSecIndex = m_xStName.IndexOf(shape);
                 hight = m_xStParamA[stbSecIndex] / 1000f;
-                Width = m_xStParamB[stbSecIndex] / 1000f;
+                width = m_xStParamB[stbSecIndex] / 1000f;
                 shapeType = m_xStType[stbSecIndex];
             }
 
             // 始点と終点から梁断面サーフェスの作成
-            m_shapeMesh = MakeElementsMeshFromVertex(nodeStart, nodeEnd, hight, Width, shapeType, structType, elementNum, elements, xKind);
+            m_shapeMesh = MakeElementsMeshFromVertex(nodeStart, nodeEnd, hight, width, shapeType, structType, elementNum, elements, xKind);
+            if (xKind == "RC" && structType == "Column" && shapeType == "BOX")
+                MakeBar(stbSecIndex, nodeStart, nodeEnd, width, hight);
+
             elementNum++;
         }
         m_shapeMesh.Clear();
@@ -144,8 +152,8 @@ public partial class STBReader:MonoBehaviour {
         Mesh meshObj = new Mesh();
 
         // 部材のアングルの確認
-        angleY = -1 * (float)Math.Atan((nodeEnd.y - nodeStart.y) / (nodeEnd.x - nodeStart.x));
-        angleZ = -1 * (float)Math.Atan((nodeEnd.z - nodeStart.z) / (nodeEnd.x - nodeStart.x));
+        angleY = -1 * (float)Mathf.Atan((nodeEnd.y - nodeStart.y) / (nodeEnd.x - nodeStart.x));
+        angleZ = -1 * (float)Mathf.Atan((nodeEnd.z - nodeStart.z) / (nodeEnd.x - nodeStart.x));
 
         // 梁は部材天端の中心が起点に対して、柱・ブレースは部材芯が起点なので場合分け
         switch (structType) {
@@ -309,5 +317,71 @@ public partial class STBReader:MonoBehaviour {
                                 node.z - width / 2 * (float)Math.Cos(angle)
                                 );
         return (vertex);
+    }
+
+    void MakeBar(int index, Vector3 nodeStart, Vector3 nodeEnd, float width, float hight) {
+        Mesh meshObj = new Mesh();
+        // かぶり、鉄筋径はとりあえずで設定
+        float kaburi = 50/1000f;
+        float bandD = 10/1000f;
+        float mainD = 25/1000f;
+        float pit = m_xRcColumnBar[index][5] / 1000f;
+        Vector3[,] cornerPoint = new Vector3[2,4];
+        float angle = -1 * (float)Math.Atan((nodeEnd.y - nodeStart.y) / (nodeEnd.x - nodeStart.x));
+
+        cornerPoint = GetCornerPoint(nodeStart, nodeEnd, width - (2 * kaburi + bandD), hight - (2 * kaburi + bandD), angle);
+        MakeBand(cornerPoint, bandD, pit);
+    }
+
+    Vector3[,] GetCornerPoint(Vector3 nodeStart, Vector3 nodeEnd, float width, float hight, float angle) {
+        //  Y        4 - 3
+        //  ^        | 0 |
+        //  o >  X   1 - 2
+        Vector3[,] cornerPoint = new Vector3[2,5];
+        Vector3 node = nodeStart;
+        for (int i = 0; i < 2; i++) {
+            cornerPoint[i, 0] = node;
+            cornerPoint[i, 1] = new Vector3(node.x - width / 2 * (float)Math.Sin(angle),
+                                            node.y - width / 2 * (float)Math.Cos(angle),
+                                            node.z - hight / 2
+                                            );
+            cornerPoint[i, 2] = new Vector3(node.x + width / 2 * (float)Math.Sin(angle),
+                                            node.y + width / 2 * (float)Math.Cos(angle),
+                                            node.z - hight / 2
+                                            );
+            cornerPoint[i, 3] = new Vector3(node.x + width / 2 * (float)Math.Sin(angle),
+                                            node.y + width / 2 * (float)Math.Cos(angle),
+                                            node.z + hight / 2
+                                            );
+            cornerPoint[i, 4] = new Vector3(node.x - width / 2 * (float)Math.Sin(angle),
+                                            node.y - width / 2 * (float)Math.Cos(angle),
+                                            node.z + hight / 2
+                                            );
+            node = nodeEnd;
+        }
+        return (cornerPoint);
+    }
+
+    void MakeBand(Vector3[,] cornerPoint, float bandD, float pit) {
+        float length;
+        Vector3[] vertex = new Vector3[5];
+        length = Vector3.Distance(cornerPoint[0, 0], cornerPoint[1, 0]);
+        int i = 0;
+
+        while ((pit * i) / length < 1) {
+            for (int j = 0; j < 4; j++)
+                vertex[j] = Vector3.Lerp(cornerPoint[0, j + 1], cornerPoint[1, j + 1], (pit * i) / length);
+            vertex[4] = vertex[0];
+
+            for (int j = 0; j < 4; j++) {
+                Mesh meshObj = CreateMesh.Pipe(vertex[j], vertex[j + 1], bandD / 2f);
+                GameObject element = new GameObject("band");
+                element.AddComponent<MeshFilter>().mesh = meshObj;
+                element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Standard")) {
+                    color = new Color(1, 0, 1, 1)
+                };
+            }
+            i++;
+        }
     }
 }

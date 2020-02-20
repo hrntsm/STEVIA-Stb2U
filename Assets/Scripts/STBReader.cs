@@ -11,11 +11,13 @@ public partial class STBReader:MonoBehaviour {
     private List<int> m_xRcColumnId = new List<int>();
     private List<int> m_xRcColumnDepth = new List<int>();
     private List<int> m_xRcColumnWidth = new List<int>();
+    private List<List<int>> m_xRcColumnBar = new List<List<int>>();
     private List<int> m_xStColumnId = new List<int>();
     private List<string> m_xStColumnShape = new List<string>();
     private List<int> m_xRcBeamId = new List<int>();
     private List<int> m_xRcBeamDepth = new List<int>();
     private List<int> m_xRcBeamWidth = new List<int>();
+    private List<List<int>> m_xRcBeamBar = new List<List<int>>();
     private List<int> m_xStBeamId = new List<int>();
     private List<string> m_xStBeamShape = new List<string>();
     private List<int> m_xStBraceId = new List<int>();
@@ -37,16 +39,19 @@ public partial class STBReader:MonoBehaviour {
         foreach (var xRcColumn in xRcColumns) {
             m_xRcColumnId.Add((int)xRcColumn.Attribute("id"));
             var xFigure = xRcColumn.Element("StbSecFigure");
+            var xBar = xRcColumn.Element("StbSecBar_Arrangement");
 
             // 子要素が StbSecRect か StbSecCircle を判定
             if (xFigure.Element("StbSecRect") != null) {
                 m_xRcColumnDepth.Add((int)xFigure.Element("StbSecRect").Attribute("DY"));
                 m_xRcColumnWidth.Add((int)xFigure.Element("StbSecRect").Attribute("DX"));
+                m_xRcColumnBar.Add(GetBarInfo(xBar));
             }
             else {
                 m_xRcColumnDepth.Add((int)xFigure.Element("StbSecCircle").Attribute("D"));
                 m_xRcColumnWidth.Add(0); // Circle と判定用に width は 0
             }
+            i++;
         }
         // StbSecColumn_S の取得
         var xStColumns = xDoc.Root.Descendants("StbSecColumn_S");
@@ -147,5 +152,29 @@ public partial class STBReader:MonoBehaviour {
             {"StbBrace", "Brace"}
         };
         return (memberNameArray);
+    }
+
+    List<int> GetBarInfo(XElement xBar) {
+        List<int> barList = new List<int>();
+
+        barList.Add((int)xBar.Element("StbSecRect_Column_Same").Attribute("count_main_X_1st"));
+        if (xBar.Element("StbSecRect_Column_Same").Attribute("count_main_X_2nd") != null) {
+            barList.Add((int)xBar.Element("StbSecRect_Column_Same").Attribute("count_main_X_2st"));
+        }
+        else {
+            barList.Add(0);
+        }
+        barList.Add((int)xBar.Element("StbSecRect_Column_Same").Attribute("count_main_Y_1st"));
+        if (xBar.Element("StbSecRect_Column_Same").Attribute("count_main_Y_2nd") != null) {
+            barList.Add((int)xBar.Element("StbSecRect_Column_Same").Attribute("count_main_Y_2st"));
+        }
+        else {
+            barList.Add(0);
+        }
+        barList.Add((int)xBar.Element("StbSecRect_Column_Same").Attribute("count_main_total"));
+        barList.Add((int)xBar.Element("StbSecRect_Column_Same").Attribute("pitch_band"));
+        barList.Add((int)xBar.Element("StbSecRect_Column_Same").Attribute("count_band_dir_X"));
+        barList.Add((int)xBar.Element("StbSecRect_Column_Same").Attribute("count_band_dir_Y"));
+        return (barList);
     }
 }
