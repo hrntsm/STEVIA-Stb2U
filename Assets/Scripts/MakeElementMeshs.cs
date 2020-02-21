@@ -327,42 +327,47 @@ public partial class STBReader:MonoBehaviour {
         float mainD = 25/1000f;
         float pit = m_xRcColumnBar[index][5] / 1000f;
         Vector3[,] cornerPoint = new Vector3[2,4];
-        float angle = -1 * (float)Math.Atan((nodeEnd.y - nodeStart.y) / (nodeEnd.x - nodeStart.x));
 
-        cornerPoint = GetCornerPoint(nodeStart, nodeEnd, width - (2 * kaburi + bandD), hight - (2 * kaburi + bandD), angle);
-        MakeBand(cornerPoint, bandD, pit);
+        cornerPoint = GetCornerPoint(nodeStart, nodeEnd, width - (2 * kaburi + bandD), hight - (2 * kaburi + bandD));
+        MakeHoop(cornerPoint, bandD, pit);
     }
 
-    Vector3[,] GetCornerPoint(Vector3 nodeStart, Vector3 nodeEnd, float width, float hight, float angle) {
-        //  Y        4 - 3
+    Vector3[,] GetCornerPoint(Vector3 nodeStart, Vector3 nodeEnd, float width, float hight) {
+        //  Z        4 - 3
         //  ^        | 0 |
         //  o >  X   1 - 2
         Vector3[,] cornerPoint = new Vector3[2,5];
         Vector3 node = nodeStart;
+        float dx = nodeEnd.x - nodeStart.x;
+        float dy = nodeEnd.y - nodeStart.y;
+        float dz = nodeEnd.z - nodeStart.z;
+        float angleX = -1f * Mathf.Atan2(dx, dy) * Mathf.Rad2Deg;
+        float angleZ = -1f * Mathf.Atan2(dz, dy) * Mathf.Rad2Deg;
+
         for (int i = 0; i < 2; i++) {
             cornerPoint[i, 0] = node;
-            cornerPoint[i, 1] = new Vector3(node.x - width / 2 * (float)Math.Sin(angle),
-                                            node.y - width / 2 * (float)Math.Cos(angle),
-                                            node.z - hight / 2
+            cornerPoint[i, 1] = new Vector3(node.x - width / 2f * Mathf.Cos(angleX),
+                                            node.y - width / 2f * Mathf.Sin(angleX) - hight / 2f * Mathf.Sin(angleZ),
+                                            node.z - hight / 2f * Mathf.Cos(angleZ)
                                             );
-            cornerPoint[i, 2] = new Vector3(node.x + width / 2 * (float)Math.Sin(angle),
-                                            node.y + width / 2 * (float)Math.Cos(angle),
-                                            node.z - hight / 2
+            cornerPoint[i, 2] = new Vector3(node.x + width / 2f * Mathf.Cos(angleX),
+                                            node.y + width / 2f * Mathf.Sin(angleX) + hight / 2f * Mathf.Sin(angleZ),
+                                            node.z - hight / 2f * Mathf.Cos(angleZ)
                                             );
-            cornerPoint[i, 3] = new Vector3(node.x + width / 2 * (float)Math.Sin(angle),
-                                            node.y + width / 2 * (float)Math.Cos(angle),
-                                            node.z + hight / 2
+            cornerPoint[i, 3] = new Vector3(node.x + width / 2f * Mathf.Cos(angleX),
+                                            node.y + width / 2f * Mathf.Sin(angleX) + hight / 2f * Mathf.Sin(angleZ),
+                                            node.z + hight / 2f * Mathf.Cos(angleZ)
                                             );
-            cornerPoint[i, 4] = new Vector3(node.x - width / 2 * (float)Math.Sin(angle),
-                                            node.y - width / 2 * (float)Math.Cos(angle),
-                                            node.z + hight / 2
+            cornerPoint[i, 4] = new Vector3(node.x - width / 2f * Mathf.Cos(angleX),
+                                            node.y - width / 2f * Mathf.Sin(angleX) - hight / 2f * Mathf.Sin(angleZ),
+                                            node.z + hight / 2f * Mathf.Cos(angleZ)
                                             );
             node = nodeEnd;
         }
         return (cornerPoint);
     }
 
-    void MakeBand(Vector3[,] cornerPoint, float bandD, float pit) {
+    void MakeHoop(Vector3[,] cornerPoint, float bandD, float pit) {
         float distance;
         Vector3[] vertex = new Vector3[5];
         distance = Vector3.Distance(cornerPoint[0, 0], cornerPoint[1, 0]);
