@@ -157,21 +157,21 @@ public partial class STBReader:MonoBehaviour {
     List<int> GetBarInfo(XElement xBar) {
         List<int> barList = new List<int>();
 
+        // Main 1
         barList.Add((int)xBar.Element("StbSecRect_Column_Same").Attribute("count_main_X_1st"));
-        if (xBar.Element("StbSecRect_Column_Same").Attribute("count_main_X_2nd") != null) {
-            barList.Add((int)xBar.Element("StbSecRect_Column_Same").Attribute("count_main_X_2st"));
-        }
-        else {
-            barList.Add(0);
-        }
         barList.Add((int)xBar.Element("StbSecRect_Column_Same").Attribute("count_main_Y_1st"));
-        if (xBar.Element("StbSecRect_Column_Same").Attribute("count_main_Y_2nd") != null) {
-            barList.Add((int)xBar.Element("StbSecRect_Column_Same").Attribute("count_main_Y_2st"));
-        }
-        else {
+        // Main2
+        if (xBar.Element("StbSecRect_Column_Same").Attribute("count_main_X_2nd") != null)
+            barList.Add((int)xBar.Element("StbSecRect_Column_Same").Attribute("count_main_X_2st"));
+        else
             barList.Add(0);
-        }
+        if (xBar.Element("StbSecRect_Column_Same").Attribute("count_main_Y_2nd") != null)
+            barList.Add((int)xBar.Element("StbSecRect_Column_Same").Attribute("count_main_Y_2st"));
+        else
+            barList.Add(0);
+        // Main total
         barList.Add((int)xBar.Element("StbSecRect_Column_Same").Attribute("count_main_total"));
+        // Band
         barList.Add((int)xBar.Element("StbSecRect_Column_Same").Attribute("pitch_band"));
         barList.Add((int)xBar.Element("StbSecRect_Column_Same").Attribute("count_band_dir_X"));
         barList.Add((int)xBar.Element("StbSecRect_Column_Same").Attribute("count_band_dir_Y"));

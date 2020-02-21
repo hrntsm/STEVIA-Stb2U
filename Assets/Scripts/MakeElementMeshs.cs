@@ -320,16 +320,32 @@ public partial class STBReader:MonoBehaviour {
     }
 
     void MakeBar(int index, Vector3 nodeStart, Vector3 nodeEnd, float width, float hight) {
-        Mesh meshObj = new Mesh();
         // かぶり、鉄筋径はとりあえずで設定
         float kaburi = 50/1000f;
         float bandD = 10/1000f;
         float mainD = 25/1000f;
+        float barSpace = Mathf.Max(1.5f * mainD, 25 / 1000f); // 鉄筋のあきは、
         float pit = m_xRcColumnBar[index][5] / 1000f;
-        Vector3[,] cornerPoint = new Vector3[2,4];
+        int[] mainBarNum = GetMainBarInfo(index);
+        float bandPos = 2 * kaburi + bandD;
+        float main1Pos = bandPos + bandD + mainD;
+        float main2Pos = main1Pos + mainD + 2 * barSpace;
 
-        cornerPoint = GetCornerPoint(nodeStart, nodeEnd, width - (2 * kaburi + bandD), hight - (2 * kaburi + bandD));
-        MakeHoop(cornerPoint, bandD, pit);
+        Vector3[,] hoopPoint = GetCornerPoint(nodeStart, nodeEnd, width - bandPos, hight - bandPos);
+        Vector3[,] main1Point = GetCornerPoint(nodeStart, nodeEnd, width - main1Pos, hight - main1Pos);
+        Vector3[,] main2Point = GetCornerPoint(nodeStart, nodeEnd, width - main2Pos, hight - main2Pos);
+        MakeHoop(hoopPoint, bandD, pit);
+        MakeMainBar(main1Point, mainD, mainBarNum, 1);
+        //MakeMainBar(main2Point, mainD, mainBarNum, 2); // 2段筋のときは1段筋をよせないといけないのでこのやり方ではうまくいかない
+    }
+
+    int[] GetMainBarInfo(int index) {
+        int[] mainBar = new int[5];
+
+        for (int i = 0; i < 5; i++) {
+            mainBar[i] = m_xRcColumnBar[index][i];
+        }
+        return (mainBar);
     }
 
     Vector3[,] GetCornerPoint(Vector3 nodeStart, Vector3 nodeEnd, float width, float hight) {
@@ -367,15 +383,14 @@ public partial class STBReader:MonoBehaviour {
         return (cornerPoint);
     }
 
-    void MakeHoop(Vector3[,] cornerPoint, float bandD, float pit) {
-        float distance;
+    void MakeHoop(Vector3[,] hoopPoint, float bandD, float pit) {
         Vector3[] vertex = new Vector3[5];
-        distance = Vector3.Distance(cornerPoint[0, 0], cornerPoint[1, 0]);
+        float distance = Vector3.Distance(hoopPoint[0, 0], hoopPoint[1, 0]);
         int i = 0;
 
         while ((pit * i) / distance < 1) {
             for (int j = 0; j < 4; j++)
-                vertex[j] = Vector3.Lerp(cornerPoint[0, j + 1], cornerPoint[1, j + 1], (pit * i) / distance);
+                vertex[j] = Vector3.Lerp(hoopPoint[0, j + 1], hoopPoint[1, j + 1], (pit * i) / distance);
             vertex[4] = vertex[0];
 
             for (int j = 0; j < 4; j++) {
@@ -387,6 +402,55 @@ public partial class STBReader:MonoBehaviour {
                 };
             }
             i++;
+        }
+    }
+    
+    void MakeMainBar(Vector3[,] mainPoint, float mainD, int[] mainBarNum, int posNum) {
+        int posIndex;
+
+        if (posNum == 1)
+            posIndex = 0;
+        else
+            posIndex = 2;
+
+        for (int i = 1; i < 5; i++) {
+            // コーナーの主筋
+            Mesh meshObj = CreateMesh.Pipe(mainPoint[0, i], mainPoint[1, i], mainD / 2f, 12, true);
+            GameObject element = new GameObject("main");
+            element.AddComponent<MeshFilter>().mesh = meshObj;
+            element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
+                color = new Color(1, 1, 0, 1)
+            };
+        }
+
+        float barXNum = mainBarNum[posIndex];
+        float barYNum = mainBarNum[posIndex　+ 1];
+        float posXRatio = 1 / (barXNum - 1);
+        float posYRatio = 1 / (barYNum - 1);
+        int count = 0;
+        List<Vector3> vertex = new List<Vector3>();
+
+        for (int j = 1; j <= barXNum - 2; j++) {
+            vertex.Add(Vector3.Lerp(mainPoint[0, 1], mainPoint[0, 2], posXRatio * j));
+            vertex.Add(Vector3.Lerp(mainPoint[1, 1], mainPoint[1, 2], posXRatio * j));
+            vertex.Add(Vector3.Lerp(mainPoint[0, 3], mainPoint[0, 4], posXRatio * j));
+            vertex.Add(Vector3.Lerp(mainPoint[1, 3], mainPoint[1, 4], posXRatio * j));
+            count += 2;
+        }
+        for (int j = 1; j <= barYNum - 2; j++) {
+            vertex.Add(Vector3.Lerp(mainPoint[0, 2], mainPoint[0, 3], posYRatio * j));
+            vertex.Add(Vector3.Lerp(mainPoint[1, 2], mainPoint[1, 3], posYRatio * j));
+            vertex.Add(Vector3.Lerp(mainPoint[0, 4], mainPoint[0, 1], posYRatio * j));
+            vertex.Add(Vector3.Lerp(mainPoint[1, 4], mainPoint[1, 1], posYRatio * j));
+            count += 2;
+        }
+        for (int i = 0; i < count; i++) {
+            Mesh meshObj = CreateMesh.Pipe(vertex[2 * i], vertex[ 2 * i + 1], mainD / 2f, 12, true);
+            GameObject element = new GameObject("main");
+            element.AddComponent<MeshFilter>().mesh = meshObj;
+            element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
+                color = new Color(1, 1, 0, 1)
+            };
         }
     }
 }
