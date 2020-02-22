@@ -81,8 +81,8 @@ public class CreateMesh : MonoBehaviour {
         float dx = endPoint.x - startPoint.x;
         float dy = endPoint.y - startPoint.y;
         float dz = endPoint.z - startPoint.z;
-        float angleX = -1f * Mathf.Atan2(dx, dy) * Mathf.Rad2Deg;
-        float angleZ = -1f * Mathf.Atan2(dz, dy) * Mathf.Rad2Deg;
+        float angleX = -1f * Mathf.Atan2(dx, dy);
+        float angleZ = -1f * Mathf.Atan2(dz, dy);
         
         int i = 0;
         float baseAngle = 2f * Mathf.PI / divNum;

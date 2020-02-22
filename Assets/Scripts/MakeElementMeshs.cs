@@ -150,7 +150,6 @@ public partial class STBReader:MonoBehaviour {
                         default:
                             break;
                     }
-
                 }
             }
             elementNum++;
@@ -159,14 +158,15 @@ public partial class STBReader:MonoBehaviour {
     }
 
     public List<Mesh> MakeElementsMeshFromVertex(Vector3 nodeStart, Vector3 nodeEnd, float hight, float width, string shapeType, string structType, int elementNum, GameObject elements, string kind) {
-        float angleY, angleZ;
         Vector3[] vertexS = new Vector3[6];
         Vector3[] vertexE = new Vector3[6];
         Mesh meshObj = new Mesh();
 
-        // 部材のアングルの確認
-        angleY = -1 * (float)Mathf.Atan((nodeEnd.y - nodeStart.y) / (nodeEnd.x - nodeStart.x));
-        angleZ = -1 * (float)Mathf.Atan((nodeEnd.z - nodeStart.z) / (nodeEnd.x - nodeStart.x));
+        float dx = nodeEnd.x - nodeStart.x;
+        float dy = nodeEnd.y - nodeStart.y;
+        float dz = nodeEnd.z - nodeStart.z;
+        float angleY = -1f * Mathf.Atan2(dy, dx);
+        float angleZ = -1f * Mathf.Atan2(dz, dx);
 
         // 梁は部材天端の中心が起点に対して、柱・ブレースは部材芯が起点なので場合分け
         switch (structType) {

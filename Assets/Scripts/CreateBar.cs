@@ -4,6 +4,23 @@ using UnityEngine;
 
 public class CreateBar : MonoBehaviour {
 
+    static int[] GetColMainNum(int index) {
+        int[] mainBar = new int[5];
+
+        for (int i = 0; i < 5; i++)
+            mainBar[i] = STBReader.m_xRcColumnBar[index][i];
+        return (mainBar);
+    }
+
+    static int[] GetBeamMainNum(int index) {
+        int[] mainBar = new int[5];
+
+        for (int i = 0; i < 5; i++)
+            mainBar[i] = STBReader.m_xRcBeamBar[index][i];
+        return (mainBar);
+    }
+
+
     public static void Column(int index, Vector3 nodeStart, Vector3 nodeEnd, float width, float hight) {
         // かぶり、鉄筋径はとりあえずで設定
         float kaburi = 50 / 1000f;
@@ -14,44 +31,16 @@ public class CreateBar : MonoBehaviour {
         float main1Space = bandSpace + bandD + mainD;
         float main2Space = main1Space + 2 * (mainD + barSpace);
 
-        Vector3[,] hoopPos = GetCornerPoint(nodeStart, nodeEnd, width - bandSpace, hight - bandSpace);
-        Vector3[,] main1Pos = GetCornerPoint(nodeStart, nodeEnd, width - main1Space, hight - main1Space);
-        Vector3[,] mainX2Pos = GetCornerPoint(nodeStart, nodeEnd, width - main1Space, hight - main2Space);
-        Vector3[,] mainY2Pos = GetCornerPoint(nodeStart, nodeEnd, width - main2Space, hight - main1Space);
+        Vector3[,] hoopPos = GetColumnCorner(nodeStart, nodeEnd, width - bandSpace, hight - bandSpace);
+        Vector3[,] main1Pos = GetColumnCorner(nodeStart, nodeEnd, width - main1Space, hight - main1Space);
+        Vector3[,] mainX2Pos = GetColumnCorner(nodeStart, nodeEnd, width - main1Space, hight - main2Space);
+        Vector3[,] mainY2Pos = GetColumnCorner(nodeStart, nodeEnd, width - main2Space, hight - main1Space);
 
         MakeHoop(hoopPos, bandD, index);
         MakeColumnMainBar(main1Pos, mainX2Pos, mainY2Pos, barSpace, mainD, index);
     }
 
-    public static void Beam(int index, Vector3 nodeStart, Vector3 nodeEnd, float width, float hight) {
-        // かぶり、鉄筋径はとりあえずで設定
-        float kaburi = 50 / 1000f;
-        float bandD = 10 / 1000f;
-        float mainD = 25 / 1000f;
-        float barSpace = Mathf.Max(1.5f * mainD, 25 / 1000f); // 鉄筋のあき
-        float bandSpace = 2 * kaburi + bandD;
-        float main1Space = bandSpace + bandD + mainD;
-        float main2Space = main1Space + 2 * (mainD + barSpace);
-        float main3Space = main2Space + 2 * (mainD + barSpace);
-
-        Vector3[,] strupPos = GetCornerPoint(nodeStart, nodeEnd, width - bandSpace, hight - bandSpace);
-        Vector3[,] main1Pos = GetCornerPoint(nodeStart, nodeEnd, width - main1Space, hight - main1Space);
-        Vector3[,] main2Pos = GetCornerPoint(nodeStart, nodeEnd, width - main1Space, hight - main2Space);
-        Vector3[,] main3Pos = GetCornerPoint(nodeStart, nodeEnd, width - main1Space, hight - main3Space);
-        MakeStrup(strupPos, bandD, index);
-        //MakeBeamMainBar(main1Pos, main2Pos, main3Pos, barSpace, mainD, index);
-    }
-
-    static int[] GetMainBarInfo(int index) {
-        int[] mainBar = new int[5];
-
-        for (int i = 0; i < 5; i++) {
-            mainBar[i] = STBReader.m_xRcColumnBar[index][i];
-        }
-        return (mainBar);
-    }
-
-    static Vector3[,] GetCornerPoint(Vector3 nodeStart, Vector3 nodeEnd, float width, float hight) {
+    static Vector3[,] GetColumnCorner(Vector3 nodeStart, Vector3 nodeEnd, float width, float hight) {
         //  Z        4 - 3
         //  ^        | 0 |
         //  o >  X   1 - 2
@@ -60,8 +49,8 @@ public class CreateBar : MonoBehaviour {
         float dx = nodeEnd.x - nodeStart.x;
         float dy = nodeEnd.y - nodeStart.y;
         float dz = nodeEnd.z - nodeStart.z;
-        float angleX = -1f * Mathf.Atan2(dx, dy) * Mathf.Rad2Deg;
-        float angleZ = -1f * Mathf.Atan2(dz, dy) * Mathf.Rad2Deg;
+        float angleX = -1f * Mathf.Atan2(dx, dy);
+        float angleZ = -1f * Mathf.Atan2(dz, dy);
 
         for (int i = 0; i < 2; i++) {
             cornerPoint[i, 0] = node;
@@ -84,45 +73,6 @@ public class CreateBar : MonoBehaviour {
             node = nodeEnd;
         }
         return (cornerPoint);
-    }
-
-    static Vector3[,] GetBandPos(Vector3[,] cornerPos, int dirXNum, int dirYNum) {
-        Vector3[,] hoopPos = new Vector3[2, 2 * (dirXNum + dirYNum)];
-        // dir_X
-        for (int i = 0; i < dirXNum; i++) {
-            for (int j = 0; j < 2; j++) {
-                if (i == 0) {
-                    hoopPos[j, 2 * i] = cornerPos[j, 1];
-                    hoopPos[j, 2 * i + 1] = cornerPos[j, 2];
-                }
-                else if (i == dirXNum - 1) {
-                    hoopPos[j, 2 * i] = cornerPos[j, 4];
-                    hoopPos[j, 2 * i + 1] = cornerPos[j, 3];
-                }
-                else {
-                    hoopPos[j, 2 * i] = Vector3.Lerp(cornerPos[j, 1], cornerPos[j, 4], 1f / (dirXNum - 1) * i);
-                    hoopPos[j, 2 * i + 1] = Vector3.Lerp(cornerPos[j, 2], cornerPos[j, 3], 1f / (dirXNum - 1) * i);
-                }
-            }
-        }
-        // dir_Y
-        for (int i = dirXNum; i < dirXNum + dirYNum; i++) {
-            for (int j = 0; j < 2; j++) {
-                if (i == 0) {
-                    hoopPos[j, 2 * i] = cornerPos[j, 1];
-                    hoopPos[j, 2 * i + 1] = cornerPos[j, 4];
-                }
-                else if (i == dirXNum + dirYNum - 1) {
-                    hoopPos[j, 2 * i] = cornerPos[j, 2];
-                    hoopPos[j, 2 * i + 1] = cornerPos[j, 3];
-                }
-                else {
-                    hoopPos[j, 2 * i] = Vector3.Lerp(cornerPos[j, 1], cornerPos[j, 2], 1f / (dirYNum - 1) * (i - dirXNum));
-                    hoopPos[j, 2 * i + 1] = Vector3.Lerp(cornerPos[j, 4], cornerPos[j, 3], 1f / (dirYNum - 1) * (i - dirXNum));
-                }
-            }
-        }
-        return (hoopPos);
     }
 
     static void MakeHoop(Vector3[,] cornerPos, float bandD, int index) {
@@ -152,34 +102,8 @@ public class CreateBar : MonoBehaviour {
         }
     }
 
-    static void MakeStrup(Vector3[,] cornerPos, float bandD, int index) {
-        float pitch = STBReader.m_xRcBeamBar[index][6] / 1000f;
-        int strupNum = STBReader.m_xRcBeamBar[index][7];
-        int sumBar = strupNum + 2;
-        float distance = Vector3.Distance(cornerPos[0, 0], cornerPos[1, 0]);
-        List<Vector3> vertex = new List<Vector3>();
-        int i = 0;
-
-        Vector3[,] strupPos = GetBandPos(cornerPos, 2, strupNum);
-
-        while ((pitch * i) / distance < 1) {
-            for (int j = 0; j < 2 * sumBar; j++) {
-                vertex.Add(Vector3.Lerp(strupPos[0, j], strupPos[1, j], (float)(pitch * i) / distance));
-            }
-            for (int j = 0; j < strupNum; j++) {
-                Mesh meshObj = CreateMesh.Pipe(vertex[2 * j + (i * 2 * sumBar)], vertex[2 * j + 1 + (i * 2 * sumBar)], bandD / 2f, 12, true);
-                GameObject element = new GameObject("Strup");
-                element.AddComponent<MeshFilter>().mesh = meshObj;
-                element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
-                    color = new Color(1, 0, 1, 1)
-                };
-            }
-            i++;
-        }
-    }
-
     static void MakeColumnMainBar(Vector3[,] mainPos, Vector3[,] mainX2Pos, Vector3[,] mainY2Pos, float barSpace, float mainD, int index) {
-        int[] mainBarNum = GetMainBarInfo(index);
+        int[] mainBarNum = GetColMainNum(index);
         bool[] hasMain2 = { false, false }; // {Main2_X, Main2_Y}
         if (mainBarNum[2] > 1)
             hasMain2[0] = true;
@@ -287,5 +211,169 @@ public class CreateBar : MonoBehaviour {
                 color = new Color(1, 1, 0, 1)
             };
         }
+    }
+
+    public static void Beam(int index, Vector3 nodeStart, Vector3 nodeEnd, float width, float hight) {
+        // かぶり、鉄筋径はとりあえずで設定
+        float kaburi = 50 / 1000f;
+        float bandD = 10 / 1000f;
+        float mainD = 25 / 1000f;
+        float barSpace = Mathf.Max(1.5f * mainD, 25 / 1000f); // 鉄筋のあき
+        float bandSpace = 2 * kaburi + bandD;
+        float main1Space = bandSpace + bandD + mainD;
+        float main2Space = main1Space + 2 * (mainD + barSpace);
+        float main3Space = main2Space + 2 * (mainD + barSpace);
+
+        Vector3[,] strupPos = GetBeamCorner(nodeStart, nodeEnd, width - bandSpace, hight, bandSpace / 2);
+        Vector3[,] main1Pos = GetBeamCorner(nodeStart, nodeEnd, width - main1Space, hight, main1Space / 2);
+        Vector3[,] main2Pos = GetBeamCorner(nodeStart, nodeEnd, width - main1Space, hight, main2Space / 2);
+        Vector3[,] main3Pos = GetBeamCorner(nodeStart, nodeEnd, width - main1Space, hight, main3Space / 2);
+        MakeStrup(strupPos, bandD, index);
+        MakeBeamMainBar(main1Pos, main2Pos, main3Pos, barSpace, mainD, index);
+    }
+
+    static Vector3[,] GetBeamCorner(Vector3 nodeStart, Vector3 nodeEnd, float width, float hight, float space) {
+        //  Z        4 - 0 - 3
+        //  ^        |       |
+        //  o >  X   1 - - - 2
+        Vector3[,] cornerPoint = new Vector3[2, 5];
+        Vector3 node = nodeStart;
+        float dx = nodeEnd.x - nodeStart.x;
+        float dy = nodeEnd.y - nodeStart.y;
+        float dz = nodeEnd.z - nodeStart.z;
+        float angleY = -1f * Mathf.Atan2(dy, dx);
+        float angleZ = -1f * Mathf.Atan2(dz, dx);
+
+        for (int i = 0; i < 2; i++) {
+            cornerPoint[i, 0] = node;
+            cornerPoint[i, 1] = new Vector3(node.x + width / 2f * Mathf.Sin(angleZ),
+                                            node.y - hight + space,
+                                            node.z + width / 2f * Mathf.Cos(angleZ)
+                                            );
+            cornerPoint[i, 2] = new Vector3(node.x - width / 2f * Mathf.Sin(angleZ),
+                                            node.y - hight + space,
+                                            node.z - width / 2f * Mathf.Cos(angleZ)
+                                            );
+            cornerPoint[i, 3] = new Vector3(node.x - width / 2f * Mathf.Sin(angleZ),
+                                            node.y - space,
+                                            node.z - width / 2f * Mathf.Cos(angleZ)
+                                            );
+            cornerPoint[i, 4] = new Vector3(node.x + width / 2f * Mathf.Sin(angleZ),
+                                            node.y - space,
+                                            node.z + width / 2f * Mathf.Cos(angleZ)
+                                            );
+            node = nodeEnd;
+        }
+        return (cornerPoint);
+    }
+
+    static void MakeStrup(Vector3[,] cornerPos, float bandD, int index) {
+        float pitch = STBReader.m_xRcBeamBar[index][6] / 1000f;
+        int strupNum = STBReader.m_xRcBeamBar[index][7];
+        int sumBar = strupNum + 2;
+        float distance = Vector3.Distance(cornerPos[0, 0], cornerPos[1, 0]);
+        List<Vector3> vertex = new List<Vector3>();
+        int i = 0;
+
+        Vector3[,] strupPos = GetBandPos(cornerPos, 2, strupNum);
+
+        while ((pitch * i) / distance < 1) {
+            for (int j = 0; j < 2 * sumBar; j++) {
+                vertex.Add(Vector3.Lerp(strupPos[0, j], strupPos[1, j], (float)(pitch * i) / distance));
+            }
+            for (int j = 0; j < sumBar; j++) {
+                Mesh meshObj = CreateMesh.Pipe(vertex[2 * j + (i * 2 * sumBar)], vertex[2 * j + 1 + (i * 2 * sumBar)], bandD / 2f, 12, true);
+                GameObject element = new GameObject("Strup");
+                element.AddComponent<MeshFilter>().mesh = meshObj;
+                element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
+                    color = new Color(0, 0, 1, 1)
+                };
+            }
+            i++;
+        }
+    }
+
+    static void MakeBeamMainBar(Vector3[,] main1Pos, Vector3[,] main2Pos, Vector3[,] main3Pos, float barSpace, float mainD, int index) {
+        int[] mainBarNum = GetBeamMainNum(index);
+        bool[] hasMain = new bool[6]; // {Main1_Top, Main1_bottom, Main2_Top, Main2_bottom, Main3_Top, Main3_bottom, }
+
+        for (int i = 0; i < 5; i++) {
+            if (mainBarNum[i] > 1)
+                hasMain[i] = true;
+            else
+                hasMain[i] = false;
+        }
+
+        for (int i = 1; i < 5; i++) {
+            // コーナーの主筋
+            Mesh meshObj = CreateMesh.Pipe(main1Pos[0, i], main1Pos[1, i], mainD / 2f, 12, true);
+            GameObject element = new GameObject("main");
+            element.AddComponent<MeshFilter>().mesh = meshObj;
+            element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
+                color = new Color(0, 1, 0, 1)
+            };
+        }
+
+        float posX1Ratio = 1f / (mainBarNum[0] - 1);
+        float posY1Ratio = 1f / (mainBarNum[1] - 1);
+        float distance = Vector3.Distance(main1Pos[0, 1], main1Pos[0, 2]);
+        int barCount = 0;
+        List<Vector3> vertex = new List<Vector3>();
+
+        for (int j = 1; j <= mainBarNum[0] - 2; j++) {
+            vertex.Add(Vector3.Lerp(main1Pos[0, 1], main1Pos[0, 2], posX1Ratio * j));
+            vertex.Add(Vector3.Lerp(main1Pos[1, 1], main1Pos[1, 2], posX1Ratio * j));
+            vertex.Add(Vector3.Lerp(main1Pos[0, 3], main1Pos[0, 4], posX1Ratio * j));
+            vertex.Add(Vector3.Lerp(main1Pos[1, 3], main1Pos[1, 4], posX1Ratio * j));
+            barCount += 2;
+        }
+
+        for (int i = 0; i < barCount; i++) {
+            Mesh meshObj = CreateMesh.Pipe(vertex[2 * i], vertex[2 * i + 1], mainD / 2f, 12, true);
+            GameObject element = new GameObject("main");
+            element.AddComponent<MeshFilter>().mesh = meshObj;
+            element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
+                color = new Color(0, 1, 0, 1)
+            };
+        }
+    }
+
+    static Vector3[,] GetBandPos(Vector3[,] cornerPos, int dirXNum, int dirYNum) {
+        Vector3[,] bandPos = new Vector3[2, 2 * (dirXNum + dirYNum)];
+        // dir_X
+        for (int i = 0; i < dirXNum; i++) {
+            for (int j = 0; j < 2; j++) {
+                if (i == 0) {
+                    bandPos[j, 2 * i] = cornerPos[j, 1];
+                    bandPos[j, 2 * i + 1] = cornerPos[j, 2];
+                }
+                else if (i == dirXNum - 1) {
+                    bandPos[j, 2 * i] = cornerPos[j, 4];
+                    bandPos[j, 2 * i + 1] = cornerPos[j, 3];
+                }
+                else {
+                    bandPos[j, 2 * i] = Vector3.Lerp(cornerPos[j, 1], cornerPos[j, 4], 1f / (dirXNum - 1) * i);
+                    bandPos[j, 2 * i + 1] = Vector3.Lerp(cornerPos[j, 2], cornerPos[j, 3], 1f / (dirXNum - 1) * i);
+                }
+            }
+        }
+        // dir_Y
+        for (int i = dirXNum; i < dirXNum + dirYNum; i++) {
+            for (int j = 0; j < 2; j++) {
+                if (i == 0) {
+                    bandPos[j, 2 * i] = cornerPos[j, 1];
+                    bandPos[j, 2 * i + 1] = cornerPos[j, 4];
+                }
+                else if (i == dirXNum + dirYNum - 1) {
+                    bandPos[j, 2 * i] = cornerPos[j, 2];
+                    bandPos[j, 2 * i + 1] = cornerPos[j, 3];
+                }
+                else {
+                    bandPos[j, 2 * i] = Vector3.Lerp(cornerPos[j, 1], cornerPos[j, 2], 1f / (dirYNum - 1) * (i - dirXNum));
+                    bandPos[j, 2 * i + 1] = Vector3.Lerp(cornerPos[j, 4], cornerPos[j, 3], 1f / (dirYNum - 1) * (i - dirXNum));
+                }
+            }
+        }
+        return (bandPos);
     }
 }
