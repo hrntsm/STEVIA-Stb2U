@@ -162,11 +162,11 @@ public partial class STBReader:MonoBehaviour {
         barList.Add((int)xBar.Element("StbSecRect_Column_Same").Attribute("count_main_Y_1st"));
         // Main2
         if (xBar.Element("StbSecRect_Column_Same").Attribute("count_main_X_2nd") != null)
-            barList.Add((int)xBar.Element("StbSecRect_Column_Same").Attribute("count_main_X_2st"));
+            barList.Add((int)xBar.Element("StbSecRect_Column_Same").Attribute("count_main_X_2nd"));
         else
             barList.Add(0);
         if (xBar.Element("StbSecRect_Column_Same").Attribute("count_main_Y_2nd") != null)
-            barList.Add((int)xBar.Element("StbSecRect_Column_Same").Attribute("count_main_Y_2st"));
+            barList.Add((int)xBar.Element("StbSecRect_Column_Same").Attribute("count_main_Y_2nd"));
         else
             barList.Add(0);
         // Main total
