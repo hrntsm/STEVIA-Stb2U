@@ -325,18 +325,16 @@ public partial class STBReader:MonoBehaviour {
         float bandD = 10/1000f;
         float mainD = 25/1000f;
         float barSpace = Mathf.Max(1.5f * mainD, 25 / 1000f); // 鉄筋のあき
-        float pit = m_xRcColumnBar[index][5] / 1000f;
-        int[] mainBarNum = GetMainBarInfo(index);
         float bandSpace = 2 * kaburi + bandD;
         float main1Space = bandSpace + bandD + mainD;
-        float main2Space = main1Space + mainD + 2 * barSpace;
+        float main2Space = main1Space + 2 * (mainD + barSpace);
 
         Vector3[,] hoopPos = GetCornerPoint(nodeStart, nodeEnd, width - bandSpace, hight - bandSpace);
         Vector3[,] main1Pos = GetCornerPoint(nodeStart, nodeEnd, width - main1Space, hight - main1Space);
         Vector3[,] mainX2Pos = GetCornerPoint(nodeStart, nodeEnd, width - main1Space, hight - main2Space);
         Vector3[,] mainY2Pos = GetCornerPoint(nodeStart, nodeEnd, width - main2Space, hight - main1Space);
-        MakeHoop(hoopPos, bandD, pit);
-        MakeMainBar(main1Pos, mainX2Pos, mainY2Pos, barSpace, mainD, mainBarNum);
+        MakeHoop(hoopPos, bandD, index);
+        MakeMainBar(main1Pos, mainX2Pos, mainY2Pos, barSpace, mainD, index);
     }
 
     int[] GetMainBarInfo(int index) {
@@ -383,19 +381,62 @@ public partial class STBReader:MonoBehaviour {
         return (cornerPoint);
     }
 
-    void MakeHoop(Vector3[,] hoopPos, float bandD, float pit) {
-        Vector3[] vertex = new Vector3[5];
-        float distance = Vector3.Distance(hoopPos[0, 0], hoopPos[1, 0]);
+    Vector3[,] GetHoopPos(Vector3[,] cornerPos, int dirXNum, int dirYNum) {
+        Vector3[,] hoopPos = new Vector3[2, 2 * (dirXNum + dirYNum)];
+        // dir_X
+        for (int i = 0; i < dirXNum; i++) {
+            for (int j = 0; j < 2; j++) {
+                if (i == 0) {
+                    hoopPos[j, 2 * i] = cornerPos[j, 1];
+                    hoopPos[j, 2 * i + 1] = cornerPos[j, 2];
+                }
+                else if (i == dirXNum - 1) {
+                    hoopPos[j, 2 * i] = cornerPos[j, 4];
+                    hoopPos[j, 2 * i + 1] = cornerPos[j, 3];
+                }
+                else {
+                    hoopPos[j, 2 * i] = Vector3.Lerp(cornerPos[j, 1], cornerPos[j, 4], 1f / (dirXNum - 1) * i);
+                    hoopPos[j, 2 * i + 1] = Vector3.Lerp(cornerPos[j, 2], cornerPos[j, 3], 1f / (dirXNum - 1) * i);
+                }
+            }
+        }
+        // dir_Y
+        for (int i = dirXNum; i < dirXNum + dirYNum; i++) {
+            for (int j = 0; j < 2; j++) {
+                if (i == 0) {
+                    hoopPos[j, 2 * i] = cornerPos[j, 1];
+                    hoopPos[j, 2 * i + 1] = cornerPos[j, 4];
+                }
+                else if (i == dirXNum + dirYNum - 1) {
+                    hoopPos[j, 2 * i] = cornerPos[j, 2];
+                    hoopPos[j, 2 * i + 1] = cornerPos[j, 3];
+                }
+                else {
+                    hoopPos[j, 2 * i] = Vector3.Lerp(cornerPos[j, 1], cornerPos[j, 2], 1f / (dirYNum - 1) * (i - dirXNum));
+                    hoopPos[j, 2 * i + 1] = Vector3.Lerp(cornerPos[j, 4], cornerPos[j, 3], 1f / (dirYNum - 1) * (i - dirXNum));
+                }
+            }
+        }
+        return (hoopPos);
+    }
+
+    void MakeHoop(Vector3[,] cornerPos, float bandD, int index) {
+        float pit = m_xRcColumnBar[index][5] / 1000f;
+        int dirXNum = m_xRcColumnBar[index][6];
+        int dirYNum = m_xRcColumnBar[index][7];
+        int sumBar = dirXNum + dirYNum;
+        float distance = Vector3.Distance(cornerPos[0, 0], cornerPos[1, 0]);
+        List<Vector3> vertex = new List<Vector3>();
         int i = 0;
 
-        while ((pit * i) / distance < 1) {
-            for (int j = 0; j < 4; j++) {
-                vertex[j] = Vector3.Lerp(hoopPos[0, j + 1], hoopPos[1, j + 1], (pit * i) / distance);
-            }
-            vertex[4] = vertex[0];
+        Vector3[,] hoopPos = GetHoopPos(cornerPos, dirXNum, dirYNum);
 
-            for (int j = 0; j < 4; j++) {
-                Mesh meshObj = CreateMesh.Pipe(vertex[j], vertex[j + 1], bandD / 2f, 12, true);
+        while ((pit * i) / distance < 1) {
+            for (int j = 0; j < 2 * (dirXNum + dirYNum); j++) {
+                vertex.Add(Vector3.Lerp(hoopPos[0, j], hoopPos[1, j], (float)(pit * i) / distance));
+            }
+            for (int j = 0; j < dirXNum + dirYNum; j++) {
+                Mesh meshObj = CreateMesh.Pipe(vertex[2 * j + (i * 2 * sumBar)], vertex[2 * j + 1 + (i * 2 * sumBar)], bandD / 2f, 12, true);
                 GameObject element = new GameObject("hoop");
                 element.AddComponent<MeshFilter>().mesh = meshObj;
                 element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
@@ -406,7 +447,8 @@ public partial class STBReader:MonoBehaviour {
         }
     }
     
-    void MakeMainBar(Vector3[,] mainPos, Vector3[,] mainX2Pos, Vector3[,] mainY2Pos, float barSpace, float mainD, int[] mainBarNum) {
+    void MakeMainBar(Vector3[,] mainPos, Vector3[,] mainX2Pos, Vector3[,] mainY2Pos, float barSpace, float mainD, int index) {
+        int[] mainBarNum = GetMainBarInfo(index);
         bool[] hasMain2 = { false, false }; // {Main2_X, Main2_Y}
         if (mainBarNum[2] > 1)
             hasMain2[0] = true;
@@ -423,8 +465,10 @@ public partial class STBReader:MonoBehaviour {
             };
         }
         
-        float posXRatio = 1f / (mainBarNum[0] - 1);
-        float posYRatio = 1f / (mainBarNum[1] - 1);
+        float posX1Ratio = 1f / (mainBarNum[0] - 1);
+        float posY1Ratio = 1f / (mainBarNum[1] - 1);
+        float posX2Ratio = 1f / (mainBarNum[2] - 1);
+        float posY2Ratio = 1f / (mainBarNum[3] - 1);
         float distanceX = Vector3.Distance(mainPos[0, 1], mainPos[0, 2]);
         float distanceY = Vector3.Distance(mainPos[0, 2], mainPos[0, 3]);
         int barCount = 0;
@@ -432,75 +476,75 @@ public partial class STBReader:MonoBehaviour {
 
         if (hasMain2[1]) {
             // 寄せ筋の作成
-            vertex.Add(Vector3.Lerp(mainPos[0, 1], mainPos[0, 2], barSpace / distanceX));
-            vertex.Add(Vector3.Lerp(mainPos[1, 1], mainPos[1, 2], barSpace / distanceX));
-            vertex.Add(Vector3.Lerp(mainPos[0, 3], mainPos[0, 4], barSpace / distanceX));
-            vertex.Add(Vector3.Lerp(mainPos[1, 3], mainPos[1, 4], barSpace / distanceX));
-            vertex.Add(Vector3.Lerp(mainPos[0, 1], mainPos[0, 2], 1f - barSpace / distanceX));
-            vertex.Add(Vector3.Lerp(mainPos[1, 1], mainPos[1, 2], 1f - barSpace / distanceX));
-            vertex.Add(Vector3.Lerp(mainPos[0, 3], mainPos[0, 4], 1f - barSpace / distanceX));
-            vertex.Add(Vector3.Lerp(mainPos[1, 3], mainPos[1, 4], 1f - barSpace / distanceX));
+            vertex.Add(Vector3.Lerp(mainPos[0, 1], mainPos[0, 2], (barSpace + mainD) / distanceX));
+            vertex.Add(Vector3.Lerp(mainPos[1, 1], mainPos[1, 2], (barSpace + mainD) / distanceX));
+            vertex.Add(Vector3.Lerp(mainPos[0, 3], mainPos[0, 4], (barSpace + mainD) / distanceX));
+            vertex.Add(Vector3.Lerp(mainPos[1, 3], mainPos[1, 4], (barSpace + mainD) / distanceX));
+            vertex.Add(Vector3.Lerp(mainPos[0, 1], mainPos[0, 2], 1f - (barSpace + mainD) / distanceX));
+            vertex.Add(Vector3.Lerp(mainPos[1, 1], mainPos[1, 2], 1f - (barSpace + mainD) / distanceX));
+            vertex.Add(Vector3.Lerp(mainPos[0, 3], mainPos[0, 4], 1f - (barSpace + mainD) / distanceX));
+            vertex.Add(Vector3.Lerp(mainPos[1, 3], mainPos[1, 4], 1f - (barSpace + mainD) / distanceX));
             barCount += 4;
             // 1st_X
             for (int j = 2; j <= mainBarNum[0] - 3; j++) {
-                vertex.Add(Vector3.Lerp(mainPos[0, 1], mainPos[0, 2], posXRatio * j));
-                vertex.Add(Vector3.Lerp(mainPos[1, 1], mainPos[1, 2], posXRatio * j));
-                vertex.Add(Vector3.Lerp(mainPos[0, 3], mainPos[0, 4], posXRatio * j));
-                vertex.Add(Vector3.Lerp(mainPos[1, 3], mainPos[1, 4], posXRatio * j));
+                vertex.Add(Vector3.Lerp(mainPos[0, 1], mainPos[0, 2], posX1Ratio * j));
+                vertex.Add(Vector3.Lerp(mainPos[1, 1], mainPos[1, 2], posX1Ratio * j));
+                vertex.Add(Vector3.Lerp(mainPos[0, 3], mainPos[0, 4], posX1Ratio * j));
+                vertex.Add(Vector3.Lerp(mainPos[1, 3], mainPos[1, 4], posX1Ratio * j));
                 barCount += 2;
             }
             // 2nd_X
-            for (int j = 1; j <= mainBarNum[0] - 2; j++) {
-                vertex.Add(Vector3.Lerp(mainX2Pos[0, 1], mainX2Pos[0, 2], posXRatio * j));
-                vertex.Add(Vector3.Lerp(mainX2Pos[1, 1], mainX2Pos[1, 2], posXRatio * j));
-                vertex.Add(Vector3.Lerp(mainX2Pos[0, 3], mainX2Pos[0, 4], posXRatio * j));
-                vertex.Add(Vector3.Lerp(mainX2Pos[1, 3], mainX2Pos[1, 4], posXRatio * j));
+            for (int j = 1; j <= mainBarNum[2] - 2; j++) {
+                vertex.Add(Vector3.Lerp(mainX2Pos[0, 1], mainX2Pos[0, 2], posX2Ratio * j));
+                vertex.Add(Vector3.Lerp(mainX2Pos[1, 1], mainX2Pos[1, 2], posX2Ratio * j));
+                vertex.Add(Vector3.Lerp(mainX2Pos[0, 3], mainX2Pos[0, 4], posX2Ratio * j));
+                vertex.Add(Vector3.Lerp(mainX2Pos[1, 3], mainX2Pos[1, 4], posX2Ratio * j));
                 barCount += 2;
             }
         }
         else {
             for (int j = 1; j <= mainBarNum[0] - 2; j++) {
-                vertex.Add(Vector3.Lerp(mainPos[0, 1], mainPos[0, 2], posXRatio * j));
-                vertex.Add(Vector3.Lerp(mainPos[1, 1], mainPos[1, 2], posXRatio * j));
-                vertex.Add(Vector3.Lerp(mainPos[0, 3], mainPos[0, 4], posXRatio * j));
-                vertex.Add(Vector3.Lerp(mainPos[1, 3], mainPos[1, 4], posXRatio * j));
+                vertex.Add(Vector3.Lerp(mainPos[0, 1], mainPos[0, 2], posX1Ratio * j));
+                vertex.Add(Vector3.Lerp(mainPos[1, 1], mainPos[1, 2], posX1Ratio * j));
+                vertex.Add(Vector3.Lerp(mainPos[0, 3], mainPos[0, 4], posX1Ratio * j));
+                vertex.Add(Vector3.Lerp(mainPos[1, 3], mainPos[1, 4], posX1Ratio * j));
                 barCount += 2;
             }
         }
         if (hasMain2[0]) {
             // 寄せ筋の作成
-            vertex.Add(Vector3.Lerp(mainPos[0, 2], mainPos[0, 3], barSpace / distanceY));
-            vertex.Add(Vector3.Lerp(mainPos[1, 2], mainPos[1, 3], barSpace / distanceY));
-            vertex.Add(Vector3.Lerp(mainPos[0, 4], mainPos[0, 1], barSpace / distanceY));
-            vertex.Add(Vector3.Lerp(mainPos[1, 4], mainPos[1, 1], barSpace / distanceY));
-            vertex.Add(Vector3.Lerp(mainPos[0, 2], mainPos[0, 3], 1f - barSpace / distanceY));
-            vertex.Add(Vector3.Lerp(mainPos[1, 2], mainPos[1, 3], 1f - barSpace / distanceY));
-            vertex.Add(Vector3.Lerp(mainPos[0, 4], mainPos[0, 1], 1f - barSpace / distanceY));
-            vertex.Add(Vector3.Lerp(mainPos[1, 4], mainPos[1, 1], 1f - barSpace / distanceY));
+            vertex.Add(Vector3.Lerp(mainPos[0, 2], mainPos[0, 3], (barSpace + mainD) / distanceY));
+            vertex.Add(Vector3.Lerp(mainPos[1, 2], mainPos[1, 3], (barSpace + mainD) / distanceY));
+            vertex.Add(Vector3.Lerp(mainPos[0, 4], mainPos[0, 1], (barSpace + mainD) / distanceY));
+            vertex.Add(Vector3.Lerp(mainPos[1, 4], mainPos[1, 1], (barSpace + mainD) / distanceY));
+            vertex.Add(Vector3.Lerp(mainPos[0, 2], mainPos[0, 3], 1f - (barSpace + mainD) / distanceY));
+            vertex.Add(Vector3.Lerp(mainPos[1, 2], mainPos[1, 3], 1f - (barSpace + mainD) / distanceY));
+            vertex.Add(Vector3.Lerp(mainPos[0, 4], mainPos[0, 1], 1f - (barSpace + mainD) / distanceY));
+            vertex.Add(Vector3.Lerp(mainPos[1, 4], mainPos[1, 1], 1f - (barSpace + mainD) / distanceY));
             barCount += 4;
             // 1st_Y
             for (int j = 2; j <= mainBarNum[0] - 3; j++) {
-                vertex.Add(Vector3.Lerp(mainPos[0, 2], mainPos[0, 3], posYRatio * j));
-                vertex.Add(Vector3.Lerp(mainPos[1, 2], mainPos[1, 3], posYRatio * j));
-                vertex.Add(Vector3.Lerp(mainPos[0, 4], mainPos[0, 1], posYRatio * j));
-                vertex.Add(Vector3.Lerp(mainPos[1, 4], mainPos[1, 1], posYRatio * j));
+                vertex.Add(Vector3.Lerp(mainPos[0, 2], mainPos[0, 3], posY1Ratio * j));
+                vertex.Add(Vector3.Lerp(mainPos[1, 2], mainPos[1, 3], posY1Ratio * j));
+                vertex.Add(Vector3.Lerp(mainPos[0, 4], mainPos[0, 1], posY1Ratio * j));
+                vertex.Add(Vector3.Lerp(mainPos[1, 4], mainPos[1, 1], posY1Ratio * j));
                 barCount += 2;
             }
             // 2nd_Y
-            for (int j = 1; j <= mainBarNum[0] - 2; j++) {
-                vertex.Add(Vector3.Lerp(mainY2Pos[0, 2], mainY2Pos[0, 3], posYRatio * j));
-                vertex.Add(Vector3.Lerp(mainY2Pos[1, 2], mainY2Pos[1, 3], posYRatio * j));
-                vertex.Add(Vector3.Lerp(mainY2Pos[0, 4], mainY2Pos[0, 1], posYRatio * j));
-                vertex.Add(Vector3.Lerp(mainY2Pos[1, 4], mainY2Pos[1, 1], posYRatio * j));
+            for (int j = 1; j <= mainBarNum[3] - 2; j++) {
+                vertex.Add(Vector3.Lerp(mainY2Pos[0, 2], mainY2Pos[0, 3], posY2Ratio * j));
+                vertex.Add(Vector3.Lerp(mainY2Pos[1, 2], mainY2Pos[1, 3], posY2Ratio * j));
+                vertex.Add(Vector3.Lerp(mainY2Pos[0, 4], mainY2Pos[0, 1], posY2Ratio * j));
+                vertex.Add(Vector3.Lerp(mainY2Pos[1, 4], mainY2Pos[1, 1], posY2Ratio * j));
                 barCount += 2;
             }
         }
         else {
             for (int j = 1; j <= mainBarNum[1] - 2; j++) {
-                vertex.Add(Vector3.Lerp(mainPos[0, 2], mainPos[0, 3], posYRatio * j));
-                vertex.Add(Vector3.Lerp(mainPos[1, 2], mainPos[1, 3], posYRatio * j));
-                vertex.Add(Vector3.Lerp(mainPos[0, 4], mainPos[0, 1], posYRatio * j));
-                vertex.Add(Vector3.Lerp(mainPos[1, 4], mainPos[1, 1], posYRatio * j));
+                vertex.Add(Vector3.Lerp(mainPos[0, 2], mainPos[0, 3], posY1Ratio * j));
+                vertex.Add(Vector3.Lerp(mainPos[1, 2], mainPos[1, 3], posY1Ratio * j));
+                vertex.Add(Vector3.Lerp(mainPos[0, 4], mainPos[0, 1], posY1Ratio * j));
+                vertex.Add(Vector3.Lerp(mainPos[1, 4], mainPos[1, 1], posY1Ratio * j));
                 barCount += 2;
             }
         }
