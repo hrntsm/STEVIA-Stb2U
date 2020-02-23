@@ -296,6 +296,9 @@ public class CreateBar : MonoBehaviour {
     static void MakeBeamMainBar(Vector3[,] main1Pos, Vector3[,] main2Pos, Vector3[,] main3Pos, float barSpace, float mainD, int index) {
         int[] mainBarNum = GetBeamMainNum(index);
         bool[] hasMain = new bool[6]; // {Main1_Top, Main1_bottom, Main2_Top, Main2_bottom, Main3_Top, Main3_bottom, }
+        float distance = Vector3.Distance(main1Pos[0, 1], main1Pos[0, 2]);
+        int barCount = 0;
+        List<Vector3> vertex = new List<Vector3>();
 
         for (int i = 0; i < 5; i++) {
             if (mainBarNum[i] > 1)
@@ -304,28 +307,59 @@ public class CreateBar : MonoBehaviour {
                 hasMain[i] = false;
         }
 
-        for (int i = 1; i < 5; i++) {
-            // コーナーの主筋
-            Mesh meshObj = CreateMesh.Pipe(main1Pos[0, i], main1Pos[1, i], mainD / 2f, 12, true);
-            GameObject element = new GameObject("main");
-            element.AddComponent<MeshFilter>().mesh = meshObj;
-            element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
-                color = new Color(0, 1, 0, 1)
-            };
+        if (hasMain[0]) {
+            float posRatio = 1f / (mainBarNum[0] - 1);
+
+            for (int j = 0; j < mainBarNum[0]; j++) {
+                vertex.Add(Vector3.Lerp(main1Pos[0, 1], main1Pos[0, 2], posRatio * j));
+                vertex.Add(Vector3.Lerp(main1Pos[1, 1], main1Pos[1, 2], posRatio * j));
+                barCount++;
+            }
         }
+        if (hasMain[1]) {
+            float posRatio = 1f / (mainBarNum[1] - 1);
 
-        float posX1Ratio = 1f / (mainBarNum[0] - 1);
-        float posY1Ratio = 1f / (mainBarNum[1] - 1);
-        float distance = Vector3.Distance(main1Pos[0, 1], main1Pos[0, 2]);
-        int barCount = 0;
-        List<Vector3> vertex = new List<Vector3>();
+            for (int j = 0; j < mainBarNum[1]; j++) {
+                vertex.Add(Vector3.Lerp(main1Pos[0, 3], main1Pos[0, 4], posRatio * j));
+                vertex.Add(Vector3.Lerp(main1Pos[1, 3], main1Pos[1, 4], posRatio * j));
+                barCount++;
+            }
+        }
+        if (hasMain[2]) {
+            float posRatio = 1f / (mainBarNum[2] - 1);
 
-        for (int j = 1; j <= mainBarNum[0] - 2; j++) {
-            vertex.Add(Vector3.Lerp(main1Pos[0, 1], main1Pos[0, 2], posX1Ratio * j));
-            vertex.Add(Vector3.Lerp(main1Pos[1, 1], main1Pos[1, 2], posX1Ratio * j));
-            vertex.Add(Vector3.Lerp(main1Pos[0, 3], main1Pos[0, 4], posX1Ratio * j));
-            vertex.Add(Vector3.Lerp(main1Pos[1, 3], main1Pos[1, 4], posX1Ratio * j));
-            barCount += 2;
+            for (int j = 0; j < mainBarNum[2]; j++) {
+                vertex.Add(Vector3.Lerp(main2Pos[0, 1], main2Pos[0, 2], posRatio * j));
+                vertex.Add(Vector3.Lerp(main2Pos[1, 1], main2Pos[1, 2], posRatio * j));
+                barCount++;
+            }
+        }
+        if (hasMain[3]) {
+            float posRatio = 1f / (mainBarNum[3] - 1);
+
+            for (int j = 0; j < mainBarNum[3]; j++) {
+                vertex.Add(Vector3.Lerp(main2Pos[0, 3], main2Pos[0, 4], posRatio * j));
+                vertex.Add(Vector3.Lerp(main2Pos[1, 3], main2Pos[1, 4], posRatio * j));
+                barCount++;
+            }
+        }
+        if (hasMain[4]) {
+            float posRatio = 1f / (mainBarNum[4] - 1);
+
+            for (int j = 0; j < mainBarNum[4]; j++) {
+                vertex.Add(Vector3.Lerp(main3Pos[0, 1], main3Pos[0, 2], posRatio * j));
+                vertex.Add(Vector3.Lerp(main3Pos[1, 1], main3Pos[1, 2], posRatio * j));
+                barCount++;
+            }
+        }
+        if (hasMain[5]) {
+            float posRatio = 1f / (mainBarNum[5] - 1);
+
+            for (int j = 0; j < mainBarNum[5]; j++) {
+                vertex.Add(Vector3.Lerp(main3Pos[0, 3], main3Pos[0, 4], posRatio * j));
+                vertex.Add(Vector3.Lerp(main3Pos[1, 3], main3Pos[1, 4], posRatio * j));
+                barCount++;
+            }
         }
 
         for (int i = 0; i < barCount; i++) {

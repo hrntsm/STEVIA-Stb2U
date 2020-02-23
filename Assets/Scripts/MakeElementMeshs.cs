@@ -141,7 +141,7 @@ public partial class STBReader:MonoBehaviour {
                     switch (structType) {
                         case "Column":
                         case "Post":
-                            CreateBar.Column(stbSecIndex, nodeStart, nodeEnd, width, hight);
+                           CreateBar.Column(stbSecIndex, nodeStart, nodeEnd, width, hight);
                             break;
                         case "Girder":
                         case "Beam":
