@@ -187,12 +187,16 @@ public partial class STBReader:MonoBehaviour {
 
     List<int> GetBeamBarInfo(XElement xBar) {
         List<int> barList = new List<int>();
-        string elementName = "StbSecBeam_Same_Section";
+        string elementName;
 
         if (xBar.Element("StbSecBeam_Start_Center_End_Section") != null)
             elementName = "StbSecBeam_Start_Center_End_Section";
         else if (xBar.Element("StbSecBeam_Start_End_Section") != null)
             elementName = "StbSecBeam_Start_End_Section";
+        else if (xBar.Element("StbSecBeam_Same_Section") != null)
+            elementName = "StbSecBeam_Same_Section";
+        else 
+            return (new List<int> { 2, 2, 0, 0, 0, 0, 200, 2 });
 
         // Main 1
         barList.Add((int)xBar.Element(elementName).Attribute("count_main_top_1st"));
