@@ -52,7 +52,7 @@ public partial class STBReader:MonoBehaviour {
         Vector3 nodeStart, nodeEnd;
         float hight = 0;
         float width = 0;
-        int elementNum = 0;
+        int elemNum = 0;
         int stbSecIndex = 0;
         int nodeIndexStart, nodeIndexEnd, xNodeStart, xNodeEnd, xElementIdSection, idSection;
         var xElements = xDoc.Root.Descendants(xDateTag);
@@ -60,6 +60,7 @@ public partial class STBReader:MonoBehaviour {
         string shapeType = "";
 
         GameObject elements = new GameObject(xDateTag + "s");
+        GameObject barObj = new GameObject(xDateTag + "Bar");
         foreach (var xElement in xElements) {
             switch (structType) {
                 case "Girder":
@@ -134,25 +135,25 @@ public partial class STBReader:MonoBehaviour {
                 width = m_xStParamB[stbSecIndex] / 1000f;
                 shapeType = m_xStType[stbSecIndex];
             }
-            m_shapeMesh = MakeElementsMeshFromVertex(nodeStart, nodeEnd, hight, width, shapeType, structType, elementNum, elements, xKind);
+            m_shapeMesh = MakeElementsMeshFromVertex(nodeStart, nodeEnd, hight, width, shapeType, structType, elemNum, elements, xKind);
             // 配筋の作成
             if (xKind == "RC") {
                 if (shapeType == "BOX") {
                     switch (structType) {
                         case "Column":
                         case "Post":
-                           CreateBar.Column(stbSecIndex, nodeStart, nodeEnd, width, hight);
+                            CreateBar.Column(stbSecIndex, nodeStart, nodeEnd, width, hight, barObj, elemNum);
                             break;
                         case "Girder":
                         case "Beam":
-                            CreateBar.Beam(stbSecIndex, nodeStart, nodeEnd, width, hight);
+                            CreateBar.Beam(stbSecIndex, nodeStart, nodeEnd, width, hight, barObj, elemNum);
                             break;
                         default:
                             break;
                     }
                 }
             }
-            elementNum++;
+            elemNum++;
         }
         m_shapeMesh.Clear();
     }

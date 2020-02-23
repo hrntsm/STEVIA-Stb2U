@@ -21,7 +21,7 @@ public class CreateBar : MonoBehaviour {
     }
 
 
-    public static void Column(int index, Vector3 nodeStart, Vector3 nodeEnd, float width, float hight) {
+    public static void Column(int index, Vector3 nodeStart, Vector3 nodeEnd, float width, float hight, GameObject parent, int elemNum) {
         // かぶり、鉄筋径はとりあえずで設定
         float kaburi = 50 / 1000f;
         float bandD = 10 / 1000f;
@@ -36,8 +36,12 @@ public class CreateBar : MonoBehaviour {
         Vector3[,] mainX2Pos = GetColumnCorner(nodeStart, nodeEnd, width - main1Space, hight - main2Space);
         Vector3[,] mainY2Pos = GetColumnCorner(nodeStart, nodeEnd, width - main2Space, hight - main1Space);
 
-        MakeHoop(hoopPos, bandD, index);
-        MakeColumnMainBar(main1Pos, mainX2Pos, mainY2Pos, barSpace, mainD, index);
+        string name = string.Format("Bar" + "{0}", elemNum);
+        GameObject barObj = new GameObject(name);
+        barObj.transform.parent = parent.transform;
+
+        MakeHoop(hoopPos, bandD, index, barObj);
+        MakeColumnMainBar(main1Pos, mainX2Pos, mainY2Pos, barSpace, mainD, index, barObj);
     }
 
     static Vector3[,] GetColumnCorner(Vector3 nodeStart, Vector3 nodeEnd, float width, float hight) {
@@ -75,7 +79,7 @@ public class CreateBar : MonoBehaviour {
         return (cornerPoint);
     }
 
-    static void MakeHoop(Vector3[,] cornerPos, float bandD, int index) {
+    static void MakeHoop(Vector3[,] cornerPos, float bandD, int index, GameObject parent) {
         float pitch = STBReader.m_xRcColumnBar[index][5] / 1000f;
         int dirXNum = STBReader.m_xRcColumnBar[index][6];
         int dirYNum = STBReader.m_xRcColumnBar[index][7];
@@ -97,12 +101,13 @@ public class CreateBar : MonoBehaviour {
                 element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
                     color = new Color(1, 0, 1, 1)
                 };
+                element.transform.parent = parent.transform;
             }
             i++;
         }
     }
 
-    static void MakeColumnMainBar(Vector3[,] mainPos, Vector3[,] mainX2Pos, Vector3[,] mainY2Pos, float barSpace, float mainD, int index) {
+    static void MakeColumnMainBar(Vector3[,] mainPos, Vector3[,] mainX2Pos, Vector3[,] mainY2Pos, float barSpace, float mainD, int index, GameObject parent) {
         int[] mainBarNum = GetColMainNum(index);
         bool[] hasMain2 = { false, false }; // {Main2_X, Main2_Y}
         if (mainBarNum[2] > 1)
@@ -118,6 +123,7 @@ public class CreateBar : MonoBehaviour {
             element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
                 color = new Color(1, 1, 0, 1)
             };
+            element.transform.parent = parent.transform;
         }
 
         float posX1Ratio = 1f / (mainBarNum[0] - 1);
@@ -210,10 +216,11 @@ public class CreateBar : MonoBehaviour {
             element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
                 color = new Color(1, 1, 0, 1)
             };
+            element.transform.parent = parent.transform;
         }
     }
 
-    public static void Beam(int index, Vector3 nodeStart, Vector3 nodeEnd, float width, float hight) {
+    public static void Beam(int index, Vector3 nodeStart, Vector3 nodeEnd, float width, float hight, GameObject parent, int elemNum) {
         // かぶり、鉄筋径はとりあえずで設定
         float kaburi = 50 / 1000f;
         float bandD = 10 / 1000f;
@@ -228,8 +235,13 @@ public class CreateBar : MonoBehaviour {
         Vector3[,] main1Pos = GetBeamCorner(nodeStart, nodeEnd, width - main1Space, hight, main1Space / 2);
         Vector3[,] main2Pos = GetBeamCorner(nodeStart, nodeEnd, width - main1Space, hight, main2Space / 2);
         Vector3[,] main3Pos = GetBeamCorner(nodeStart, nodeEnd, width - main1Space, hight, main3Space / 2);
-        MakeStrup(strupPos, bandD, index);
-        MakeBeamMainBar(main1Pos, main2Pos, main3Pos, barSpace, mainD, index);
+
+        string name = string.Format("Bar" + "{0}", elemNum);
+        GameObject barObj = new GameObject(name);
+        barObj.transform.parent = parent.transform;
+
+        MakeStrup(strupPos, bandD, index, barObj);
+        MakeBeamMainBar(main1Pos, main2Pos, main3Pos, barSpace, mainD, index, barObj);
     }
 
     static Vector3[,] GetBeamCorner(Vector3 nodeStart, Vector3 nodeEnd, float width, float hight, float space) {
@@ -267,7 +279,7 @@ public class CreateBar : MonoBehaviour {
         return (cornerPoint);
     }
 
-    static void MakeStrup(Vector3[,] cornerPos, float bandD, int index) {
+    static void MakeStrup(Vector3[,] cornerPos, float bandD, int index, GameObject parent) {
         float pitch = STBReader.m_xRcBeamBar[index][6] / 1000f;
         int strupNum = STBReader.m_xRcBeamBar[index][7];
         int sumBar = strupNum + 2;
@@ -288,12 +300,13 @@ public class CreateBar : MonoBehaviour {
                 element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
                     color = new Color(0, 0, 1, 1)
                 };
+                element.transform.parent = parent.transform;
             }
             i++;
         }
     }
 
-    static void MakeBeamMainBar(Vector3[,] main1Pos, Vector3[,] main2Pos, Vector3[,] main3Pos, float barSpace, float mainD, int index) {
+    static void MakeBeamMainBar(Vector3[,] main1Pos, Vector3[,] main2Pos, Vector3[,] main3Pos, float barSpace, float mainD, int index, GameObject parent) {
         int[] mainBarNum = GetBeamMainNum(index);
         bool[] hasMain = new bool[6]; // {Main1_Top, Main1_bottom, Main2_Top, Main2_bottom, Main3_Top, Main3_bottom, }
         float distance = Vector3.Distance(main1Pos[0, 1], main1Pos[0, 2]);
@@ -369,6 +382,7 @@ public class CreateBar : MonoBehaviour {
             element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
                 color = new Color(0, 1, 0, 1)
             };
+            element.transform.parent = parent.transform;
         }
     }
 
