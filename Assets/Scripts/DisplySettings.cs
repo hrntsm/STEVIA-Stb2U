@@ -9,9 +9,11 @@ public class DisplySettings : MonoBehaviour {
     GameObject m_dispObject;
     string m_findName = "";
     bool m_hasObj = false;
+    Animator animMenu;
 
     void Start() {
         m_toggle = GetComponent<Toggle>();
+        animMenu = gameObject.GetComponent<Animator>();
     }
 
     public void ElementDisp(int index) {
@@ -35,5 +37,12 @@ public class DisplySettings : MonoBehaviour {
             m_hasObj = true;
         }
         m_dispObject.SetActive(m_toggle.isOn);
+    }
+
+    public void Hamburger() {
+        if (animMenu.GetInteger("MenuOpen") == 0)
+            animMenu.SetInteger("MenuOpen", 1);
+        else
+            animMenu.SetInteger("MenuOpen", 0);
     }
 }
