@@ -24,7 +24,7 @@ Quote from [building SMART Japan Structural Design Subcommittee](https://en.buil
   + Column, Post, Girder, Beam
 + Show/Hide change using checkbox
 + Change element color
-  + 0Å`1 in RGBA
+  + 0-1 in RGBA
     + If you input "1,1,1,1", R=255,G=255,B=255,A=255.
   + Bar is default color only.
 + Setting camera focal length
