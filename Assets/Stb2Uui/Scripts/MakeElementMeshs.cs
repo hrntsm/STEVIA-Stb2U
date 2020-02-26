@@ -51,15 +51,16 @@ public partial class STBReader:MonoBehaviour {
     static void MakeElementMesh(XDocument xDoc, string xDateTag, string structType) {
         Vector3 nodeStart, nodeEnd;
         float hight = 0;
-        float Width = 0;
-        int elementNum = 0;
-        int nodeIndexStart, nodeIndexEnd, xNodeStart, xNodeEnd, xElementIdSection,
-            stbSecIndex, idSection;
+        float width = 0;
+        int elemNum = 0;
+        int stbSecIndex = 0;
+        int nodeIndexStart, nodeIndexEnd, xNodeStart, xNodeEnd, xElementIdSection, idSection;
         var xElements = xDoc.Root.Descendants(xDateTag);
         string shape, xKind;
         string shapeType = "";
 
         GameObject elements = new GameObject(xDateTag + "s");
+        GameObject barObj = new GameObject(xDateTag + "Bar");
         foreach (var xElement in xElements) {
             switch (structType) {
                 case "Girder":
@@ -68,9 +69,14 @@ public partial class STBReader:MonoBehaviour {
                     xNodeStart = (int)xElement.Attribute("idNode_start");
                     xNodeEnd = (int)xElement.Attribute("idNode_end");
                     break;
-                default:
+                case "Column":
+                case "Post":
                     xNodeStart = (int)xElement.Attribute("idNode_bottom");
                     xNodeEnd = (int)xElement.Attribute("idNode_top");
+                    break;
+                default:
+                    xNodeStart = 0;
+                    xNodeEnd = 0;
                     break;
             }
             xElementIdSection = (int)xElement.Attribute("id_section");
@@ -88,18 +94,18 @@ public partial class STBReader:MonoBehaviour {
                     case "Beam":
                         stbSecIndex = m_xRcBeamId.IndexOf(xElementIdSection);
                         hight = m_xRcBeamDepth[stbSecIndex] / 1000f;
-                        Width = m_xRcBeamWidth[stbSecIndex] / 1000f;
+                        width = m_xRcBeamWidth[stbSecIndex] / 1000f;
                         break;
                     case "Column":
                     case "Post":
                         stbSecIndex = m_xRcColumnId.IndexOf(xElementIdSection);
                         hight = m_xRcColumnDepth[stbSecIndex] / 1000f;
-                        Width = m_xRcColumnWidth[stbSecIndex] / 1000f;
+                        width = m_xRcColumnWidth[stbSecIndex] / 1000f;
                         break;
                     default:
                         break;
                 }
-                if (Width == 0)
+                if (width == 0)
                     shapeType = "Pipe";
                 else
                     shapeType = "BOX";
@@ -126,26 +132,42 @@ public partial class STBReader:MonoBehaviour {
                 }
                 stbSecIndex = m_xStName.IndexOf(shape);
                 hight = m_xStParamA[stbSecIndex] / 1000f;
-                Width = m_xStParamB[stbSecIndex] / 1000f;
+                width = m_xStParamB[stbSecIndex] / 1000f;
                 shapeType = m_xStType[stbSecIndex];
             }
-
-            // 始点と終点から梁断面サーフェスの作成
-            m_shapeMesh = MakeElementsMeshFromVertex(nodeStart, nodeEnd, hight, Width, shapeType, structType, elementNum, elements, xKind);
-            elementNum++;
+            m_shapeMesh = MakeElementsMeshFromVertex(nodeStart, nodeEnd, hight, width, shapeType, structType, elemNum, elements, xKind);
+            // 配筋の作成
+            if (xKind == "RC") {
+                if (shapeType == "BOX") {
+                    switch (structType) {
+                        case "Column":
+                        case "Post":
+                            CreateBar.Column(stbSecIndex, nodeStart, nodeEnd, width, hight, barObj, elemNum);
+                            break;
+                        case "Girder":
+                        case "Beam":
+                            CreateBar.Beam(stbSecIndex, nodeStart, nodeEnd, width, hight, barObj, elemNum);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+            elemNum++;
         }
         m_shapeMesh.Clear();
     }
 
     public static List<Mesh> MakeElementsMeshFromVertex(Vector3 nodeStart, Vector3 nodeEnd, float hight, float width, string shapeType, string structType, int elementNum, GameObject elements, string kind) {
-        float angleY, angleZ;
         Vector3[] vertexS = new Vector3[6];
         Vector3[] vertexE = new Vector3[6];
         Mesh meshObj = new Mesh();
 
-        // 部材のアングルの確認
-        angleY = -1 * (float)Math.Atan((nodeEnd.y - nodeStart.y) / (nodeEnd.x - nodeStart.x));
-        angleZ = -1 * (float)Math.Atan((nodeEnd.z - nodeStart.z) / (nodeEnd.x - nodeStart.x));
+        float dx = nodeEnd.x - nodeStart.x;
+        float dy = nodeEnd.y - nodeStart.y;
+        float dz = nodeEnd.z - nodeStart.z;
+        float angleY = -1f * Mathf.Atan2(dy, dx);
+        float angleZ = -1f * Mathf.Atan2(dz, dx);
 
         // 梁は部材天端の中心が起点に対して、柱・ブレースは部材芯が起点なので場合分け
         switch (structType) {

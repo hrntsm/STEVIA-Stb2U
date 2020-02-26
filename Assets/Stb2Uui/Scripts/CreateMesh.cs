@@ -78,20 +78,25 @@ public class CreateMesh : MonoBehaviour {
         List<Vector3> vertices = new List<Vector3>();
         List<int> triangles = new List<int>();
         Mesh meshObj = new Mesh();
-
+        float dx = endPoint.x - startPoint.x;
+        float dy = endPoint.y - startPoint.y;
+        float dz = endPoint.z - startPoint.z;
+        float angleX = -1f * Mathf.Atan2(dx, dy);
+        float angleZ = -1f * Mathf.Atan2(dz, dy);
+        
         int i = 0;
-        float baseAngle = 2 * Mathf.PI / divNum;
+        float baseAngle = 2f * Mathf.PI / divNum;
         float startX, startY, startZ;
         float endX, endY, endZ;
 
         while (i < divNum) {
-            startX = startPoint.x + radious * Mathf.Cos(baseAngle * i);
-            startY = startPoint.y;
-            startZ = startPoint.z + radious * Mathf.Sin(baseAngle * i);
+            startX = startPoint.x + radious *  Mathf.Cos(baseAngle * i) * Mathf.Cos(angleX);
+            startY = startPoint.y + radious * (Mathf.Cos(baseAngle * i) * Mathf.Sin(angleX) + Mathf.Sin(baseAngle * i) * Mathf.Sin(angleZ));
+            startZ = startPoint.z + radious *  Mathf.Sin(baseAngle * i) * Mathf.Cos(angleZ);
 
-            endX = endPoint.x + radious * Mathf.Cos(baseAngle * i);
-            endY = endPoint.y;
-            endZ = endPoint.z + radious * Mathf.Sin(baseAngle * i);
+            endX = endPoint.x + radious *  Mathf.Cos(baseAngle * i) * Mathf.Cos(angleX);
+            endY = endPoint.y + radious * (Mathf.Cos(baseAngle * i) * Mathf.Sin(angleX) + Mathf.Sin(baseAngle * i) * Mathf.Sin(angleZ));
+            endZ = endPoint.z + radious *  Mathf.Sin(baseAngle * i) * Mathf.Cos(angleZ);
 
             vertices.Add(new Vector3(startX, startY, startZ));
             vertices.Add(new Vector3(endX, endY, endZ));
@@ -118,13 +123,13 @@ public class CreateMesh : MonoBehaviour {
         if (isCap) {
             i = 0;
             while (i < divNum) {
-                startX = startPoint.x + radious * Mathf.Cos(baseAngle * i);
-                startY = startPoint.y;
-                startZ = startPoint.z + radious * Mathf.Sin(baseAngle * i);
+                startX = startPoint.x + radious *  Mathf.Cos(baseAngle * i) * Mathf.Cos(angleX);
+                startY = startPoint.y + radious * (Mathf.Cos(baseAngle * i) * Mathf.Sin(angleX) + Mathf.Sin(baseAngle * i) * Mathf.Sin(angleZ));
+                startZ = startPoint.z + radious *  Mathf.Sin(baseAngle * i) * Mathf.Cos(angleZ);
 
-                endX = endPoint.x + radious * Mathf.Cos(baseAngle * i);
-                endY = endPoint.y;
-                endZ = endPoint.z + radious * Mathf.Sin(baseAngle * i);
+                endX = endPoint.x + radious *  Mathf.Cos(baseAngle * i) * Mathf.Cos(angleX);
+                endY = endPoint.y + radious * (Mathf.Cos(baseAngle * i) * Mathf.Sin(angleX) + Mathf.Sin(baseAngle * i) * Mathf.Sin(angleZ));
+                endZ = endPoint.z + radious *  Mathf.Sin(baseAngle * i) * Mathf.Cos(angleZ);
 
                 vertices.Add(new Vector3(startX, startY, startZ));
                 vertices.Add(new Vector3(endX, endY, endZ));
