@@ -53,8 +53,13 @@ Assets/StbData/
 Assets/sky5X/
 Assets/Standard Assets/
 Assets/SkySerie Freebie/
+Assets/Plugins/
+Assets/VRM/
+Assets/_TerrainAutoUpgrade/
+/Archive/
 sky5X.meta
 Standard Assets.meta
 StbData.meta
 SkySerie Freebie.meta
-/Archive/
+VRM.meta
+_TerrainAutoUpgrade.meta
