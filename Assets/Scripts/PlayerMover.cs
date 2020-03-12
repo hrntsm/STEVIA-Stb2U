@@ -5,40 +5,44 @@ using Valve.VR;
 
 public class PlayerMover:MonoBehaviour {
 
-    private SteamVR_Input_Sources source;
-    private SteamVR_Action_Boolean actionBoolean;
-    private SteamVR_Action_Vector2 actionVector2;
+    SteamVR_Input_Sources _source;
+    SteamVR_Action_Boolean _actionBoolean;
+    SteamVR_Action_Vector2 _actionVector2;
+    GameObject _vrmObject;
 
-    private bool click;
-    private float tpad_x;
-    private float tpad_y;
+    bool _click;
+    float _tpadX;
+    float _tpadY;
 
-    private float mv_sp = 2.0f;
+    float _moveSpeed = 2.0f;
 
     // Use this for initialization
     void Start() {
-        actionBoolean = SteamVR_Actions._default.Teleport;
-        actionVector2 = SteamVR_Actions._default.tpad;
+        _actionBoolean = SteamVR_Actions._default.Teleport;
+        _actionVector2 = SteamVR_Actions._default.tpad;
     }
 
     // Update is called once per frame
     void Update() {
-        click = actionBoolean.GetState(source);
-        tpad_x = actionVector2.GetAxis(source).x;
-        tpad_y = actionVector2.GetAxis(source).y;
+        if (!_vrmObject) {
+            _vrmObject = GameObject.Find("VRM");
+        }
+        _click = _actionBoolean.GetState(_source);
+        _tpadX = _actionVector2.GetAxis(_source).x;
+        _tpadY = _actionVector2.GetAxis(_source).y;
 
-        // TODO 正面に向かって進むようにする。VRMのforworadにすればよい？
-        if (Input.GetKey(KeyCode.W) || (click && tpad_y > 0 && tpad_x < 0.7f && tpad_x > -0.7f)) {
-            transform.position += transform.forward * Time.deltaTime * mv_sp;
+        // VRMのforworadにすることで、向かっている正面をキーの前ボタンと対応させた。
+        if (Input.GetKey(KeyCode.W) || (_click && _tpadY > 0 && _tpadX < 0.7f && _tpadX > -0.7f)) {
+            transform.position += _vrmObject.transform.forward * Time.deltaTime * _moveSpeed;
         }
-        if (Input.GetKey(KeyCode.S) || (click && tpad_y < 0 && tpad_x < 0.7f && tpad_x > -0.7f)) {
-            transform.position -= transform.forward * Time.deltaTime * mv_sp;
+        if (Input.GetKey(KeyCode.S) || (_click && _tpadY < 0 && _tpadX < 0.7f && _tpadX > -0.7f)) {
+            transform.position -= _vrmObject.transform.forward * Time.deltaTime * _moveSpeed;
         }
-        if (Input.GetKey(KeyCode.A) || (click && tpad_x < 0 && tpad_y < 0.7f && tpad_y > -0.7f)) {
-            transform.position -= transform.right * Time.deltaTime * mv_sp;
+        if (Input.GetKey(KeyCode.A) || (_click && _tpadX < 0 && _tpadY < 0.7f && _tpadY > -0.7f)) {
+            transform.position -= _vrmObject.transform.right * Time.deltaTime * _moveSpeed;
         }
-        if (Input.GetKey(KeyCode.D) || (click && tpad_x > 0 && tpad_y < 0.7f && tpad_y > -0.7f)) {
-            transform.position += transform.right * Time.deltaTime * mv_sp;
+        if (Input.GetKey(KeyCode.D) || (_click && _tpadX > 0 && _tpadY < 0.7f && _tpadY > -0.7f)) {
+            transform.position += _vrmObject.transform.right * Time.deltaTime * _moveSpeed;
         }
     }
 }
