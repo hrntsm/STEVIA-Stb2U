@@ -98,7 +98,7 @@ public class CreateBar : MonoBehaviour {
                 Mesh meshObj = CreateMesh.Pipe(vertex[2 * j + (i * 2 * sumBar)], vertex[2 * j + 1 + (i * 2 * sumBar)], bandD / 2f, 12, true);
                 GameObject element = new GameObject("hoop");
                 element.AddComponent<MeshFilter>().mesh = meshObj;
-                element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
+                element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Standard")) {
                     color = new Color(1, 0, 1, 1)
                 };
                 element.transform.parent = parent.transform;
@@ -120,7 +120,7 @@ public class CreateBar : MonoBehaviour {
             Mesh meshObj = CreateMesh.Pipe(mainPos[0, i], mainPos[1, i], mainD / 2f, 12, true);
             GameObject element = new GameObject("main");
             element.AddComponent<MeshFilter>().mesh = meshObj;
-            element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
+            element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Standard")) {
                 color = new Color(1, 1, 0, 1)
             };
             element.transform.parent = parent.transform;
@@ -213,7 +213,7 @@ public class CreateBar : MonoBehaviour {
             Mesh meshObj = CreateMesh.Pipe(vertex[2 * i], vertex[2 * i + 1], mainD / 2f, 12, true);
             GameObject element = new GameObject("main");
             element.AddComponent<MeshFilter>().mesh = meshObj;
-            element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
+            element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Standard")) {
                 color = new Color(1, 1, 0, 1)
             };
             element.transform.parent = parent.transform;
@@ -297,7 +297,7 @@ public class CreateBar : MonoBehaviour {
                 Mesh meshObj = CreateMesh.Pipe(vertex[2 * j + (i * 2 * sumBar)], vertex[2 * j + 1 + (i * 2 * sumBar)], bandD / 2f, 12, true);
                 GameObject element = new GameObject("Strup");
                 element.AddComponent<MeshFilter>().mesh = meshObj;
-                element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
+                element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Standard")) {
                     color = new Color(0, 0, 1, 1)
                 };
                 element.transform.parent = parent.transform;
@@ -379,7 +379,7 @@ public class CreateBar : MonoBehaviour {
             Mesh meshObj = CreateMesh.Pipe(vertex[2 * i], vertex[2 * i + 1], mainD / 2f, 12, true);
             GameObject element = new GameObject("main");
             element.AddComponent<MeshFilter>().mesh = meshObj;
-            element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
+            element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Standard")) {
                 color = new Color(0, 1, 0, 1)
             };
             element.transform.parent = parent.transform;
