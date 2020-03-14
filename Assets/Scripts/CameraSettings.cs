@@ -3,15 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CameraSettings : MonoBehaviour{
-    InputField m_inputField;
+namespace Stevia {
 
-    void Start() {
-        m_inputField = GetComponent<InputField>();
-    }
+    public class CameraSettings:MonoBehaviour {
+        InputField _inputField;
 
-    public void SetLensLength() {
-        Camera cam = Camera.main;
-        cam.focalLength = float.Parse(m_inputField.text);
+        void Start() {
+            _inputField = GetComponent<InputField>();
+        }
+
+        public void SetLensLength() {
+            Camera cam = Camera.main;
+            cam.focalLength = float.Parse(_inputField.text);
+        }
     }
 }
