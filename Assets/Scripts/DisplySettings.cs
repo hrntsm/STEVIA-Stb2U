@@ -36,10 +36,29 @@ namespace Stevia {
                 default: break;
             }
             if (_hasObj == false) {
-                _dispObject = GameObject.Find(_findName);
+                var stbData = GameObject.Find("StbData");
+                _dispObject = stbData.transform.Find(_findName).gameObject;
                 _hasObj = true;
             }
             _dispObject.SetActive(_toggle.isOn);
+        }
+
+        public static void BarOff() {
+            string name;
+            for (int index = 0; index < 6; index++) {
+                switch (index) {
+                    case 0: name = "StbColumnBar"; break;
+                    case 1: name = "StbGirderBar"; break;
+                    case 2: name = "StbPostBar"; break;
+                    case 3: name = "StbBeamBar"; break;
+                    case 4: name = "StbBraceBar"; break;
+                    case 5: name = "StbSlabBar"; break;
+                    case 6: name = "StbSlabBar"; break;
+                    default: name = ""; break;
+                }
+                var barObject = GameObject.Find(name);
+                barObject.SetActive(false);
+            }
         }
 
         public void Hamburger() {

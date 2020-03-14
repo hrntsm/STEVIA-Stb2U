@@ -103,13 +103,15 @@ namespace Stevia {
                 GetStbSteelSection(xDoc, SteelSecName[i, 0], SteelSecName[i, 1]);
                 i++;
             }
-            // 断面の生成
+            // meshの生成
             i = 0;
             string[,] memberName = GetMemberNameArray();
             while (i < memberName.GetLength(0)) {
                 MakeElementMesh(xDoc, memberName[i, 0], memberName[i, 1]);
                 i++;
             }
+            // 配筋表示は最初はオフにする
+            DisplySettings.BarOff();
         }
 
         XDocument GetStbFileData() {

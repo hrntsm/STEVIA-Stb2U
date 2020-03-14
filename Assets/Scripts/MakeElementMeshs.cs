@@ -15,6 +15,9 @@ namespace Stevia {
             int slabNum = 0;
             var xSlabs = xDoc.Root.Descendants("StbSlab");
             GameObject slabs = new GameObject("StbSlabs");
+            GameObject slabBar = new GameObject("StbSlabBar");
+            slabs.transform.parent = GameObject.Find("StbData").transform;
+            slabBar.transform.parent = GameObject.Find("StbData").transform;
 
             foreach (var xSlab in xSlabs) {
                 List<int> xSlabNodeIds = new List<int>();
@@ -62,6 +65,8 @@ namespace Stevia {
 
             GameObject elements = new GameObject(xDateTag + "s");
             GameObject barObj = new GameObject(xDateTag + "Bar");
+            elements.transform.parent = GameObject.Find("StbData").transform;
+            barObj.transform.parent = GameObject.Find("StbData").transform;
             foreach (var xElement in xElements) {
                 switch (structType) {
                     case "Girder":
