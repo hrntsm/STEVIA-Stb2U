@@ -7,33 +7,35 @@ using UnityEngine;
 namespace Stevia {
 
     public partial class STBReader:MonoBehaviour {
-        public Material _material;
-        private List<Vector3> _stbNodes = new List<Vector3>();
-        private List<int> _vertexIDs = new List<int>();
+        [SerializeField]
+        Material _material;
 
-        private List<int> _xRcColumnId = new List<int>();
-        private List<int> _xRcColumnDepth = new List<int>();
-        private List<int> _xRcColumnWidth = new List<int>();
+        List<Vector3> _stbNodes = new List<Vector3>();
+        List<int> _vertexIDs = new List<int>();
+
+        List<int> _xRcColumnId = new List<int>();
+        List<int> _xRcColumnDepth = new List<int>();
+        List<int> _xRcColumnWidth = new List<int>();
         public static List<List<int>> _xRcColumnBar = new List<List<int>>();
 
-        private List<int> _xStColumnId = new List<int>();
-        private List<string> _xStColumnShape = new List<string>();
+        List<int> _xStColumnId = new List<int>();
+        List<string> _xStColumnShape = new List<string>();
 
-        private List<int> _xRcBeamId = new List<int>();
-        private List<int> _xRcBeamDepth = new List<int>();
-        private List<int> _xRcBeamWidth = new List<int>();
+        List<int> _xRcBeamId = new List<int>();
+        List<int> _xRcBeamDepth = new List<int>();
+        List<int> _xRcBeamWidth = new List<int>();
         public static List<List<int>> _xRcBeamBar = new List<List<int>>();
 
-        private List<int> _xStBeamId = new List<int>();
-        private List<string> _xStBeamShape = new List<string>();
+        List<int> _xStBeamId = new List<int>();
+        List<string> _xStBeamShape = new List<string>();
 
-        private List<int> _xStBraceId = new List<int>();
-        private List<string> _xStBraceShape = new List<string>();
-        private List<string> _xStName = new List<string>();
-        private List<float> _xStParamA = new List<float>();
-        private List<float> _xStParamB = new List<float>();
-        private List<string> _xStType = new List<string>();
-        private List<Mesh> _shapeMesh = new List<Mesh>();
+        List<int> _xStBraceId = new List<int>();
+        List<string> _xStBraceShape = new List<string>();
+        List<string> _xStName = new List<string>();
+        List<float> _xStParamA = new List<float>();
+        List<float> _xStParamB = new List<float>();
+        List<string> _xStType = new List<string>();
+        List<Mesh> _shapeMesh = new List<Mesh>();
 
         // Start is called before the first frame update
         void Start() {

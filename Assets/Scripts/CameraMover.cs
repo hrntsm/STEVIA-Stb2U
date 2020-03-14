@@ -20,25 +20,25 @@ namespace Stevia {
 
         //カメラの移動量
         [SerializeField, Range(0.1f, 10.0f)]
-        private float _positionStep = 2.0f;
+        float _positionStep = 2.0f;
 
         //マウス感度
         [SerializeField, Range(30.0f, 150.0f)]
-        private float _mouseSensitive = 90.0f;
+        float _mouseSensitive = 90.0f;
 
         //カメラ操作の有効無効
-        private bool _cameraMoveActive = true;
+        bool _cameraMoveActive = true;
         //カメラのtransform  
-        private Transform _camTransform;
+        Transform _camTransform;
         //マウスの始点 
-        private Vector3 _startMousePos;
+        Vector3 _startMousePos;
         //カメラ回転の始点情報
-        private Vector3 _presentCamRotation;
-        private Vector3 _presentCamPos;
+        Vector3 _presentCamRotation;
+        Vector3 _presentCamPos;
         //初期状態 Rotation
-        private Quaternion _initialCamRotation;
+        Quaternion _initialCamRotation;
         //UIメッセージの表示
-        private bool _uiMessageActiv;
+        bool _uiMessageActiv;
 
         void Start() {
             _camTransform = this.gameObject.transform;
