@@ -32,16 +32,20 @@ namespace Stevia {
             _tpadY = _actionVector2.GetAxis(_source).y;
 
             // VRMのforworadにすることで、向かっている正面をキーの前ボタンと対応させた。
-            if (Input.GetKey(KeyCode.W) || (_click && _tpadY > 0 && _tpadX < 0.7f && _tpadX > -0.7f)) {
+            //if (Input.GetKey(KeyCode.W) || (_click && _tpadY > 0 && _tpadX < 0.7f && _tpadX > -0.7f)) {
+            if (_click && _tpadY > 0 && _tpadX < 0.7f && _tpadX > -0.7f) {
                 transform.position += _vrmObject.transform.forward * Time.deltaTime * _moveSpeed;
             }
-            if (Input.GetKey(KeyCode.S) || (_click && _tpadY < 0 && _tpadX < 0.7f && _tpadX > -0.7f)) {
+            //if (Input.GetKey(KeyCode.S) || (_click && _tpadY < 0 && _tpadX < 0.7f && _tpadX > -0.7f)) {
+            if (_click && _tpadY < 0 && _tpadX < 0.7f && _tpadX > -0.7f) {
                 transform.position -= _vrmObject.transform.forward * Time.deltaTime * _moveSpeed;
             }
-            if (Input.GetKey(KeyCode.A) || (_click && _tpadX < 0 && _tpadY < 0.7f && _tpadY > -0.7f)) {
+            //if (Input.GetKey(KeyCode.A) || (_click && _tpadX < 0 && _tpadY < 0.7f && _tpadY > -0.7f)) {
+            if (_click && _tpadX < 0 && _tpadY < 0.7f && _tpadY > -0.7f) {
                 transform.position -= _vrmObject.transform.right * Time.deltaTime * _moveSpeed;
             }
-            if (Input.GetKey(KeyCode.D) || (_click && _tpadX > 0 && _tpadY < 0.7f && _tpadY > -0.7f)) {
+            //if (Input.GetKey(KeyCode.D) || (_click && _tpadX > 0 && _tpadY < 0.7f && _tpadY > -0.7f)) {
+            if (_click && _tpadX > 0 && _tpadY < 0.7f && _tpadY > -0.7f) {
                 transform.position += _vrmObject.transform.right * Time.deltaTime * _moveSpeed;
             }
         }
