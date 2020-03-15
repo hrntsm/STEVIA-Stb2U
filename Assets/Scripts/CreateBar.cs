@@ -42,8 +42,8 @@ namespace Stevia {
             GameObject barObj = new GameObject(name);
             barObj.transform.parent = parent.transform;
 
-            MakeHoop(hoopPos, bandD, index, barObj);
-            MakeColumnMainBar(main1Pos, mainX2Pos, mainY2Pos, barSpace, mainD, index, barObj);
+            CreateBar.Hoop(hoopPos, bandD, index, barObj);
+            CreateBar.ColumnMainBar(main1Pos, mainX2Pos, mainY2Pos, barSpace, mainD, index, barObj);
         }
 
         static Vector3[,] GetColumnCorner(Vector3 nodeStart, Vector3 nodeEnd, float width, float hight) {
@@ -81,7 +81,11 @@ namespace Stevia {
             return (cornerPoint);
         }
 
-        static void MakeHoop(Vector3[,] cornerPos, float bandD, int index, GameObject parent) {
+        static void Hoop(Vector3[,] cornerPos, float bandD, int index, GameObject parent) {
+            // メッシュ結合用に親のオブジェクト作成
+            var hoops = new GameObject("Hoops");
+            hoops.transform.parent = parent.transform;
+
             float pitch = STBReader._xRcColumnBar[index][5] / 1000f;
             int dirXNum = STBReader._xRcColumnBar[index][6];
             int dirYNum = STBReader._xRcColumnBar[index][7];
@@ -89,6 +93,7 @@ namespace Stevia {
             float distance = Vector3.Distance(cornerPos[0, 0], cornerPos[1, 0]);
             List<Vector3> vertex = new List<Vector3>();
             int i = 0;
+
 
             Vector3[,] hoopPos = GetBandPos(cornerPos, dirXNum, dirYNum);
 
@@ -103,13 +108,21 @@ namespace Stevia {
                     element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Standard")) {
                         color = new Color(1, 0, 1, 1)
                     };
-                    element.transform.parent = parent.transform;
+                    element.transform.parent = hoops.transform;
                 }
                 i++;
             }
+
+            // ドローコール削減のため、作成したフープを一つのメッシュに結合
+            var color = new Color(1, 0, 1, 1);
+            Conbine(hoops, color);
         }
 
-        static void MakeColumnMainBar(Vector3[,] mainPos, Vector3[,] mainX2Pos, Vector3[,] mainY2Pos, float barSpace, float mainD, int index, GameObject parent) {
+        static void ColumnMainBar(Vector3[,] mainPos, Vector3[,] mainX2Pos, Vector3[,] mainY2Pos, float barSpace, float mainD, int index, GameObject parent) {
+            // メッシュ結合用に親のオブジェクト作成
+            var mainBars = new GameObject("MainBars");
+            mainBars.transform.parent = parent.transform;
+
             int[] mainBarNum = GetColMainNum(index);
             bool[] hasMain2 = { false, false }; // {Main2_X, Main2_Y}
             if (mainBarNum[2] > 1)
@@ -120,12 +133,12 @@ namespace Stevia {
             for (int i = 1; i < 5; i++) {
                 // コーナーの主筋
                 Mesh meshObj = CreateMesh.Pipe(mainPos[0, i], mainPos[1, i], mainD / 2f, 12, true);
-                GameObject element = new GameObject("main");
+                GameObject element = new GameObject("MainBar");
                 element.AddComponent<MeshFilter>().mesh = meshObj;
                 element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Standard")) {
                     color = new Color(1, 1, 0, 1)
                 };
-                element.transform.parent = parent.transform;
+                element.transform.parent = mainBars.transform;
             }
 
             float posX1Ratio = 1f / (mainBarNum[0] - 1);
@@ -213,13 +226,17 @@ namespace Stevia {
             }
             for (int i = 0; i < barCount; i++) {
                 Mesh meshObj = CreateMesh.Pipe(vertex[2 * i], vertex[2 * i + 1], mainD / 2f, 12, true);
-                GameObject element = new GameObject("main");
+                GameObject element = new GameObject("mainBars");
                 element.AddComponent<MeshFilter>().mesh = meshObj;
                 element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Standard")) {
                     color = new Color(1, 1, 0, 1)
                 };
-                element.transform.parent = parent.transform;
+                element.transform.parent = mainBars.transform;
             }
+
+            // ドローコール削減のため、作成したフープを一つのメッシュに結合
+            var color = new Color(1, 1, 0, 1);
+            Conbine(mainBars, color);
         }
 
         public static void Beam(int index, Vector3 nodeStart, Vector3 nodeEnd, float width, float hight, GameObject parent, int elemNum) {
@@ -242,8 +259,8 @@ namespace Stevia {
             GameObject barObj = new GameObject(name);
             barObj.transform.parent = parent.transform;
 
-            MakeStrup(strupPos, bandD, index, barObj);
-            MakeBeamMainBar(main1Pos, main2Pos, main3Pos, barSpace, mainD, index, barObj);
+            CreateBar.Stirrup(strupPos, bandD, index, barObj);
+            CreateBar.BeamMainBar(main1Pos, main2Pos, main3Pos, barSpace, mainD, index, barObj);
         }
 
         static Vector3[,] GetBeamCorner(Vector3 nodeStart, Vector3 nodeEnd, float width, float hight, float space) {
@@ -281,7 +298,11 @@ namespace Stevia {
             return (cornerPoint);
         }
 
-        static void MakeStrup(Vector3[,] cornerPos, float bandD, int index, GameObject parent) {
+        static void Stirrup(Vector3[,] cornerPos, float bandD, int index, GameObject parent) {
+            // メッシュ結合用に親のオブジェクト作成
+            var stirrups = new GameObject("Stirrups");
+            stirrups.transform.parent = parent.transform;
+
             float pitch = STBReader._xRcBeamBar[index][6] / 1000f;
             int strupNum = STBReader._xRcBeamBar[index][7];
             int sumBar = strupNum + 2;
@@ -289,28 +310,36 @@ namespace Stevia {
             List<Vector3> vertex = new List<Vector3>();
             int i = 0;
 
-            Vector3[,] strupPos = GetBandPos(cornerPos, 2, strupNum);
+            Vector3[,] stirrupPos = GetBandPos(cornerPos, 2, strupNum);
 
             while ((pitch * i) / distance < 1) {
                 for (int j = 0; j < 2 * sumBar; j++) {
-                    vertex.Add(Vector3.Lerp(strupPos[0, j], strupPos[1, j], (float)(pitch * i) / distance));
+                    vertex.Add(Vector3.Lerp(stirrupPos[0, j], stirrupPos[1, j], (float)(pitch * i) / distance));
                 }
                 for (int j = 0; j < sumBar; j++) {
                     Mesh meshObj = CreateMesh.Pipe(vertex[2 * j + (i * 2 * sumBar)], vertex[2 * j + 1 + (i * 2 * sumBar)], bandD / 2f, 12, true);
-                    GameObject element = new GameObject("Strup");
+                    GameObject element = new GameObject("Stirrup");
                     element.AddComponent<MeshFilter>().mesh = meshObj;
                     element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Standard")) {
                         color = new Color(0, 0, 1, 1)
                     };
-                    element.transform.parent = parent.transform;
+                    element.transform.parent = stirrups.transform;
                 }
                 i++;
             }
+
+            // ドローコール削減のため、作成したフープを一つのメッシュに結合
+            var color = new Color(0, 0, 1, 1);
+            Conbine(stirrups, color);
         }
 
-        static void MakeBeamMainBar(Vector3[,] main1Pos, Vector3[,] main2Pos, Vector3[,] main3Pos, float barSpace, float mainD, int index, GameObject parent) {
+        static void BeamMainBar(Vector3[,] main1Pos, Vector3[,] main2Pos, Vector3[,] main3Pos, float barSpace, float mainD, int index, GameObject parent) {
+            // メッシュ結合用に親のオブジェクト作成
+            var mainBars = new GameObject("MainBars");
+            mainBars.transform.parent = parent.transform;
+
             int[] mainBarNum = GetBeamMainNum(index);
-            bool[] hasMain = new bool[6]; // {Main1_Top, Main1_bottom, Main2_Top, Main2_bottom, Main3_Top, Main3_bottom, }
+            bool[] hasMain = new bool[6]; // {Main1_Top, Main1_bottom, Main2_Top, Main2_bottom, Main3_Top, Main3_bottom}
             float distance = Vector3.Distance(main1Pos[0, 1], main1Pos[0, 2]);
             int barCount = 0;
             List<Vector3> vertex = new List<Vector3>();
@@ -379,13 +408,17 @@ namespace Stevia {
 
             for (int i = 0; i < barCount; i++) {
                 Mesh meshObj = CreateMesh.Pipe(vertex[2 * i], vertex[2 * i + 1], mainD / 2f, 12, true);
-                GameObject element = new GameObject("main");
+                GameObject element = new GameObject("MainBar");
                 element.AddComponent<MeshFilter>().mesh = meshObj;
                 element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Standard")) {
                     color = new Color(0, 1, 0, 1)
                 };
-                element.transform.parent = parent.transform;
+                element.transform.parent = mainBars.transform;
             }
+
+            // ドローコール削減のため、作成したフープを一つのメッシュに結合
+            var color = new Color(0, 1, 0, 1);
+            Conbine(mainBars, color);
         }
 
         static Vector3[,] GetBandPos(Vector3[,] cornerPos, int dirXNum, int dirYNum) {
@@ -425,6 +458,23 @@ namespace Stevia {
                 }
             }
             return (bandPos);
+        }
+
+        static void Conbine(GameObject barObject, Color barColor) {
+            MeshFilter[] meshFilters = barObject.GetComponentsInChildren<MeshFilter>();
+            CombineInstance[] combine = new CombineInstance[meshFilters.Length];
+            int count = 0;
+            while (count < meshFilters.Length) {
+                combine[count].mesh = meshFilters[count].sharedMesh;
+                combine[count].transform = meshFilters[count].transform.localToWorldMatrix;
+                meshFilters[count].gameObject.SetActive(false);
+                count++;
+            }
+            barObject.AddComponent<MeshFilter>().mesh.CombineMeshes(combine);
+            barObject.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Standard")) {
+                color = barColor
+            };
+            barObject.transform.gameObject.SetActive(true);
         }
     }
 }
