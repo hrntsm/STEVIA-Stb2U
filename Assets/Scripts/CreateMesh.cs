@@ -214,5 +214,22 @@ namespace Stevia {
             vertices.Add(vertexE[5]);
             return (vertices);
         }
+
+        public static void Conbine(GameObject parent, Color meshColor, string shaderName) {
+            MeshFilter[] meshFilters = parent.GetComponentsInChildren<MeshFilter>();
+            CombineInstance[] combine = new CombineInstance[meshFilters.Length];
+            int count = 0;
+            while (count < meshFilters.Length) {
+                combine[count].mesh = meshFilters[count].sharedMesh;
+                combine[count].transform = meshFilters[count].transform.localToWorldMatrix;
+                meshFilters[count].gameObject.SetActive(false);
+                count++;
+            }
+            parent.AddComponent<MeshFilter>().mesh.CombineMeshes(combine);
+            parent.AddComponent<MeshRenderer>().material = new Material(Shader.Find(shaderName)) {
+                color = meshColor
+            };
+            parent.transform.gameObject.SetActive(true);
+        }
     }
 }

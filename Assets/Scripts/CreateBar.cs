@@ -115,7 +115,7 @@ namespace Stevia {
 
             // ドローコール削減のため、作成したフープを一つのメッシュに結合
             var color = new Color(1, 0, 1, 1);
-            Conbine(hoops, color);
+            CreateMesh.Conbine(hoops, color, "Standard");
         }
 
         static void ColumnMainBar(Vector3[,] mainPos, Vector3[,] mainX2Pos, Vector3[,] mainY2Pos, float barSpace, float mainD, int index, GameObject parent) {
@@ -236,7 +236,7 @@ namespace Stevia {
 
             // ドローコール削減のため、作成したフープを一つのメッシュに結合
             var color = new Color(1, 1, 0, 1);
-            Conbine(mainBars, color);
+            CreateMesh.Conbine(mainBars, color, "Standard");
         }
 
         public static void Beam(int index, Vector3 nodeStart, Vector3 nodeEnd, float width, float hight, GameObject parent, int elemNum) {
@@ -330,7 +330,7 @@ namespace Stevia {
 
             // ドローコール削減のため、作成したフープを一つのメッシュに結合
             var color = new Color(0, 0, 1, 1);
-            Conbine(stirrups, color);
+            CreateMesh.Conbine(stirrups, color, "Standard");
         }
 
         static void BeamMainBar(Vector3[,] main1Pos, Vector3[,] main2Pos, Vector3[,] main3Pos, float barSpace, float mainD, int index, GameObject parent) {
@@ -418,7 +418,7 @@ namespace Stevia {
 
             // ドローコール削減のため、作成したフープを一つのメッシュに結合
             var color = new Color(0, 1, 0, 1);
-            Conbine(mainBars, color);
+            CreateMesh.Conbine(mainBars, color, "Standard");
         }
 
         static Vector3[,] GetBandPos(Vector3[,] cornerPos, int dirXNum, int dirYNum) {
@@ -458,23 +458,6 @@ namespace Stevia {
                 }
             }
             return (bandPos);
-        }
-
-        static void Conbine(GameObject barObject, Color barColor) {
-            MeshFilter[] meshFilters = barObject.GetComponentsInChildren<MeshFilter>();
-            CombineInstance[] combine = new CombineInstance[meshFilters.Length];
-            int count = 0;
-            while (count < meshFilters.Length) {
-                combine[count].mesh = meshFilters[count].sharedMesh;
-                combine[count].transform = meshFilters[count].transform.localToWorldMatrix;
-                meshFilters[count].gameObject.SetActive(false);
-                count++;
-            }
-            barObject.AddComponent<MeshFilter>().mesh.CombineMeshes(combine);
-            barObject.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Standard")) {
-                color = barColor
-            };
-            barObject.transform.gameObject.SetActive(true);
         }
     }
 }
