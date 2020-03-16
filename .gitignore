@@ -57,6 +57,7 @@ Assets/Plugins/
 Assets/VRM/
 Assets/_TerrainAutoUpgrade/
 Assets/StreamingAssets/
+Assets/ExternalPlugins/
 /Archive/
 sky5X.meta
 Standard Assets.meta
@@ -64,4 +65,5 @@ StbData.meta
 SkySerie Freebie.meta
 StreamingAssets.meta
 VRM.meta
+ExternalPlugins.meta
 _TerrainAutoUpgrade.meta
