@@ -5,6 +5,7 @@ using VRM;
 using UnityEngine;
 using SFB;
 using RootMotion.FinalIK;
+using AniLipSync.VRM;
 
 namespace Stevia {
 
@@ -72,6 +73,10 @@ namespace Stevia {
             foreach (var renderer in GetComponentsInChildren<SkinnedMeshRenderer>(true)) {
                 renderer.updateWhenOffscreen = true;
             }
+
+            // リップシンクのターゲット指定
+            var aniLipSync = GameObject.Find("AniLipSync-VRM");
+            aniLipSync.GetComponent<AnimMorphTarget>().blendShapeProxy = _model.GetComponent<VRMBlendShapeProxy>();
 
             // まばたきをする設定
             _model.AddComponent<VRM.Blinker>();
