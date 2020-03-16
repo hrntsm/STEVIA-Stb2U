@@ -172,7 +172,7 @@ Camera:
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
-  m_TargetEye: 3
+  m_TargetEye: 0
   m_HDR: 1
   m_AllowMSAA: 1
   m_AllowDynamicResolution: 0
@@ -207,6 +207,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1631794148}
     m_Modifications:
+    - target: {fileID: 8049178286632273715, guid: dff0443d3ca482343b73735c00aaf7cd,
+        type: 3}
+      propertyPath: m_Name
+      value: RGBAInputField
+      objectReference: {fileID: 0}
     - target: {fileID: 8049178286632273714, guid: dff0443d3ca482343b73735c00aaf7cd,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -311,11 +316,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8049178286632273715, guid: dff0443d3ca482343b73735c00aaf7cd,
-        type: 3}
-      propertyPath: m_Name
-      value: RGBAInputField
       objectReference: {fileID: 0}
     - target: {fileID: 8049178286632273717, guid: dff0443d3ca482343b73735c00aaf7cd,
         type: 3}
@@ -2070,6 +2070,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 381409280}
     m_Modifications:
+    - target: {fileID: 8049178286632273715, guid: dff0443d3ca482343b73735c00aaf7cd,
+        type: 3}
+      propertyPath: m_Name
+      value: RGBAInputField
+      objectReference: {fileID: 0}
     - target: {fileID: 8049178286632273714, guid: dff0443d3ca482343b73735c00aaf7cd,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2175,11 +2180,6 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 8049178286632273715, guid: dff0443d3ca482343b73735c00aaf7cd,
-        type: 3}
-      propertyPath: m_Name
-      value: RGBAInputField
-      objectReference: {fileID: 0}
     - target: {fileID: 8049178286632273717, guid: dff0443d3ca482343b73735c00aaf7cd,
         type: 3}
       propertyPath: m_OnEndEdit.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
@@ -2236,6 +2236,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 803100678}
     m_Modifications:
+    - target: {fileID: 8049178286632273715, guid: dff0443d3ca482343b73735c00aaf7cd,
+        type: 3}
+      propertyPath: m_Name
+      value: RGBAInputField
+      objectReference: {fileID: 0}
     - target: {fileID: 8049178286632273714, guid: dff0443d3ca482343b73735c00aaf7cd,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2341,11 +2346,6 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 8049178286632273715, guid: dff0443d3ca482343b73735c00aaf7cd,
-        type: 3}
-      propertyPath: m_Name
-      value: RGBAInputField
-      objectReference: {fileID: 0}
     - target: {fileID: 8049178286632273717, guid: dff0443d3ca482343b73735c00aaf7cd,
         type: 3}
       propertyPath: m_OnEndEdit.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
@@ -2397,6 +2397,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1819182786}
     m_Modifications:
+    - target: {fileID: 8049178286632273715, guid: dff0443d3ca482343b73735c00aaf7cd,
+        type: 3}
+      propertyPath: m_Name
+      value: RGBAInputField
+      objectReference: {fileID: 0}
     - target: {fileID: 8049178286632273714, guid: dff0443d3ca482343b73735c00aaf7cd,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2501,11 +2506,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8049178286632273715, guid: dff0443d3ca482343b73735c00aaf7cd,
-        type: 3}
-      propertyPath: m_Name
-      value: RGBAInputField
       objectReference: {fileID: 0}
     - target: {fileID: 8049178286632273717, guid: dff0443d3ca482343b73735c00aaf7cd,
         type: 3}
@@ -2607,6 +2607,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1493804191}
     m_Modifications:
+    - target: {fileID: 8049178286632273715, guid: dff0443d3ca482343b73735c00aaf7cd,
+        type: 3}
+      propertyPath: m_Name
+      value: RGBAInputField
+      objectReference: {fileID: 0}
     - target: {fileID: 8049178286632273714, guid: dff0443d3ca482343b73735c00aaf7cd,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2711,11 +2716,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8049178286632273715, guid: dff0443d3ca482343b73735c00aaf7cd,
-        type: 3}
-      propertyPath: m_Name
-      value: RGBAInputField
       objectReference: {fileID: 0}
     - target: {fileID: 8049178286632273717, guid: dff0443d3ca482343b73735c00aaf7cd,
         type: 3}
@@ -3159,6 +3159,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 598168945}
     m_Modifications:
+    - target: {fileID: 8049178286632273715, guid: dff0443d3ca482343b73735c00aaf7cd,
+        type: 3}
+      propertyPath: m_Name
+      value: RGBAInputField
+      objectReference: {fileID: 0}
     - target: {fileID: 8049178286632273714, guid: dff0443d3ca482343b73735c00aaf7cd,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -3263,11 +3268,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8049178286632273715, guid: dff0443d3ca482343b73735c00aaf7cd,
-        type: 3}
-      propertyPath: m_Name
-      value: RGBAInputField
       objectReference: {fileID: 0}
     - target: {fileID: 8049178286632273717, guid: dff0443d3ca482343b73735c00aaf7cd,
         type: 3}
@@ -3402,6 +3402,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 587833974}
     m_Modifications:
+    - target: {fileID: 8049178286632273715, guid: dff0443d3ca482343b73735c00aaf7cd,
+        type: 3}
+      propertyPath: m_Name
+      value: RGBAInputField
+      objectReference: {fileID: 0}
     - target: {fileID: 8049178286632273714, guid: dff0443d3ca482343b73735c00aaf7cd,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -3506,11 +3511,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8049178286632273715, guid: dff0443d3ca482343b73735c00aaf7cd,
-        type: 3}
-      propertyPath: m_Name
-      value: RGBAInputField
       objectReference: {fileID: 0}
     - target: {fileID: 8049178286632273717, guid: dff0443d3ca482343b73735c00aaf7cd,
         type: 3}
@@ -3683,6 +3683,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 220684699}
     m_Modifications:
+    - target: {fileID: 8049178286632273715, guid: dff0443d3ca482343b73735c00aaf7cd,
+        type: 3}
+      propertyPath: m_Name
+      value: RGBAInputField
+      objectReference: {fileID: 0}
     - target: {fileID: 8049178286632273714, guid: dff0443d3ca482343b73735c00aaf7cd,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -3787,11 +3792,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8049178286632273715, guid: dff0443d3ca482343b73735c00aaf7cd,
-        type: 3}
-      propertyPath: m_Name
-      value: RGBAInputField
       objectReference: {fileID: 0}
     - target: {fileID: 8049178286632273717, guid: dff0443d3ca482343b73735c00aaf7cd,
         type: 3}
@@ -4081,6 +4081,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 666141945}
     m_Modifications:
+    - target: {fileID: 8049178286632273715, guid: dff0443d3ca482343b73735c00aaf7cd,
+        type: 3}
+      propertyPath: m_Name
+      value: RGBAInputField
+      objectReference: {fileID: 0}
     - target: {fileID: 8049178286632273714, guid: dff0443d3ca482343b73735c00aaf7cd,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4185,11 +4190,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8049178286632273715, guid: dff0443d3ca482343b73735c00aaf7cd,
-        type: 3}
-      propertyPath: m_Name
-      value: RGBAInputField
       objectReference: {fileID: 0}
     - target: {fileID: 8049178286632273717, guid: dff0443d3ca482343b73735c00aaf7cd,
         type: 3}
@@ -4655,6 +4655,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2092480318}
     m_Modifications:
+    - target: {fileID: 8049178286632273715, guid: dff0443d3ca482343b73735c00aaf7cd,
+        type: 3}
+      propertyPath: m_Name
+      value: RGBAInputField
+      objectReference: {fileID: 0}
     - target: {fileID: 8049178286632273714, guid: dff0443d3ca482343b73735c00aaf7cd,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4759,11 +4764,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8049178286632273715, guid: dff0443d3ca482343b73735c00aaf7cd,
-        type: 3}
-      propertyPath: m_Name
-      value: RGBAInputField
       objectReference: {fileID: 0}
     - target: {fileID: 8049178286632273717, guid: dff0443d3ca482343b73735c00aaf7cd,
         type: 3}
@@ -5239,6 +5239,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1804716345}
     m_Modifications:
+    - target: {fileID: 8049178286632273715, guid: dff0443d3ca482343b73735c00aaf7cd,
+        type: 3}
+      propertyPath: m_Name
+      value: RGBAInputField
+      objectReference: {fileID: 0}
     - target: {fileID: 8049178286632273714, guid: dff0443d3ca482343b73735c00aaf7cd,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -5343,11 +5348,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8049178286632273715, guid: dff0443d3ca482343b73735c00aaf7cd,
-        type: 3}
-      propertyPath: m_Name
-      value: RGBAInputField
       objectReference: {fileID: 0}
     - target: {fileID: 8049178286632273717, guid: dff0443d3ca482343b73735c00aaf7cd,
         type: 3}

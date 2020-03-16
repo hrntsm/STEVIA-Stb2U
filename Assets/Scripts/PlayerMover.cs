@@ -7,16 +7,25 @@ namespace Stevia {
 
     public class PlayerMover:MonoBehaviour {
 
-        SteamVR_Input_Sources _source;
+        SteamVR_Input_Sources _srcRight = SteamVR_Input_Sources.RightHand;
+        SteamVR_Input_Sources _srcLeft = SteamVR_Input_Sources.LeftHand;
         SteamVR_Action_Boolean _actionBoolean;
         SteamVR_Action_Vector2 _actionVector2;
         GameObject _vrmObject;
 
-        bool _click;
-        float _tpadX;
-        float _tpadY;
+        bool _clickRight;
+        float _tpadRightX;
+        float _tpadRightY;
 
+        bool _clickLeft;
+        float _tpadLeftX;
+        float _tpadLeftY;
+
+        [SerializeField]
         float _moveSpeed = 2.0f;
+
+        [SerializeField]
+        float _rotateSpeed = 15.0f;
         
         void Start() {
             _actionBoolean = SteamVR_Actions._default.Teleport;
@@ -27,26 +36,38 @@ namespace Stevia {
             if (!_vrmObject) {
                 _vrmObject = GameObject.Find("VRM");
             }
-            _click = _actionBoolean.GetState(_source);
-            _tpadX = _actionVector2.GetAxis(_source).x;
-            _tpadY = _actionVector2.GetAxis(_source).y;
+            // 右手input
+            _clickRight = _actionBoolean.GetState(_srcRight);
+            _tpadRightX = _actionVector2.GetAxis(_srcRight).x;
+            _tpadRightY = _actionVector2.GetAxis(_srcRight).y;
+            
+            // 左手input
+            _clickLeft = _actionBoolean.GetState(_srcLeft);
+            _tpadLeftX = _actionVector2.GetAxis(_srcLeft).x;
+            _tpadLeftY = _actionVector2.GetAxis(_srcLeft).y;
 
+            // 右のタッチパッドは移動を割り当て
             // VRMのforworadにすることで、向かっている正面をキーの前ボタンと対応させた。
-            //if (Input.GetKey(KeyCode.W) || (_click && _tpadY > 0 && _tpadX < 0.7f && _tpadX > -0.7f)) {
-            if (_click && _tpadY > 0 && _tpadX < 0.5f && _tpadX > -0.5f) {
+            if (_clickRight && _tpadRightY > 0 && _tpadRightX < 0.5f && _tpadRightX > -0.5f) {
                 transform.position += _vrmObject.transform.forward * Time.deltaTime * _moveSpeed;
             }
-            //if (Input.GetKey(KeyCode.S) || (_click && _tpadY < 0 && _tpadX < 0.7f && _tpadX > -0.7f)) {
-            if (_click && _tpadY < 0 && _tpadX < 0.5f && _tpadX > -0.5f) {
+            if (_clickRight && _tpadRightY < 0 && _tpadRightX < 0.5f && _tpadRightX > -0.5f) {
                 transform.position -= _vrmObject.transform.forward * Time.deltaTime * _moveSpeed;
             }
-            //if (Input.GetKey(KeyCode.A) || (_click && _tpadX < 0 && _tpadY < 0.7f && _tpadY > -0.7f)) {
-            if (_click && _tpadX < 0 && _tpadY < 0.5f && _tpadY > -0.5f) {
+            if (_clickRight && _tpadRightX < 0 && _tpadRightY < 0.5f && _tpadRightY > -0.5f) {
                 transform.position -= _vrmObject.transform.right * Time.deltaTime * _moveSpeed;
             }
-            //if (Input.GetKey(KeyCode.D) || (_click && _tpadX > 0 && _tpadY < 0.7f && _tpadY > -0.7f)) {
-            if (_click && _tpadX > 0 && _tpadY < 0.5f && _tpadY > -0.5f) {
+            if (_clickRight && _tpadRightX > 0 && _tpadRightY < 0.5f && _tpadRightY > -0.5f) {
                 transform.position += _vrmObject.transform.right * Time.deltaTime * _moveSpeed;
+            }
+
+            // 左のタッチパッドは回転を割り当て
+            // RotateAroundにVRMを入れることで、VRM中心に回転するように設定
+            if (_clickLeft && _tpadLeftX < 0 && _tpadLeftY < 0.5f && _tpadLeftY > -0.5f) {
+                transform.RotateAround(_vrmObject.transform.position, transform.up, -Time.deltaTime * _rotateSpeed);
+            }
+            if (_clickLeft && _tpadLeftX > 0 && _tpadLeftY < 0.5f && _tpadLeftY > -0.5f) {
+                transform.RotateAround(_vrmObject.transform.position, transform.up, Time.deltaTime * _rotateSpeed);
             }
         }
     }
