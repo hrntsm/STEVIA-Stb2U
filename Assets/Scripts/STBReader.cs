@@ -2,6 +2,7 @@
 using System.Xml.Linq;
 using SFB;
 using UnityEngine;
+using Stevia.STB.Model;
 
 
 namespace Stevia {
@@ -9,9 +10,6 @@ namespace Stevia {
     public partial class STBReader:MonoBehaviour {
         [SerializeField]
         Material _material;
-
-        List<Vector3> _stbNodes = new List<Vector3>();
-        List<int> _vertexIDs = new List<int>();
 
         List<int> _xRcColumnId = new List<int>();
         List<int> _xRcColumnDepth = new List<int>();
@@ -37,11 +35,17 @@ namespace Stevia {
         List<string> _xStType = new List<string>();
         List<Mesh> _shapeMesh = new List<Mesh>();
 
-        // Start is called before the first frame update
+        StbNodes _nodes = new StbNodes();
+        StbStorys _storys = new StbStorys();
+
         void Start() {
             int i = 0;
+            // stbデータの読み込み
             XDocument xDoc = GetStbFileData();
-            GetStbNodes(xDoc, _stbNodes, _vertexIDs);
+            // ノードの取得
+            _nodes.LoadData(xDoc);
+            _storys.LoadData(xDoc);
+            // スラブの取得
             MakeSlabObjs(xDoc);
             // StbSecColumn_RC の取得
             var xRcColumns = xDoc.Root.Descendants("StbSecColumn_RC");

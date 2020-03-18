@@ -32,12 +32,12 @@ namespace Stevia {
                 int i = 0;
                 while (i < 4) {
                     if (countNode == 4)
-                        nodeIndex[i] = _vertexIDs.IndexOf(xSlabNodeIds[i]);
+                        nodeIndex[i] = _nodes.Id.IndexOf(xSlabNodeIds[i]);
                     else if (i == 3) // triangle slab
                         break;
                     i++;
                 }
-                meshObj = CreateMesh.Slab(_stbNodes, nodeIndex);
+                meshObj = CreateMesh.Slab(_nodes.Vertex, nodeIndex);
 
                 slabName = string.Format("Slab{0}", slabNum);
                 GameObject slab = new GameObject(slabName);
@@ -89,10 +89,10 @@ namespace Stevia {
                 xKind = (string)xElement.Attribute("kind_structure");
 
                 // 始点と終点の座標取得
-                nodeIndexStart = _vertexIDs.IndexOf(xNodeStart);
-                nodeIndexEnd = _vertexIDs.IndexOf(xNodeEnd);
-                nodeStart = _stbNodes[nodeIndexStart];
-                nodeEnd = _stbNodes[nodeIndexEnd];
+                nodeIndexStart = _nodes.Id.IndexOf(xNodeStart);
+                nodeIndexEnd = _nodes.Id.IndexOf(xNodeEnd);
+                nodeStart = _nodes.Vertex[nodeIndexStart];
+                nodeEnd = _nodes.Vertex[nodeIndexEnd];
 
                 if (xKind == "RC") {
                     switch (structType) {
