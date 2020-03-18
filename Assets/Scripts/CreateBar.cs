@@ -10,7 +10,7 @@ namespace Stevia {
             int[] mainBar = new int[5];
 
             for (int i = 0; i < 5; i++)
-                mainBar[i] = STBReader._xRcColumnBar[index][i];
+                mainBar[i] = STBReader._stbSecColRC.BarList[index][i];
             return (mainBar);
         }
 
@@ -86,9 +86,9 @@ namespace Stevia {
             var hoops = new GameObject("Hoops");
             hoops.transform.parent = parent.transform;
 
-            float pitch = STBReader._xRcColumnBar[index][5] / 1000f;
-            int dirXNum = STBReader._xRcColumnBar[index][6];
-            int dirYNum = STBReader._xRcColumnBar[index][7];
+            float pitch = STBReader._stbSecColRC.BarList[index][5] / 1000f;
+            int dirXNum = STBReader._stbSecColRC.BarList[index][6];
+            int dirYNum = STBReader._stbSecColRC.BarList[index][7];
             int sumBar = dirXNum + dirYNum;
             float distance = Vector3.Distance(cornerPos[0, 0], cornerPos[1, 0]);
             List<Vector3> vertex = new List<Vector3>();

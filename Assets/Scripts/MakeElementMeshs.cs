@@ -43,7 +43,7 @@ namespace Stevia {
 
         void MakeElementMesh(XDocument xDoc, string xDateTag, string structType) {
             Vector3 nodeStart, nodeEnd;
-            float hight = 0;
+            float height = 0;
             float width = 0;
             int elemNum = 0;
             int stbSecIndex = 0;
@@ -88,19 +88,19 @@ namespace Stevia {
                         case "Girder":
                         case "Beam":
                             stbSecIndex = _xRcBeamId.IndexOf(xElementIdSection);
-                            hight = _xRcBeamDepth[stbSecIndex] / 1000f;
+                            height = _xRcBeamDepth[stbSecIndex] / 1000f;
                             width = _xRcBeamWidth[stbSecIndex] / 1000f;
                             break;
                         case "Column":
                         case "Post":
-                            stbSecIndex = _xRcColumnId.IndexOf(xElementIdSection);
-                            hight = _xRcColumnDepth[stbSecIndex] / 1000f;
-                            width = _xRcColumnWidth[stbSecIndex] / 1000f;
+                            stbSecIndex = _stbSecColRC.Id.IndexOf(xElementIdSection);
+                            height = _stbSecColRC.Height[stbSecIndex];
+                            width = _stbSecColRC.Width[stbSecIndex];
                             break;
                         default:
                             break;
                     }
-                    if (width == 0)
+                    if (height == 0)
                         shapeType = "Pipe";
                     else
                         shapeType = "BOX";
@@ -126,22 +126,22 @@ namespace Stevia {
                             break;
                     }
                     stbSecIndex = _xStName.IndexOf(shape);
-                    hight = _xStParamA[stbSecIndex] / 1000f;
+                    height = _xStParamA[stbSecIndex] / 1000f;
                     width = _xStParamB[stbSecIndex] / 1000f;
                     shapeType = _xStType[stbSecIndex];
                 }
-                _shapeMesh = MakeElementsMeshFromVertex(nodeStart, nodeEnd, hight, width, shapeType, structType, elemNum, elements, xKind);
+                _shapeMesh = MakeElementsMeshFromVertex(nodeStart, nodeEnd, height, width, shapeType, structType, elemNum, elements, xKind);
                 // 配筋の作成
                 if (xKind == "RC") {
                     if (shapeType == "BOX") {
                         switch (structType) {
                             case "Column":
                             case "Post":
-                                CreateBar.Column(stbSecIndex, nodeStart, nodeEnd, width, hight, barObj, elemNum);
+                                CreateBar.Column(stbSecIndex, nodeStart, nodeEnd, width, height, barObj, elemNum);
                                 break;
                             case "Girder":
                             case "Beam":
-                                CreateBar.Beam(stbSecIndex, nodeStart, nodeEnd, width, hight, barObj, elemNum);
+                                CreateBar.Beam(stbSecIndex, nodeStart, nodeEnd, width, height, barObj, elemNum);
                                 break;
                             default:
                                 break;
@@ -188,7 +188,7 @@ namespace Stevia {
                 case "BOX":
                     meshObj = CreateMesh.BOX(vertexS, vertexE); break;
                 case "Pipe":
-                    meshObj = CreateMesh.Pipe(nodeStart, nodeEnd, hight / 2); break;
+                    meshObj = CreateMesh.Pipe(nodeStart, nodeEnd, width / 2); break;
                 case "L":
                     meshObj = CreateMesh.L(vertexS, vertexE); break;
                 default: break;

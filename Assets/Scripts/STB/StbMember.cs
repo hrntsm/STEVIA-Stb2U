@@ -59,7 +59,7 @@ namespace Stevia.STB.Model.Member {
         public List<double> ThicknessExBottom { get; } = new List<double>();
         public List<DirsLoad> DirLoad { get; } = new List<DirsLoad>();
         public List<double> AngleLoad { get; } = new List<double>();
-        public List<bool> IsFoundation { get; } = new List<bool>();
+        public List<bool> isFoundation { get; } = new List<bool>();
         public List<TypesHanch> TypeHaunch { get; } = new List<TypesHanch>();
         public List<List<int>> NodeIdList { get; } = new List<List<int>>();
 
@@ -74,11 +74,13 @@ namespace Stevia.STB.Model.Member {
                 KindStructure.Add(KindsStructure.RC); // スラブはRCのみ
 
                 // 必須ではないコード
-                if ((string)stbSlab.Attribute("kind_slab") == "NORMAL") {
-                    KindSlab.Add(KindsSlab.NORMAL);
-                }
-                else {
-                    KindSlab.Add(KindsSlab.CANTI);
+                if (stbSlab.Attribute("kind_slab") != null) {
+                    if ((string)stbSlab.Attribute("kind_slab") == "NORMAL") {
+                        KindSlab.Add(KindsSlab.NORMAL);
+                    }
+                    else {
+                        KindSlab.Add(KindsSlab.CANTI);
+                    }
                 }
                 if (stbSlab.Attribute("level") != null) {
                     Level.Add((double)stbSlab.Attribute("level") / 1000d);
