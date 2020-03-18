@@ -2,6 +2,7 @@
 using System.Xml.Linq;
 using System;
 using UnityEngine;
+using Stevia.STB.Model.Member;
 
 namespace Stevia {
 
@@ -10,45 +11,33 @@ namespace Stevia {
         /// Make Slab GameObjects
         /// </summary>
         void MakeSlabObjs(XDocument xDoc) {
-            int[] nodeIndex = new int[4];
-            string slabName;
+            StbSlabs stbSlabs = new StbSlabs();
             int slabNum = 0;
-            var xSlabs = xDoc.Root.Descendants("StbSlab");
+
+            stbSlabs.LoadData(xDoc);
             GameObject slabs = new GameObject("StbSlabs");
             GameObject slabBar = new GameObject("StbSlabBar");
             slabs.transform.parent = GameObject.Find("StbData").transform;
             slabBar.transform.parent = GameObject.Find("StbData").transform;
 
-            foreach (var xSlab in xSlabs) {
-                List<int> xSlabNodeIds = new List<int>();
+            foreach (var NodeIds in stbSlabs.NodeIdList) {
+                int[] nodeIndex = new int[NodeIds.Count];
                 Mesh meshObj = new Mesh();
-                int countNode = 0;
 
-                var xNodeIds = xSlab.Element("StbNodeid_List").Elements("StbNodeid");
-                foreach (var xNodeId in xNodeIds) {
-                    xSlabNodeIds.Add((int)xNodeId.Attribute("id"));
-                    countNode++;
-                }
-                int i = 0;
-                while (i < 4) {
-                    if (countNode == 4)
-                        nodeIndex[i] = _nodes.Id.IndexOf(xSlabNodeIds[i]);
-                    else if (i == 3) // triangle slab
-                        break;
-                    i++;
+                for (int i = 0; i < NodeIds.Count; i++) {
+                    nodeIndex[i] = _nodes.Id.IndexOf(NodeIds[i]);
                 }
                 meshObj = CreateMesh.Slab(_nodes.Vertex, nodeIndex);
 
-                slabName = string.Format("Slab{0}", slabNum);
+                var slabName = string.Format("Slab{0}", slabNum);
                 GameObject slab = new GameObject(slabName);
                 slab.AddComponent<MeshFilter>().mesh = meshObj;
                 slab.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
                     color = GetMemberColor("RC", "Slab")
                 };
+                slab.transform.localPosition = new Vector3(0, (float)stbSlabs.Level[slabNum], 0);
                 slab.transform.parent = slabs.transform;
-
                 slabNum++;
-                xSlabNodeIds.Clear(); // foreachごとでListにAddし続けてるのでここで値をClear
             }
         }
 

@@ -12,6 +12,8 @@ namespace Stevia.STB.Model {
     /// </summary>
     public class StbModel {
         // TODO 一括でStbModelに属するものを読み込めるようにする
+        //public void LoadAll(XDocument stbData) {
+        //}
     }
 
     /// <summary>
@@ -22,7 +24,7 @@ namespace Stevia.STB.Model {
         public List<double> X { get; } = new List<double>();
         public List<double> Y { get; } = new List<double>();
         public List<double> Z { get; } = new List<double>();
-        public List<NodeKind> Kind { get; } = new List<NodeKind>();
+        public List<KindsNode> Kind { get; } = new List<KindsNode>();
         public List<int> IdMember { get; } = new List<int>();
         public List<Vector3> Vertex { get; } = new List<Vector3>();
 
@@ -44,12 +46,12 @@ namespace Stevia.STB.Model {
                     IdMember.Add(-1);
                 }
                 switch ((string)stbNode.Attribute("kind")) {
-                    case "ON_BEAM": Kind.Add(NodeKind.ON_BEAM); break;
-                    case "ON_COLUMN": Kind.Add(NodeKind.ON_COLUMN); break;
-                    case "ON_GRID": Kind.Add(NodeKind.ON_GRID); break;
-                    case "ON_CANTI": Kind.Add(NodeKind.ON_CANTI); break;
-                    case "ON_SLAB": Kind.Add(NodeKind.ON_SLAB); break;
-                    case "OTHER": Kind.Add(NodeKind.OTHER); break;
+                    case "ON_BEAM": Kind.Add(KindsNode.ON_BEAM); break;
+                    case "ON_COLUMN": Kind.Add(KindsNode.ON_COLUMN); break;
+                    case "ON_GRID": Kind.Add(KindsNode.ON_GRID); break;
+                    case "ON_CANTI": Kind.Add(KindsNode.ON_CANTI); break;
+                    case "ON_SLAB": Kind.Add(KindsNode.ON_SLAB); break;
+                    case "OTHER": Kind.Add(KindsNode.OTHER); break;
                     default: break;
                 }
 
@@ -59,7 +61,7 @@ namespace Stevia.STB.Model {
             }
         }
 
-        public enum NodeKind {
+        public enum KindsNode {
             ON_BEAM,
             ON_COLUMN,
             ON_GRID,
@@ -70,10 +72,26 @@ namespace Stevia.STB.Model {
     }
 
     /// <summary>
+    /// 節点IDリスト
+    /// </summary>
+    public class StbNodeIdList {
+        public static List<int> Load(XElement stbElem) {
+            List<int> idList = new List<int>();
+
+            var xNodeIds = stbElem.Element("StbNodeid_List").Elements("StbNodeid");
+            foreach (var xNodeId in xNodeIds) {
+                idList.Add((int)xNodeId.Attribute("id"));
+            }
+            return idList;
+        }
+    }
+
+    /// <summary>
     /// 軸情報
     /// </summary>
     public class StbAxes {
     }
+
 
     /// <summary>
     /// 階情報（複数）
@@ -82,7 +100,7 @@ namespace Stevia.STB.Model {
         public List<int> Id { get; } = new List<int>();
         public List<string> Name { get; } = new List<string>();
         public List<double> Height { get; } = new List<double>();
-        public List<StoryKind> Kind { get; } = new List<StoryKind>();
+        public List<KindsStory> Kind { get; } = new List<KindsStory>();
         public List<int> IdDependens { get; } = new List<int>();
         public List<string> StrengthConcrete { get; } = new List<string>();
         public List<List<int>> NodeIdList { get; } = new List<List<int>>();
@@ -94,11 +112,11 @@ namespace Stevia.STB.Model {
                 Id.Add((int)stbStory.Attribute("id"));
                 Height.Add((double)stbStory.Attribute("height") / 1000d);
                 switch ((string)stbStory.Attribute("kind")) {
-                    case "GENERAL": Kind.Add(StoryKind.GENERAL); break;
-                    case "BASEMENT": Kind.Add(StoryKind.BASEMENT); break;
-                    case "ROOF": Kind.Add(StoryKind.ROOF); break;
-                    case "PENTHOUSE": Kind.Add(StoryKind.PENTHOUSE); break;
-                    case "ISOLATION": Kind.Add(StoryKind.ISOLATION); break;
+                    case "GENERAL": Kind.Add(KindsStory.GENERAL); break;
+                    case "BASEMENT": Kind.Add(KindsStory.BASEMENT); break;
+                    case "ROOF": Kind.Add(KindsStory.ROOF); break;
+                    case "PENTHOUSE": Kind.Add(KindsStory.PENTHOUSE); break;
+                    case "ISOLATION": Kind.Add(KindsStory.ISOLATION); break;
                     default: break;
                 }
                 
@@ -122,19 +140,13 @@ namespace Stevia.STB.Model {
             }
         }
 
-        public enum StoryKind { 
+        public enum KindsStory { 
             GENERAL,
             BASEMENT,
             ROOF,
             PENTHOUSE,
             ISOLATION
         }
-    }
-
-    /// <summary>
-    /// 柱・梁・スラブ・壁などの部材情報
-    /// </summary>
-    public class StbMembers {
     }
 
     /// <summary>
@@ -153,5 +165,12 @@ namespace Stevia.STB.Model {
     /// 床組（複数）
     /// </summary>
     public class StbSlabFrames {
+    }
+
+    public enum KindsStructure {
+        RC,
+        S,
+        SRC,
+        CFT
     }
 }

@@ -3,20 +3,29 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Stevia {
-
+    /// <summary>
+    /// Create mesh from given data
+    /// </summary>
     public class CreateMesh:MonoBehaviour {
-
+        /// <summary>
+        /// Create slab mesh
+        /// </summary>
+        /// <param name="stbNodes"></param>
+        /// <param name="nodeIndex"></param>
+        /// <returns></returns>
         public static Mesh Slab(List<Vector3> stbNodes, int[] nodeIndex) {
             List<Vector3> vertices = new List<Vector3>();
             List<int> triangles = new List<int>();
             Mesh meshObj = new Mesh();
-            int meshNum = 1;
+            int meshNum;
 
-            int i = 0;
-            while (i < 4) {
+            for (int i = 0; i < nodeIndex.Length; i++) {
                 vertices.Add(stbNodes[nodeIndex[i]]);
-                i++;
             }
+            if (nodeIndex.Length == 4)
+                meshNum = 1;
+            else
+                meshNum = 0;
             triangles = GetTriangles(meshNum);
 
             meshObj.vertices = vertices.ToArray();
@@ -25,6 +34,12 @@ namespace Stevia {
             return (meshObj);
         }
 
+        /// <summary>
+        /// Create H section mesh
+        /// </summary>
+        /// <param name="vertexS"></param>
+        /// <param name="vertexE"></param>
+        /// <returns></returns>
         public static Mesh H(Vector3[] vertexS, Vector3[] vertexE) {
             List<Vector3> vertices = new List<Vector3>();
             List<int> triangles = new List<int>();
@@ -42,6 +57,12 @@ namespace Stevia {
             return (meshObj);
         }
 
+        /// <summary>
+        /// Create BOX section mesh
+        /// </summary>
+        /// <param name="vertexS"></param>
+        /// <param name="vertexE"></param>
+        /// <returns></returns>
         public static Mesh BOX(Vector3[] vertexS, Vector3[] vertexE) {
             List<Vector3> vertices = new List<Vector3>();
             List<int> triangles = new List<int>();
@@ -60,6 +81,12 @@ namespace Stevia {
             return (meshObj);
         }
 
+        /// <summary>
+        /// Create L section mesh
+        /// </summary>
+        /// <param name="vertexS"></param>
+        /// <param name="vertexE"></param>
+        /// <returns></returns>
         public static Mesh L(Vector3[] vertexS, Vector3[] vertexE) {
             List<Vector3> vertices = new List<Vector3>();
             List<int> triangles = new List<int>();
@@ -76,6 +103,15 @@ namespace Stevia {
             return (meshObj);
         }
 
+        /// <summary>
+        /// Create L section mesh
+        /// </summary>
+        /// <param name="startPoint">Start point</param>
+        /// <param name="endPoint">End point</param>
+        /// <param name="radious">Radious</param>
+        /// <param name="divNum">Divide count of circle</param>
+        /// <param name="isCap">Boolean of with or without cap</param>
+        /// <returns></returns>
         public static Mesh Pipe(Vector3 startPoint, Vector3 endPoint, float radious, int divNum = 24, bool isCap = false) {
             List<Vector3> vertices = new List<Vector3>();
             List<int> triangles = new List<int>();
@@ -169,13 +205,20 @@ namespace Stevia {
         /// </summary>
         static List<int> GetTriangles(int meshNum) {
             List<int> triangles = new List<int>();
-            for (int i = 1; i <= meshNum; ++i) {
-                triangles.Add(4 * i - 4);
-                triangles.Add(4 * i - 3);
-                triangles.Add(4 * i - 2);
-                triangles.Add(4 * i - 2);
-                triangles.Add(4 * i - 1);
-                triangles.Add(4 * i - 4);
+            if (meshNum == 0) {
+                triangles.Add(0);
+                triangles.Add(1);
+                triangles.Add(2);
+            }
+            else {
+                for (int i = 1; i <= meshNum; ++i) {
+                    triangles.Add(4 * i - 4);
+                    triangles.Add(4 * i - 3);
+                    triangles.Add(4 * i - 2);
+                    triangles.Add(4 * i - 2);
+                    triangles.Add(4 * i - 1);
+                    triangles.Add(4 * i - 4);
+                }
             }
             return (triangles);
         }
