@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR;
 
-namespace Stevia {
+namespace Stevia.VR {
 
     public class PlayerMover:MonoBehaviour {
 

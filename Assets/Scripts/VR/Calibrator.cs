@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Stevia {
+namespace Stevia.VR {
+
     public class Calibrator:MonoBehaviour {
 
         [SerializeField]

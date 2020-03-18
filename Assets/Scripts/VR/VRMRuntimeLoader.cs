@@ -7,7 +7,7 @@ using SFB;
 using RootMotion.FinalIK;
 using AniLipSync.VRM;
 
-namespace Stevia {
+namespace Stevia.VR {
 
     public class VRMRuntimeLoader:MonoBehaviour {
         GameObject _model;
