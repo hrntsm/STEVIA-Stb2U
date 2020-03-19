@@ -59,7 +59,7 @@ namespace Stevia.STB.Model.Member {
         public List<double> ThicknessExBottom { get; } = new List<double>();
         public List<DirsLoad> DirLoad { get; } = new List<DirsLoad>();
         public List<double> AngleLoad { get; } = new List<double>();
-        public List<bool> isFoundation { get; } = new List<bool>();
+        public List<bool> IsFoundation { get; } = new List<bool>();
         public List<TypesHanch> TypeHaunch { get; } = new List<TypesHanch>();
         public List<List<int>> NodeIdList { get; } = new List<List<int>>();
 
@@ -93,7 +93,8 @@ namespace Stevia.STB.Model.Member {
                 // 必須ではないコードは未実装多め
 
                 // 子要素 StbNodeid_List
-                NodeIdList.Add(StbNodeIdList.Load(stbSlab));
+                var stbNodeIdList = new StbNodeIdList();
+                NodeIdList.Add(stbNodeIdList.Load(stbSlab));
                 index++;
             }
         }

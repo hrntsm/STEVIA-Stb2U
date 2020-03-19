@@ -46,13 +46,20 @@ namespace Stevia.STB.Model {
                     IdMember.Add(-1);
                 }
                 switch ((string)stbNode.Attribute("kind")) {
-                    case "ON_BEAM": Kind.Add(KindsNode.ON_BEAM); break;
-                    case "ON_COLUMN": Kind.Add(KindsNode.ON_COLUMN); break;
-                    case "ON_GRID": Kind.Add(KindsNode.ON_GRID); break;
-                    case "ON_CANTI": Kind.Add(KindsNode.ON_CANTI); break;
-                    case "ON_SLAB": Kind.Add(KindsNode.ON_SLAB); break;
-                    case "OTHER": Kind.Add(KindsNode.OTHER); break;
-                    default: break;
+                    case "ON_BEAM":
+                        Kind.Add(KindsNode.ON_BEAM); break;
+                    case "ON_COLUMN":
+                        Kind.Add(KindsNode.ON_COLUMN); break;
+                    case "ON_GRID":
+                        Kind.Add(KindsNode.ON_GRID); break;
+                    case "ON_CANTI":
+                        Kind.Add(KindsNode.ON_CANTI); break;
+                    case "ON_SLAB":
+                        Kind.Add(KindsNode.ON_SLAB); break;
+                    case "OTHER":
+                        Kind.Add(KindsNode.OTHER); break;
+                    default:
+                        break;
                 }
 
                 // StbNodeにはない追加した属性
@@ -75,7 +82,7 @@ namespace Stevia.STB.Model {
     /// 節点IDリスト
     /// </summary>
     public class StbNodeIdList {
-        public static List<int> Load(XElement stbElem) {
+        public List<int> Load(XElement stbElem) {
             List<int> idList = new List<int>();
 
             var xNodeIds = stbElem.Element("StbNodeid_List").Elements("StbNodeid");
@@ -112,12 +119,18 @@ namespace Stevia.STB.Model {
                 Id.Add((int)stbStory.Attribute("id"));
                 Height.Add((double)stbStory.Attribute("height") / 1000d);
                 switch ((string)stbStory.Attribute("kind")) {
-                    case "GENERAL": Kind.Add(KindsStory.GENERAL); break;
-                    case "BASEMENT": Kind.Add(KindsStory.BASEMENT); break;
-                    case "ROOF": Kind.Add(KindsStory.ROOF); break;
-                    case "PENTHOUSE": Kind.Add(KindsStory.PENTHOUSE); break;
-                    case "ISOLATION": Kind.Add(KindsStory.ISOLATION); break;
-                    default: break;
+                    case "GENERAL":
+                        Kind.Add(KindsStory.GENERAL); break;
+                    case "BASEMENT":
+                        Kind.Add(KindsStory.BASEMENT); break;
+                    case "ROOF":
+                        Kind.Add(KindsStory.ROOF); break;
+                    case "PENTHOUSE":
+                        Kind.Add(KindsStory.PENTHOUSE); break;
+                    case "ISOLATION":
+                        Kind.Add(KindsStory.ISOLATION); break;
+                    default:
+                        break;
                 }
                 
                 // 必須ではないコード

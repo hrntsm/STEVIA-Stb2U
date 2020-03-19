@@ -100,7 +100,7 @@ namespace Stevia.STB.Model.Section {
         /// <summary>
         /// 部材が矩形であるかどうか
         /// </summary>
-        public List<bool> isRect { get; } = new List<bool>();
+        public List<bool> IsRect { get; } = new List<bool>();
         /// <summary>
         /// 各配筋の本数をまとめたリスト
         /// </summary>
@@ -140,14 +140,16 @@ namespace Stevia.STB.Model.Section {
                 }
 
                 // 子要素 StbSecFigure
-                StbColSecFigure.Load(stbRcCol);
-                Width.Add(StbColSecFigure.Width);
-                Height.Add(StbColSecFigure.Height);
-                isRect.Add(StbColSecFigure.isRect);
+                var stbColSecFigure = new StbColSecFigure();
+                stbColSecFigure.Load(stbRcCol);
+                Width.Add(stbColSecFigure.Width);
+                Height.Add(stbColSecFigure.Height);
+                IsRect.Add(stbColSecFigure.IsRect);
 
                 // 子要素 StbSecBar_Arrangement
-                StbColSecBarArrangement.Load(stbRcCol, StbColSecFigure.isRect);
-                BarList.Add(StbColSecBarArrangement.BarList);
+                var stbColSecBarArrangement = new StbColSecBarArrangement();
+                stbColSecBarArrangement.Load(stbRcCol, stbColSecFigure.IsRect);
+                BarList.Add(stbColSecBarArrangement.BarList);
             }
         }
     }
@@ -156,30 +158,30 @@ namespace Stevia.STB.Model.Section {
     /// RCとSRCの柱断面形状
     /// </summary>
     public class StbColSecFigure {
-        public static float Width { get; private set; }
-        public static float Height { get; private set; }
-        public static bool isRect { get; private set; }
+        public float Width { get; private set; }
+        public float Height { get; private set; }
+        public bool IsRect { get; private set; }
 
         /// <summary>
         /// 与えられたstbデータからRC柱断面の形状を取得する。
         /// </summary>
         /// <param name="stbColumn"></param>
-        public static void Load(XElement stbColumn) {
+        public void Load(XElement stbColumn) {
             var stbFigure = stbColumn.Element("StbSecFigure");
             if (stbFigure.Element("StbSecRect") != null) {
                 Width = (float) stbFigure.Element("StbSecRect").Attribute("DX") / 1000f;
                 Height = (float) stbFigure.Element("StbSecRect").Attribute("DY") / 1000f;
-                isRect = true;
+                IsRect = true;
             }
             else if(stbFigure.Element("StbSecCircle") != null) {
                 Width = (float) stbFigure.Element("StbSecCircle").Attribute("D") / 1000f;
                 Height = 0f;
-                isRect = false;
+                IsRect = false;
             }
             else {
                 Width = 0f;
                 Height = 0f;
-                isRect = false;
+                IsRect = false;
             }
         }
     }
@@ -188,9 +190,9 @@ namespace Stevia.STB.Model.Section {
     /// RC柱の配筋情報
     /// </summary>
     public class StbColSecBarArrangement {
-        public static List<int> BarList { get; } = new List<int>();
+        public List<int> BarList { get; } = new List<int>();
 
-        public static void Load(XElement stbColumn, bool isRect) {
+        public void Load(XElement stbColumn, bool isRect) {
             string elementName;
             var stbBar = stbColumn.Element("StbSecBar_Arrangement");
 
@@ -359,10 +361,10 @@ namespace Stevia.STB.Model.Section {
                     JointIdBottom.Add(-1);
                 }
 
-
                 // 子要素 StbSecSteelColumn
-                StbSecSteelColumn.Load(stbStCol);
-                Shape.Add(StbSecSteelColumn.Shape);
+                var stbSecSteelColumn = new StbSecSteelColumn();
+                stbSecSteelColumn.Load(stbStCol);
+                Shape.Add(stbSecSteelColumn.Shape);
             }
         }
     }
@@ -371,12 +373,12 @@ namespace Stevia.STB.Model.Section {
     /// 柱断面形状の名称
     /// </summary>
     public class StbSecSteelColumn {
-        public static string Pos { get; private set; }
-        public static string Shape { get; private set; }
-        public static string StrengthMain { get; private set; }
-        public static string StrengthWeb { get; private set; }
+        public string Pos { get; private set; }
+        public string Shape { get; private set; }
+        public string StrengthMain { get; private set; }
+        public string StrengthWeb { get; private set; }
 
-        public static void Load(XElement stbStCol) {
+        public void Load(XElement stbStCol) {
             var secStCol = stbStCol.Element("StbSecSteelColumn");
             // 必須コード
             Pos = (string)secStCol.Attribute("pos");
@@ -428,15 +430,15 @@ namespace Stevia.STB.Model.Section {
         /// <summary>
         /// 部材が基礎梁であるかどうか
         /// </summary>
-        public List<bool> isFoundation { get; } = new List<bool>();
+        public List<bool> IsFoundation { get; } = new List<bool>();
         /// <summary>
         /// 部材が片持ちであるかどうか
         /// </summary>
-        public List<bool> isCanti { get; } = new List<bool>();
+        public List<bool> IsCanti { get; } = new List<bool>();
         /// <summary>
         /// 部材が外端内端であるかどうか
         /// </summary>
-        public List<bool> isOutIn { get; } = new List<bool>();
+        public List<bool> IsOutIn { get; } = new List<bool>();
         /// <summary>
         /// 主筋径
         /// </summary>
@@ -491,13 +493,15 @@ namespace Stevia.STB.Model.Section {
                 }
 
                 // 子要素 StbSecFigure
-                StbBeamSecFigure.Load(stbRcBeam);
-                Width.Add(StbBeamSecFigure.Width);
-                Depth.Add(StbBeamSecFigure.Depth);
+                var stbBeamSecFigure = new StbBeamSecFigure();
+                stbBeamSecFigure.Load(stbRcBeam);
+                Width.Add(stbBeamSecFigure.Width);
+                Depth.Add(stbBeamSecFigure.Depth);
 
                 // 子要素 StbSecBar_Arrangement
-                StbBeamSecBarArrangement.Load(stbRcBeam);
-                BarList.Add(StbBeamSecBarArrangement.BarList);
+                var stbBeamSecBarArrangement = new StbBeamSecBarArrangement();
+                stbBeamSecBarArrangement.Load(stbRcBeam);
+                BarList.Add(stbBeamSecBarArrangement.BarList);
             }
         }
     }
@@ -506,14 +510,14 @@ namespace Stevia.STB.Model.Section {
     /// RC梁断面の形状
     /// </summary>
     public class StbBeamSecFigure {
-        public static float Width { get; private set; }
-        public static float Depth { get; private set; }
+        public float Width { get; private set; }
+        public float Depth { get; private set; }
 
         /// <summary>
         /// 与えられたstbデータからRC梁断面の形状を取得する。
         /// </summary>
         /// <param name="stbBeam"></param>
-        public static void Load(XElement stbBeam) {
+        public void Load(XElement stbBeam) {
             var stbFigure = stbBeam.Element("StbSecFigure");
 
             if (stbFigure.Element("StbSecHaunch") != null) {
@@ -539,9 +543,9 @@ namespace Stevia.STB.Model.Section {
     /// RC梁の配筋情報
     /// </summary>
     public class StbBeamSecBarArrangement {
-        public static List<int> BarList { get; } = new List<int>();
+        public List<int> BarList { get; } = new List<int>();
 
-        public static void Load(XElement stbBeam) {
+        public void Load(XElement stbBeam) {
             string elementName;
             var stbBar = stbBeam.Element("StbSecBar_Arrangement");
 
@@ -624,11 +628,11 @@ namespace Stevia.STB.Model.Section {
         /// <summary>
         /// 部材が片持ちであるかどうか
         /// </summary>
-        public List<bool> isCanti { get; } = new List<bool>();
+        public List<bool> IsCanti { get; } = new List<bool>();
         /// <summary>
         /// 部材が外端内端であるかどうか
         /// </summary>
-        public List<bool> isOutIn { get; } = new List<bool>();
+        public List<bool> IsOutIn { get; } = new List<bool>();
         /// <summary>
         /// 始端の継手のID
         /// </summary>
@@ -674,16 +678,16 @@ namespace Stevia.STB.Model.Section {
                     KindBeam.Add(KindsBeam.GIRDER);
                 }
                 if (stbStBeam.Attribute("isCanti") != null) {
-                    isCanti.Add((bool)stbStBeam.Attribute("isCanti"));
+                    IsCanti.Add((bool)stbStBeam.Attribute("isCanti"));
                 }
                 else {
-                    isCanti.Add(false);
+                    IsCanti.Add(false);
                 }
                 if (stbStBeam.Attribute("isOutIn") != null) {
-                    isCanti.Add((bool)stbStBeam.Attribute("isOutIn"));
+                    IsCanti.Add((bool)stbStBeam.Attribute("isOutIn"));
                 }
                 else {
-                    isCanti.Add(false);
+                    IsCanti.Add(false);
                 }
                 if (stbStBeam.Attribute("joint_id_start") != null) {
                     JointIdStart.Add((int)stbStBeam.Attribute("joint_id_start"));
@@ -699,8 +703,9 @@ namespace Stevia.STB.Model.Section {
                 }
 
                 // 子要素 StbSecSteelBeam
-                StbSecSteelBeam.Load(stbStBeam);
-                Shape.Add(StbSecSteelBeam.Shape);
+                var stbSecSteelBeam = new StbSecSteelBeam();
+                stbSecSteelBeam.Load(stbStBeam);
+                Shape.Add(stbSecSteelBeam.Shape);
             }
         }
     }
@@ -709,12 +714,12 @@ namespace Stevia.STB.Model.Section {
     /// S梁断面形状の名称
     /// </summary>
     public class StbSecSteelBeam {
-        public static string Pos { get; private set; }
-        public static string Shape { get; private set; }
-        public static string StrengthMain { get; private set; }
-        public static string StrengthWeb { get; private set; }
+        public string Pos { get; private set; }
+        public string Shape { get; private set; }
+        public string StrengthMain { get; private set; }
+        public string StrengthWeb { get; private set; }
 
-        public static void Load(XElement stbStBeam) {
+        public void Load(XElement stbStBeam) {
             var secStBeam = stbStBeam.Element("StbSecSteelBeam");
 
             // 必須コード
@@ -796,8 +801,9 @@ namespace Stevia.STB.Model.Section {
                 }
 
                 // 子要素 StbSecSteelBeam
-                StbSecSteelBrace.Load(stbStBrace);
-                Shape.Add(StbSecSteelBrace.Shape);
+                StbSecSteelBrace stbSecSteelBrace = new StbSecSteelBrace();
+                stbSecSteelBrace.Load(stbStBrace);
+                Shape.Add(stbSecSteelBrace.Shape);
             }
         }
     }
@@ -806,12 +812,12 @@ namespace Stevia.STB.Model.Section {
     /// S梁断面形状の名称
     /// </summary>
     public class StbSecSteelBrace {
-        public static string Pos { get; private set; }
-        public static string Shape { get; private set; }
-        public static string StrengthMain { get; private set; }
-        public static string StrengthWeb { get; private set; }
+        public string Pos { get; private set; }
+        public string Shape { get; private set; }
+        public string StrengthMain { get; private set; }
+        public string StrengthWeb { get; private set; }
 
-        public static void Load(XElement stbStBrace) {
+        public void Load(XElement stbStBrace) {
             var secStBrace = stbStBrace.Element("StbSecSteelBrace");
 
             // 必須コード
