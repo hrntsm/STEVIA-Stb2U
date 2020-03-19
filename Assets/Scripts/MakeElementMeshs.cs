@@ -10,11 +10,9 @@ namespace Stevia {
         /// <summary>
         /// Make Slab GameObjects
         /// </summary>
-        void MakeSlabObjs(XDocument xDoc) {
-            StbSlabs stbSlabs = new StbSlabs();
+        void MakeSlabObjs(StbSlabs stbSlabs) {
             int slabNum = 0;
 
-            stbSlabs.LoadData(xDoc);
             GameObject slabs = new GameObject("StbSlabs");
             GameObject slabBar = new GameObject("StbSlabBar");
             slabs.transform.parent = GameObject.Find("StbData").transform;
@@ -87,15 +85,15 @@ namespace Stevia {
                     switch (structType) {
                         case "Girder":
                         case "Beam":
-                            stbSecIndex = _xRcBeamId.IndexOf(xElementIdSection);
-                            height = _xRcBeamDepth[stbSecIndex] / 1000f;
-                            width = _xRcBeamWidth[stbSecIndex] / 1000f;
+                            stbSecIndex = _secBeamRC.Id.IndexOf(xElementIdSection);
+                            height = _secBeamRC.Depth[stbSecIndex];
+                            width = _secBeamRC.Width[stbSecIndex];
                             break;
                         case "Column":
                         case "Post":
-                            stbSecIndex = _stbSecColRC.Id.IndexOf(xElementIdSection);
-                            height = _stbSecColRC.Height[stbSecIndex];
-                            width = _stbSecColRC.Width[stbSecIndex];
+                            stbSecIndex = _secColumnRC.Id.IndexOf(xElementIdSection);
+                            height = _secColumnRC.Height[stbSecIndex];
+                            width = _secColumnRC.Width[stbSecIndex];
                             break;
                         default:
                             break;
@@ -109,17 +107,17 @@ namespace Stevia {
                     switch (structType) {
                         case "Girder":
                         case "Beam":
-                            idSection = _stbSecBeamS.Id.IndexOf(xElementIdSection);
-                            shape = _stbSecBeamS.Shape[idSection];
+                            idSection = _secBeamS.Id.IndexOf(xElementIdSection);
+                            shape = _secBeamS.Shape[idSection];
                             break;
                         case "Column":
                         case "Post":
-                            idSection = _stbSecColumnS.Id.IndexOf(xElementIdSection);
-                            shape = _stbSecColumnS.Shape[idSection];
+                            idSection = _secColumnS.Id.IndexOf(xElementIdSection);
+                            shape = _secColumnS.Shape[idSection];
                             break;
                         case "Brace":
-                            idSection = _xStBraceId.IndexOf(xElementIdSection);
-                            shape = _xStBraceShape[idSection];
+                            idSection = _secBraceS.Id.IndexOf(xElementIdSection);
+                            shape = _secBraceS.Shape[idSection];
                             break;
                         default:
                             shape = "";

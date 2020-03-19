@@ -13,13 +13,6 @@ namespace Stevia {
         [SerializeField]
         Material _material;
 
-        List<int> _xRcBeamId = new List<int>();
-        List<int> _xRcBeamDepth = new List<int>();
-        List<int> _xRcBeamWidth = new List<int>();
-        public static List<List<int>> _xRcBeamBar = new List<List<int>>();
-
-        List<int> _xStBraceId = new List<int>();
-        List<string> _xStBraceShape = new List<string>();
         List<string> _xStName = new List<string>();
         List<float> _xStParamA = new List<float>();
         List<float> _xStParamB = new List<float>();
@@ -28,63 +21,38 @@ namespace Stevia {
 
         StbNodes _nodes = new StbNodes();
         StbStorys _storys = new StbStorys();
-        public static StbSecColRC _stbSecColRC  = new StbSecColRC();
-        StbSecColumnS _stbSecColumnS = new StbSecColumnS();
-        StbSecBeamS _stbSecBeamS = new StbSecBeamS();
+        StbSlabs _slabs = new StbSlabs();
+        public static StbSecColRC _secColumnRC  = new StbSecColRC();
+        public static StbSecBeamRC _secBeamRC = new StbSecBeamRC();
+        StbSecColumnS _secColumnS = new StbSecColumnS();
+        StbSecBeamS _secBeamS = new StbSecBeamS();
+        StbSecBraceS _secBraceS = new StbSecBraceS();
 
         void Start() {
-            int i;
             // stbデータの読み込み
             XDocument xDoc = GetStbFileData();
             _nodes.Load(xDoc);
             _storys.Load(xDoc);
-            _stbSecColRC.Load(xDoc);
-            _stbSecColumnS.Load(xDoc);
-            _stbSecBeamS.Load(xDoc);
-
-            // スラブの作成
-            MakeSlabObjs(xDoc);
-
-            // StbSecBeam_RC の取得
-            var xRcBeams = xDoc.Root.Descendants("StbSecBeam_RC");
-            foreach (var xRcBeam in xRcBeams) {
-                _xRcBeamId.Add((int)xRcBeam.Attribute("id"));
-                var xFigure = xRcBeam.Element("StbSecFigure");
-                var xBar = xRcBeam.Element("StbSecBar_Arrangement");
-
-                // 子要素が StbSecHaunch か StbSecStraight を判定
-                if (xFigure.Element("StbSecHaunch") != null) {
-                    _xRcBeamDepth.Add((int)xFigure.Element("StbSecHaunch").Attribute("depth_center"));
-                    _xRcBeamWidth.Add((int)xFigure.Element("StbSecHaunch").Attribute("width_center"));
-                }
-                else {
-                    _xRcBeamDepth.Add((int)xFigure.Element("StbSecStraight").Attribute("depth"));
-                    _xRcBeamWidth.Add((int)xFigure.Element("StbSecStraight").Attribute("width"));
-                }
-                _xRcBeamBar.Add(GetBeamBarInfo(xBar));
-            }
-
-            // StbSecBrace_S の取得
-            var xStBraces = xDoc.Root.Descendants("StbSecBrace_S");
-            foreach (var xStBrace in xStBraces) {
-                _xStBraceId.Add((int)xStBrace.Attribute("id"));
-                _xStBraceShape.Add((string)xStBrace.Element("StbSecSteelBrace").Attribute("shape"));
-            }
+            _slabs.Load(xDoc);
+            _secColumnRC.Load(xDoc);
+            _secColumnS.Load(xDoc);
+            _secBeamRC.Load(xDoc);
+            _secBeamS.Load(xDoc);
+            _secBraceS.Load(xDoc);
 
             // S断面形状の取得
-            i = 0;
             string[,] SteelSecName = GetSteelSecNameArray();
-            while (i < SteelSecName.GetLength(0)) {
+            for (int i = 0; i < SteelSecName.GetLength(0); i++) {
                 GetStbSteelSection(xDoc, SteelSecName[i, 0], SteelSecName[i, 1]);
-                i++;
             }
+
             // meshの生成
-            i = 0;
+            MakeSlabObjs(_slabs);
             string[,] memberName = GetMemberNameArray();
-            while (i < memberName.GetLength(0)) {
+            for (int i = 0; i < memberName.GetLength(0); i++) {
                 MakeElementMesh(xDoc, memberName[i, 0], memberName[i, 1]);
-                i++;
             }
+
             // 配筋表示は最初はオフにする
             DisplySettings.BarOff();
         }
@@ -121,46 +89,6 @@ namespace Stevia {
                 {"StbBrace", "Brace"}
             };
             return (memberNameArray);
-        }
-
-        List<int> GetBeamBarInfo(XElement xBar) {
-            List<int> barList = new List<int>();
-            string elementName;
-
-            if (xBar.Element("StbSecBeam_Start_Center_End_Section") != null)
-                elementName = "StbSecBeam_Start_Center_End_Section";
-            else if (xBar.Element("StbSecBeam_Start_End_Section") != null)
-                elementName = "StbSecBeam_Start_End_Section";
-            else if (xBar.Element("StbSecBeam_Same_Section") != null)
-                elementName = "StbSecBeam_Same_Section";
-            else
-                return (new List<int> { 2, 2, 0, 0, 0, 0, 200, 2 });
-
-            // Main 1
-            barList.Add((int)xBar.Element(elementName).Attribute("count_main_top_1st"));
-            barList.Add((int)xBar.Element(elementName).Attribute("count_main_bottom_1st"));
-            // Main2
-            if (xBar.Element(elementName).Attribute("count_main_top_2nd") != null)
-                barList.Add((int)xBar.Element(elementName).Attribute("count_main_top_2nd"));
-            else
-                barList.Add(0);
-            if (xBar.Element(elementName).Attribute("count_main_bottom_2nd") != null)
-                barList.Add((int)xBar.Element(elementName).Attribute("count_main_bottom_2nd"));
-            else
-                barList.Add(0);
-            // Main3
-            if (xBar.Element(elementName).Attribute("count_main_top_3rd") != null)
-                barList.Add((int)xBar.Element(elementName).Attribute("count_main_top_3rd"));
-            else
-                barList.Add(0);
-            if (xBar.Element(elementName).Attribute("count_main_bottom_3rd") != null)
-                barList.Add((int)xBar.Element(elementName).Attribute("count_main_bottom_3rd"));
-            else
-                barList.Add(0);
-            // Band
-            barList.Add((int)xBar.Element(elementName).Attribute("pitch_stirrup"));
-            barList.Add((int)xBar.Element(elementName).Attribute("count_stirrup"));
-            return (barList);
         }
     }
 }

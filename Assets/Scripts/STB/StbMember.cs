@@ -63,7 +63,7 @@ namespace Stevia.STB.Model.Member {
         public List<TypesHanch> TypeHaunch { get; } = new List<TypesHanch>();
         public List<List<int>> NodeIdList { get; } = new List<List<int>>();
 
-        public void LoadData(XDocument stbDoc) {
+        public void Load(XDocument stbDoc) {
             int index = 0;
             var stbSlabs = stbDoc.Root.Descendants("StbSlab");
             foreach (var stbSlab in stbSlabs) {

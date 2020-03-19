@@ -10,7 +10,7 @@ namespace Stevia {
             int[] mainBar = new int[5];
 
             for (int i = 0; i < 5; i++)
-                mainBar[i] = STBReader._stbSecColRC.BarList[index][i];
+                mainBar[i] = STBReader._secColumnRC.BarList[index][i];
             return (mainBar);
         }
 
@@ -18,7 +18,7 @@ namespace Stevia {
             int[] mainBar = new int[5];
 
             for (int i = 0; i < 5; i++)
-                mainBar[i] = STBReader._xRcBeamBar[index][i];
+                mainBar[i] = STBReader._secBeamRC.BarList[index][i];
             return (mainBar);
         }
 
@@ -86,9 +86,9 @@ namespace Stevia {
             var hoops = new GameObject("Hoops");
             hoops.transform.parent = parent.transform;
 
-            float pitch = STBReader._stbSecColRC.BarList[index][5] / 1000f;
-            int dirXNum = STBReader._stbSecColRC.BarList[index][6];
-            int dirYNum = STBReader._stbSecColRC.BarList[index][7];
+            float pitch = STBReader._secColumnRC.BarList[index][5] / 1000f;
+            int dirXNum = STBReader._secColumnRC.BarList[index][6];
+            int dirYNum = STBReader._secColumnRC.BarList[index][7];
             int sumBar = dirXNum + dirYNum;
             float distance = Vector3.Distance(cornerPos[0, 0], cornerPos[1, 0]);
             List<Vector3> vertex = new List<Vector3>();
@@ -303,8 +303,8 @@ namespace Stevia {
             var stirrups = new GameObject("Stirrups");
             stirrups.transform.parent = parent.transform;
 
-            float pitch = STBReader._xRcBeamBar[index][6] / 1000f;
-            int strupNum = STBReader._xRcBeamBar[index][7];
+            float pitch = STBReader._secBeamRC.BarList[index][6] / 1000f;
+            int strupNum = STBReader._secBeamRC.BarList[index][7];
             int sumBar = strupNum + 2;
             float distance = Vector3.Distance(cornerPos[0, 0], cornerPos[1, 0]);
             List<Vector3> vertex = new List<Vector3>();
