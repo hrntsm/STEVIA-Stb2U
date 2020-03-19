@@ -109,13 +109,13 @@ namespace Stevia {
                     switch (structType) {
                         case "Girder":
                         case "Beam":
-                            idSection = _xStBeamId.IndexOf(xElementIdSection);
-                            shape = _xStBeamShape[idSection];
+                            idSection = _stbSecBeamS.Id.IndexOf(xElementIdSection);
+                            shape = _stbSecBeamS.Shape[idSection];
                             break;
                         case "Column":
                         case "Post":
-                            idSection = _xStColumnId.IndexOf(xElementIdSection);
-                            shape = _xStColumnShape[idSection];
+                            idSection = _stbSecColumnS.Id.IndexOf(xElementIdSection);
+                            shape = _stbSecColumnS.Shape[idSection];
                             break;
                         case "Brace":
                             idSection = _xStBraceId.IndexOf(xElementIdSection);
