@@ -16,8 +16,10 @@ namespace Stevia.VR {
         float charaHeight;
 
         public void Run() {
-            float height = charaHeight - hmdEye.transform.localPosition.y;
-            cameraRig.position = new Vector3(0, height, 0);
+            float xPos = cameraRig.position.x;
+            float yPos = cameraRig.position.y + (charaHeight - hmdEye.transform.localPosition.y);
+            float zPos = cameraRig.position.z;
+            cameraRig.position = new Vector3(xPos, yPos, zPos);
         }
     }
 }

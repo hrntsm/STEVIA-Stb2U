@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+
 using UnityEngine;
+using UnityEngine.UI;
+
 using Valve.VR;
 
 namespace Stevia.VR {
@@ -69,6 +72,13 @@ namespace Stevia.VR {
             if (_clickLeft && _tpadLeftX > 0 && _tpadLeftY < 0.5f && _tpadLeftY > -0.5f) {
                 transform.RotateAround(_vrmObject.transform.position, transform.up, Time.deltaTime * _rotateSpeed);
             }
+        }
+
+        public void ChangeStory(Dropdown dropdown) {
+            float xPos = gameObject.transform.position.x;
+            float yPos = STBReader._storys.Height[dropdown.value]; // モデルの中心が起点なのでモデルの身長程度上げている
+            float zPos = gameObject.transform.position.z;
+            gameObject.transform.position = new Vector3(xPos, yPos, zPos);
         }
     }
 }

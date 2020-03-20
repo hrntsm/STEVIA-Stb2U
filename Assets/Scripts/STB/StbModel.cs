@@ -21,9 +21,9 @@ namespace Stevia.STB.Model {
     /// </summary>
     public class StbNodes {
         public List<int> Id { get; } = new List<int>();
-        public List<double> X { get; } = new List<double>();
-        public List<double> Y { get; } = new List<double>();
-        public List<double> Z { get; } = new List<double>();
+        public List<float> X { get; } = new List<float>();
+        public List<float> Y { get; } = new List<float>();
+        public List<float> Z { get; } = new List<float>();
         public List<KindsNode> Kind { get; } = new List<KindsNode>();
         public List<int> IdMember { get; } = new List<int>();
         public List<Vector3> Vertex { get; } = new List<Vector3>();
@@ -34,9 +34,9 @@ namespace Stevia.STB.Model {
             foreach (var stbNode in stbNodes) {
                 // 必須コード
                 Id.Add((int)stbNode.Attribute("id"));
-                X.Add((double)stbNode.Attribute("x") / 1000d);
-                Y.Add((double)stbNode.Attribute("z") / 1000d); // Y-Up対応
-                Z.Add((double)stbNode.Attribute("y") / 1000d);
+                X.Add((float)stbNode.Attribute("x") / 1000f);
+                Y.Add((float)stbNode.Attribute("z") / 1000f); // Y-Up対応
+                Z.Add((float)stbNode.Attribute("y") / 1000f);
                 
                 // 必須ではないコード
                 if (stbNode.Attribute("id_member") != null) {
@@ -106,7 +106,7 @@ namespace Stevia.STB.Model {
     public class StbStorys {
         public List<int> Id { get; } = new List<int>();
         public List<string> Name { get; } = new List<string>();
-        public List<double> Height { get; } = new List<double>();
+        public List<float> Height { get; } = new List<float>();
         public List<KindsStory> Kind { get; } = new List<KindsStory>();
         public List<int> IdDependens { get; } = new List<int>();
         public List<string> StrengthConcrete { get; } = new List<string>();
@@ -117,7 +117,7 @@ namespace Stevia.STB.Model {
             foreach (var stbStory in stbStorys) {
                 // 必須コード
                 Id.Add((int)stbStory.Attribute("id"));
-                Height.Add((double)stbStory.Attribute("height") / 1000d);
+                Height.Add((float)stbStory.Attribute("height") / 1000f);
                 switch ((string)stbStory.Attribute("kind")) {
                     case "GENERAL":
                         Kind.Add(KindsStory.GENERAL); break;

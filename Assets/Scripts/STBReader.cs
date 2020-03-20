@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Xml.Linq;
 using SFB;
+
 using UnityEngine;
+using UnityEngine.UI;
+
 using Stevia.STB.Model;
 using Stevia.STB.Model.Member;
 using Stevia.STB.Model.Section;
@@ -12,6 +15,8 @@ namespace Stevia {
     public partial class STBReader:MonoBehaviour {
         [SerializeField]
         Material _material;
+        [SerializeField]
+        Dropdown dropdown;
 
         List<string> _xStName = new List<string>();
         List<float> _xStParamA = new List<float>();
@@ -41,6 +46,12 @@ namespace Stevia {
             _secBeamS.Load(xDoc);
             _secBraceS.Load(xDoc);
             _stbSecSteel.Load(xDoc);
+
+            // ドロップダウンリストに階情報を追加
+            foreach (var name in _storys.Name) {
+                dropdown.options.Add(new Dropdown.OptionData { text = "階：" + name + " へ移動" });
+            }
+            dropdown.RefreshShownValue();
 
             // TODO stb読み込み関連とほかの処理は分離する。
 
