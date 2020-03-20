@@ -19,14 +19,15 @@ namespace Stevia {
         List<string> _xStType = new List<string>();
         List<Mesh> _shapeMesh = new List<Mesh>();
 
-        StbNodes _nodes = new StbNodes();
-        StbStorys _storys = new StbStorys();
-        StbSlabs _slabs = new StbSlabs();
-        public static StbSecColRC _secColumnRC  = new StbSecColRC();
+        public static StbNodes _nodes = new StbNodes();
+        public static StbStorys _storys = new StbStorys();
+        public static StbSlabs _slabs = new StbSlabs();
+        public static StbSecColRC _secColumnRC = new StbSecColRC();
         public static StbSecBeamRC _secBeamRC = new StbSecBeamRC();
-        StbSecColumnS _secColumnS = new StbSecColumnS();
-        StbSecBeamS _secBeamS = new StbSecBeamS();
-        StbSecBraceS _secBraceS = new StbSecBraceS();
+        public static StbSecColumnS _secColumnS = new StbSecColumnS();
+        public static StbSecBeamS _secBeamS = new StbSecBeamS();
+        public static StbSecBraceS _secBraceS = new StbSecBraceS();
+        public static StbSecSteel _stbSecSteel = new StbSecSteel();
 
         void Start() {
             // stbデータの読み込み
@@ -39,6 +40,9 @@ namespace Stevia {
             _secBeamRC.Load(xDoc);
             _secBeamS.Load(xDoc);
             _secBraceS.Load(xDoc);
+            _stbSecSteel.Load(xDoc);
+
+            // TODO stb読み込み関連とほかの処理は分離する。
 
             // S断面形状の取得
             string[,] SteelSecName = GetSteelSecNameArray();

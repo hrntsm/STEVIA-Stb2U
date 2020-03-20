@@ -53,6 +53,48 @@ namespace Stevia.STB.Model.Section {
     }
 
     /// <summary>
+    /// ロールHの内での種別
+    /// </summary>
+    public enum RollHType {
+        H,
+        SH
+    }
+
+    /// <summary>
+    /// ロールBOXの内での種別
+    /// </summary>
+    public enum RollBOXType {
+        BCP,
+        BCR,
+        STKR,
+        ELSE
+    }
+
+    /// <summary>
+    /// ロールTの内での種別
+    /// </summary>
+    public enum RollTType {
+        T,
+        ST
+    }
+
+    /// <summary>
+    /// 溝形の内での種別
+    /// </summary>
+    public enum RollCType {
+        C,
+        DoubleC
+    }
+
+    /// <summary>
+    /// 山形の内での種別
+    /// </summary>
+    public enum RollLType {
+        L,
+        DoubleL
+    }
+
+    /// <summary>
     /// 断面情報
     /// </summary>
     class StbSections {
@@ -157,7 +199,7 @@ namespace Stevia.STB.Model.Section {
     /// <summary>
     /// RCとSRCの柱断面形状
     /// </summary>
-    public class StbColSecFigure {
+    class StbColSecFigure {
         public float Width { get; private set; }
         public float Height { get; private set; }
         public bool IsRect { get; private set; }
@@ -169,12 +211,12 @@ namespace Stevia.STB.Model.Section {
         public void Load(XElement stbColumn) {
             var stbFigure = stbColumn.Element("StbSecFigure");
             if (stbFigure.Element("StbSecRect") != null) {
-                Width = (float) stbFigure.Element("StbSecRect").Attribute("DX") / 1000f;
-                Height = (float) stbFigure.Element("StbSecRect").Attribute("DY") / 1000f;
+                Width = (float)stbFigure.Element("StbSecRect").Attribute("DX") / 1000f;
+                Height = (float)stbFigure.Element("StbSecRect").Attribute("DY") / 1000f;
                 IsRect = true;
             }
-            else if(stbFigure.Element("StbSecCircle") != null) {
-                Width = (float) stbFigure.Element("StbSecCircle").Attribute("D") / 1000f;
+            else if (stbFigure.Element("StbSecCircle") != null) {
+                Width = (float)stbFigure.Element("StbSecCircle").Attribute("D") / 1000f;
                 Height = 0f;
                 IsRect = false;
             }
@@ -189,7 +231,7 @@ namespace Stevia.STB.Model.Section {
     /// <summary>
     /// RC柱の配筋情報
     /// </summary>
-    public class StbColSecBarArrangement {
+    class StbColSecBarArrangement {
         public List<int> BarList { get; } = new List<int>();
 
         public void Load(XElement stbColumn, bool isRect) {
@@ -209,7 +251,7 @@ namespace Stevia.STB.Model.Section {
                 elementName = "StbSecCircle_Column_Not_Same";
             }
             else {
-                BarList.AddRange(new List<int> { 2, 2, 0, 0, 4, 200, 2, 2});
+                BarList.AddRange(new List<int> { 2, 2, 0, 0, 4, 200, 2, 2 });
                 return;
             }
 
@@ -372,7 +414,7 @@ namespace Stevia.STB.Model.Section {
     /// <summary>
     /// 柱断面形状の名称
     /// </summary>
-    public class StbSecSteelColumn {
+    class StbSecSteelColumn {
         public string Pos { get; private set; }
         public string Shape { get; private set; }
         public string StrengthMain { get; private set; }
@@ -509,7 +551,7 @@ namespace Stevia.STB.Model.Section {
     /// <summary>
     /// RC梁断面の形状
     /// </summary>
-    public class StbBeamSecFigure {
+    class StbBeamSecFigure {
         public float Width { get; private set; }
         public float Depth { get; private set; }
 
@@ -542,7 +584,7 @@ namespace Stevia.STB.Model.Section {
     /// <summary>
     /// RC梁の配筋情報
     /// </summary>
-    public class StbBeamSecBarArrangement {
+    class StbBeamSecBarArrangement {
         public List<int> BarList { get; } = new List<int>();
 
         public void Load(XElement stbBeam) {
@@ -713,7 +755,7 @@ namespace Stevia.STB.Model.Section {
     /// <summary>
     /// S梁断面形状の名称
     /// </summary>
-    public class StbSecSteelBeam {
+    class StbSecSteelBeam {
         public string Pos { get; private set; }
         public string Shape { get; private set; }
         public string StrengthMain { get; private set; }
@@ -768,7 +810,6 @@ namespace Stevia.STB.Model.Section {
         /// </summary>
         public List<string> Shape { get; } = new List<string>();
 
-
         /// <summary>
         /// 与えられたstbデータからSブレース断面を取得する。
         /// </summary>
@@ -804,12 +845,13 @@ namespace Stevia.STB.Model.Section {
                 StbSecSteelBrace stbSecSteelBrace = new StbSecSteelBrace();
                 stbSecSteelBrace.Load(stbStBrace);
                 Shape.Add(stbSecSteelBrace.Shape);
+                
             }
         }
     }
 
     /// <summary>
-    /// S梁断面形状の名称
+    /// Sブレース断面形状の名称
     /// </summary>
     public class StbSecSteelBrace {
         public string Pos { get; private set; }
@@ -817,6 +859,10 @@ namespace Stevia.STB.Model.Section {
         public string StrengthMain { get; private set; }
         public string StrengthWeb { get; private set; }
 
+        /// <summary>
+        /// 属性の読み込み
+        /// </summary>
+        /// <param name="stbStBrace"></param>
         public void Load(XElement stbStBrace) {
             var secStBrace = stbStBrace.Element("StbSecSteelBrace");
 
@@ -857,5 +903,526 @@ namespace Stevia.STB.Model.Section {
     /// 鉄骨断面
     /// </summary>
     public class StbSecSteel {
+        public StbSecRollH RollH { get; } = new StbSecRollH();
+        public StbSecBuildH BuildH { get; } = new StbSecBuildH();
+        public StbSecRollBOX RollBOX { get; } = new StbSecRollBOX();
+        public StbSecBuildBOX BuildBOX { get; } = new StbSecBuildBOX();
+        public StbSecPipe Pipe { get; } = new StbSecPipe();
+        public StbSecRollT RollT { get; } = new StbSecRollT();
+        public StbSecRollC RollC { get; } = new StbSecRollC();
+        public StbSecRollL RollL { get; } = new StbSecRollL();
+        public StbSecRollLipC RollLipC { get; } = new StbSecRollLipC();
+        public StbSecRollFB RollFB { get; } = new StbSecRollFB();
+        public StbSecRollBar RollBar { get; } = new StbSecRollBar();
+
+        /// <summary>
+        /// 属性情報の読み込み
+        /// </summary>
+        /// <param name="stbData"></param>
+        public void Load(XDocument stbData) {
+            RollH.Load(stbData);
+            BuildH.Load(stbData);
+            RollBOX.Load(stbData);
+            BuildBOX.Load(stbData);
+            Pipe.Load(stbData);
+            RollT.Load(stbData);
+            RollC.Load(stbData);
+            RollL.Load(stbData);
+            RollLipC.Load(stbData);
+            RollFB.Load(stbData);
+            RollBar.Load(stbData);
+        }
+    }
+
+    /// <summary>
+    /// ロールH形断面
+    /// </summary>
+    public class StbSecRollH {
+        /// <summary>
+        /// 部材の名前
+        /// </summary>
+        public List<string> Name { get; } = new List<string>();
+        /// <summary>
+        /// 形状のタイプ
+        /// </summary>
+        public List<RollHType> Type { get; } = new List<RollHType>();
+        /// <summary>
+        /// 部材せい
+        /// </summary>
+        public List<float> A { get; } = new List<float>();
+        /// <summary>
+        /// フランジ幅
+        /// </summary>
+        public List<float> B { get; } = new List<float>();
+        /// <summary>
+        /// ウェブ厚
+        /// </summary>
+        public List<float> T1 { get; } = new List<float>();
+        /// <summary>
+        /// フランジ厚
+        /// </summary>
+        public List<float> T2 { get; } = new List<float>();
+        /// <summary>
+        /// フィレット半径
+        /// </summary>
+        public List<float> R { get; } = new  List<float>();
+
+        /// <summary>
+        /// 属性情報の読み込み
+        /// </summary>
+        /// <param name="stbData"></param>
+        public void Load(XDocument stbData) {
+            var StSections = stbData.Root.Descendants("StbSecRoll-H");
+
+            foreach (var StSection in StSections) {
+                // 必須コード
+                Name.Add((string)StSection.Attribute("name"));
+                A.Add((float)StSection.Attribute("A"));
+                B.Add((float)StSection.Attribute("B"));
+                T1.Add((float)StSection.Attribute("t1"));
+                T2.Add((float)StSection.Attribute("t2"));
+                R.Add((float)StSection.Attribute("r"));
+            }
+        }
+    }
+
+    /// <summary>
+    /// ビルトH形断面
+    /// </summary>
+    public class StbSecBuildH {
+        /// <summary>
+        /// 部材の名前
+        /// </summary>
+        public List<string> Name { get; } = new List<string>();
+        /// <summary>
+        /// 部材せい
+        /// </summary>
+        public List<float> A { get; } = new List<float>();
+        /// <summary>
+        /// フランジ幅
+        /// </summary>
+        public List<float> B { get; } = new List<float>();
+        /// <summary>
+        /// ウェブ厚
+        /// </summary>
+        public List<float> T1 { get; } = new List<float>();
+        /// <summary>
+        /// フランジ厚
+        /// </summary>
+        public List<float> T2 { get; } = new List<float>();
+
+        /// <summary>
+        /// 属性情報の読み込み
+        /// </summary>
+        /// <param name="stbData"></param>
+        public void Load(XDocument stbData) {
+            var StSections = stbData.Root.Descendants("StbSecBuild-H");
+
+            foreach (var StSection in StSections) {
+                // 必須コード
+                Name.Add((string)StSection.Attribute("name"));
+                A.Add((float)StSection.Attribute("A"));
+                B.Add((float)StSection.Attribute("B"));
+                T1.Add((float)StSection.Attribute("t1"));
+                T2.Add((float)StSection.Attribute("t2"));
+            }
+        }
+    }
+
+    /// <summary>
+    /// ロール箱形断面
+    /// </summary>
+    public class StbSecRollBOX {
+        /// <summary>
+        /// 部材の名前
+        /// </summary>
+        public List<string> Name { get; } = new List<string>();
+        /// <summary>
+        /// 形状のタイプ
+        /// </summary>
+        public List<RollBOXType> Type { get; } = new List<RollBOXType>();
+        /// <summary>
+        /// 部材せい
+        /// </summary>
+        public List<float> A { get; } = new List<float>();
+        /// <summary>
+        /// 部材幅
+        /// </summary>
+        public List<float> B { get; } = new List<float>();
+        /// <summary>
+        /// 板厚
+        /// </summary>
+        public List<float> T { get; } = new List<float>();
+        /// <summary>
+        /// コーナー半径
+        /// </summary>
+        public List<float> R { get; } = new List<float>();
+
+        /// <summary>
+        /// 属性情報の読み込み
+        /// </summary>
+        /// <param name="stbData"></param>
+        public void Load(XDocument stbData) {
+            var StSections = stbData.Root.Descendants("StbSecRoll-BOX");
+
+            foreach (var StSection in StSections) {
+                // 必須コード
+                Name.Add((string)StSection.Attribute("name"));
+                A.Add((float)StSection.Attribute("A"));
+                B.Add((float)StSection.Attribute("B"));
+                T.Add((float)StSection.Attribute("t"));
+                R.Add((float)StSection.Attribute("R"));
+            }
+        }
+    }
+
+    /// <summary>
+    /// ビルト箱形断面
+    /// </summary>
+    public class StbSecBuildBOX {
+        /// <summary>
+        /// 部材の名前
+        /// </summary>
+        public List<string> Name { get; } = new List<string>();
+        /// <summary>
+        /// 部材せい
+        /// </summary>
+        public List<float> A { get; } = new List<float>();
+        /// <summary>
+        /// 部材幅
+        /// </summary>
+        public List<float> B { get; } = new List<float>();
+        /// <summary>
+        /// ウェブ厚
+        /// </summary>
+        public List<float> T1 { get; } = new List<float>();
+        /// <summary>
+        /// フランジ厚
+        /// </summary>
+        public List<float> T2 { get; } = new List<float>();
+
+        /// <summary>
+        /// 属性情報の読み込み
+        /// </summary>
+        /// <param name="stbData"></param>
+        public void Load(XDocument stbData) {
+            var StSections = stbData.Root.Descendants("StbSecBuild-BOX");
+
+            foreach (var StSection in StSections) {
+                // 必須コード
+                Name.Add((string)StSection.Attribute("name"));
+                A.Add((float)StSection.Attribute("A"));
+                B.Add((float)StSection.Attribute("B"));
+                T1.Add((float)StSection.Attribute("t1"));
+                T2.Add((float)StSection.Attribute("t2"));
+            }
+        }
+    }
+
+    /// <summary>
+    /// 円形断面
+    /// </summary>
+    public class StbSecPipe {
+        /// <summary>
+        /// 部材の名前
+        /// </summary>
+        public List<string> Name { get; } = new List<string>();
+        /// <summary>
+        /// 直径
+        /// </summary>
+        public List<float> D { get; } = new List<float>();
+        /// <summary>
+        /// 板厚
+        /// </summary>
+        public List<float> T { get; } = new List<float>();
+
+        /// <summary>
+        /// 属性情報の読み込み
+        /// </summary>
+        /// <param name="stbData"></param>
+        public void Load(XDocument stbData) {
+            var StSections = stbData.Root.Descendants("StbSecPipe");
+
+            foreach (var StSection in StSections) {
+                // 必須コード
+                Name.Add((string)StSection.Attribute("name"));
+                D.Add((float)StSection.Attribute("D"));
+                T.Add((float)StSection.Attribute("t"));
+            }
+        }
+    }
+
+    /// <summary>
+    /// T形断面
+    /// </summary>
+    public class StbSecRollT {
+        /// <summary>
+        /// 部材の名前
+        /// </summary>
+        public List<string> Name { get; } = new List<string>();
+        /// <summary>
+        /// 形状のタイプ
+        /// </summary>
+        public List<RollTType> Type { get; } = new List<RollTType>();
+        /// <summary>
+        /// 部材せい
+        /// </summary>
+        public List<float> A { get; } = new List<float>();
+        /// <summary>
+        /// フランジ幅
+        /// </summary>
+        public List<float> B { get; } = new List<float>();
+        /// <summary>
+        /// ウェブ厚
+        /// </summary>
+        public List<float> T1 { get; } = new List<float>();
+        /// <summary>
+        /// フランジ厚
+        /// </summary>
+        public List<float> T2 { get; } = new List<float>();
+        /// <summary>
+        /// フィレット半径
+        /// </summary>
+        public List<float> R { get; } = new List<float>();
+
+        /// <summary>
+        /// 属性情報の読み込み
+        /// </summary>
+        /// <param name="stbData"></param>
+        public void Load(XDocument stbData) {
+            var StSections = stbData.Root.Descendants("StbSecRoll-T");
+
+            foreach (var StSection in StSections) {
+                // 必須コード
+                Name.Add((string)StSection.Attribute("name"));
+                A.Add((float)StSection.Attribute("A"));
+                B.Add((float)StSection.Attribute("B"));
+                T1.Add((float)StSection.Attribute("t1"));
+                T2.Add((float)StSection.Attribute("t2"));
+                R.Add((float)StSection.Attribute("r1"));
+            }
+        }
+    }
+
+    /// <summary>
+    /// 溝形断面
+    /// </summary>
+    public class StbSecRollC {
+        /// <summary>
+        /// 部材の名前
+        /// </summary>
+        public List<string> Name { get; } = new List<string>();
+        /// <summary>
+        /// 形状のタイプ
+        /// </summary>
+        public List<RollCType> Type { get; } = new List<RollCType>();
+        /// <summary>
+        /// 部材せい
+        /// </summary>
+        public List<float> A { get; } = new List<float>();
+        /// <summary>
+        /// フランジ幅
+        /// </summary>
+        public List<float> B { get; } = new List<float>();
+        /// <summary>
+        /// ウェブ厚
+        /// </summary>
+        public List<float> T1 { get; } = new List<float>();
+        /// <summary>
+        /// フランジ厚
+        /// </summary>
+        public List<float> T2 { get; } = new List<float>();
+        /// <summary>
+        /// フィレット半径
+        /// </summary>
+        public List<float> R1 { get; } = new List<float>();
+        /// <summary>
+        /// フランジ先端半径
+        /// </summary>
+        public List<float> R2 { get; } = new List<float>();
+
+        /// <summary>
+        /// 属性情報の読み込み
+        /// </summary>
+        /// <param name="stbData"></param>
+        public void Load(XDocument stbData) {
+            var StSections = stbData.Root.Descendants("StbSecRoll-C");
+
+            foreach (var StSection in StSections) {
+                // 必須コード
+                Name.Add((string)StSection.Attribute("name"));
+                A.Add((float)StSection.Attribute("A"));
+                B.Add((float)StSection.Attribute("B"));
+                T1.Add((float)StSection.Attribute("t1"));
+                T2.Add((float)StSection.Attribute("t2"));
+                R1.Add((float)StSection.Attribute("r1"));
+                R2.Add((float)StSection.Attribute("r2"));
+            }
+        }
+    }
+
+    /// <summary>
+    /// 山形断面
+    /// </summary>
+    public class StbSecRollL {
+        /// <summary>
+        /// 部材の名前
+        /// </summary>
+        public List<string> Name { get; } = new List<string>();
+        /// <summary>
+        /// 形状のタイプ
+        /// </summary>
+        public List<RollLType> Type { get; } = new List<RollLType>();
+        /// <summary>
+        /// 部材せい
+        /// </summary>
+        public List<float> A { get; } = new List<float>();
+        /// <summary>
+        /// フランジ幅
+        /// </summary>
+        public List<float> B { get; } = new List<float>();
+        /// <summary>
+        /// ウェブ厚
+        /// </summary>
+        public List<float> T1 { get; } = new List<float>();
+        /// <summary>
+        /// フランジ厚
+        /// </summary>
+        public List<float> T2 { get; } = new List<float>();
+        /// <summary>
+        /// フィレット半径
+        /// </summary>
+        public List<float> R1 { get; } = new List<float>();
+        /// <summary>
+        /// フランジ先端半径
+        /// </summary>
+        public List<float> R2 { get; } = new List<float>();
+
+        /// <summary>
+        /// 属性情報の読み込み
+        /// </summary>
+        /// <param name="stbData"></param>
+        public void Load(XDocument stbData) {
+            var StSections = stbData.Root.Descendants("StbSecRoll-L");
+
+            foreach (var StSection in StSections) {
+                // 必須コード
+                Name.Add((string)StSection.Attribute("name"));
+                A.Add((float)StSection.Attribute("A"));
+                B.Add((float)StSection.Attribute("B"));
+                T1.Add((float)StSection.Attribute("t1"));
+                T2.Add((float)StSection.Attribute("t2"));
+                R1.Add((float)StSection.Attribute("r1"));
+                R2.Add((float)StSection.Attribute("r2"));
+            }
+        }
+    }
+
+    /// <summary>
+    /// リップ溝形断面
+    /// </summary>
+    public class StbSecRollLipC {
+        /// <summary>
+        /// 部材の名前
+        /// </summary>
+        public List<string> Name { get; } = new List<string>();
+        /// <summary>
+        /// 形状のタイプ
+        /// </summary>
+        public List<RollCType> Type { get; } = new List<RollCType>();
+        /// <summary>
+        /// 部材せい
+        /// </summary>
+        public List<float> H { get; } = new List<float>();
+        /// <summary>
+        /// フランジ幅
+        /// </summary>
+        public List<float> A { get; } = new List<float>();
+        /// <summary>
+        /// リップ長
+        /// </summary>
+        public List<float> C { get; } = new List<float>();
+        /// <summary>
+        /// 板厚
+        /// </summary>
+        public List<float> T { get; } = new List<float>();
+
+        /// <summary>
+        /// 属性情報の読み込み
+        /// </summary>
+        /// <param name="stbData"></param>
+        public void Load(XDocument stbData) {
+            var StSections = stbData.Root.Descendants("StbSecRoll-LipC");
+
+            foreach (var StSection in StSections) {
+                // 必須コード
+                Name.Add((string)StSection.Attribute("name"));
+                H.Add((float)StSection.Attribute("H"));
+                A.Add((float)StSection.Attribute("A"));
+                C.Add((float)StSection.Attribute("C"));
+                T.Add((float)StSection.Attribute("t"));
+            }
+        }
+    }
+
+    /// <summary>
+    /// フラットバー断面
+    /// </summary>
+    public class StbSecRollFB {
+        /// <summary>
+        /// 部材の名前
+        /// </summary>
+        public List<string> Name { get; } = new List<string>();
+        /// <summary>
+        /// 幅
+        /// </summary>
+        public List<float> B { get; } = new List<float>();
+        /// <summary>
+        /// 板厚
+        /// </summary>
+        public List<float> T { get; } = new List<float>();
+
+        /// <summary>
+        /// 属性情報の読み込み
+        /// </summary>
+        /// <param name="stbData"></param>
+        public void Load(XDocument stbData) {
+            var StSections = stbData.Root.Descendants("StbSecRoll-FB");
+
+            foreach (var StSection in StSections) {
+                // 必須コード
+                Name.Add((string)StSection.Attribute("name"));
+                B.Add((float)StSection.Attribute("B"));
+                T.Add((float)StSection.Attribute("t"));
+            }
+        }
+    }
+
+    /// <summary>
+    /// 丸鋼断面
+    /// </summary>
+    public class StbSecRollBar {
+        /// <summary>
+        /// 部材の名前
+        /// </summary>
+        public List<string> Name { get; } = new List<string>();
+        /// <summary>
+        /// 直径
+        /// </summary>
+        public List<float> R { get; } = new List<float>();
+
+        /// <summary>
+        /// 属性情報の読み込み
+        /// </summary>
+        /// <param name="stbData"></param>
+        public void Load(XDocument stbData) {
+            var StSections = stbData.Root.Descendants("StbSecRoll-Bar");
+
+            foreach (var StSection in StSections) {
+                // 必須コード
+                Name.Add((string)StSection.Attribute("name"));
+                R.Add((float)StSection.Attribute("R"));
+            }
+        }
     }
 }
