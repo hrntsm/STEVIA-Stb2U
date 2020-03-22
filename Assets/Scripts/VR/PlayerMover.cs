@@ -76,7 +76,7 @@ namespace Stevia.VR {
 
         public void ChangeStory(Dropdown dropdown) {
             float xPos = gameObject.transform.position.x;
-            float yPos = STBReader._storys.Height[dropdown.value]; // モデルの中心が起点なのでモデルの身長程度上げている
+            float yPos = STBReader._storys.Height[dropdown.value];
             float zPos = gameObject.transform.position.z;
             gameObject.transform.position = new Vector3(xPos, yPos, zPos);
         }

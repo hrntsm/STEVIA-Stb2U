@@ -104,11 +104,25 @@ namespace Stevia.STB.Model {
     /// 階情報（複数）
     /// </summary>
     public class StbStorys {
+        /// <summary>
+        /// 階のID
+        /// </summary>
         public List<int> Id { get; } = new List<int>();
+        /// <summary>
+        /// 階名称
+        /// </summary>
         public List<string> Name { get; } = new List<string>();
+        /// <summary>
+        /// 階高(m)
+        /// </summary>
         public List<float> Height { get; } = new List<float>();
+        /// <summary>
+        /// 階属性
+        /// </summary>
         public List<KindsStory> Kind { get; } = new List<KindsStory>();
-        public List<int> IdDependens { get; } = new List<int>();
+        /// <summary>
+        /// コンクリート強度
+        /// </summary>
         public List<string> StrengthConcrete { get; } = new List<string>();
         public List<List<int>> NodeIdList { get; } = new List<List<int>>();
 
