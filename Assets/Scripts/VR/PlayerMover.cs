@@ -51,16 +51,16 @@ namespace Stevia.VR {
 
             // 右のタッチパッドは移動を割り当て
             // VRMのforworadにすることで、向かっている正面をキーの前ボタンと対応させた。
-            if (_clickRight && _tpadRightY > 0 && _tpadRightX < 0.5f && _tpadRightX > -0.5f) {
+            if (_clickRight && _tpadRightY > 0 && _tpadRightX < 0.7f && _tpadRightX > -0.7f) {
                 transform.position += _vrmObject.transform.forward * Time.deltaTime * _moveSpeed;
             }
-            if (_clickRight && _tpadRightY < 0 && _tpadRightX < 0.5f && _tpadRightX > -0.5f) {
+            if (_clickRight && _tpadRightY < 0 && _tpadRightX < 0.7f && _tpadRightX > -0.7f) {
                 transform.position -= _vrmObject.transform.forward * Time.deltaTime * _moveSpeed;
             }
-            if (_clickRight && _tpadRightX < 0 && _tpadRightY < 0.5f && _tpadRightY > -0.5f) {
+            if (_clickRight && _tpadRightX < 0 && _tpadRightY < 0.7f && _tpadRightY > -0.7f) {
                 transform.position -= _vrmObject.transform.right * Time.deltaTime * _moveSpeed;
             }
-            if (_clickRight && _tpadRightX > 0 && _tpadRightY < 0.5f && _tpadRightY > -0.5f) {
+            if (_clickRight && _tpadRightX > 0 && _tpadRightY < 0.7f && _tpadRightY > -0.7f) {
                 transform.position += _vrmObject.transform.right * Time.deltaTime * _moveSpeed;
             }
 
@@ -79,6 +79,11 @@ namespace Stevia.VR {
             float yPos = STBReader._storys.Height[dropdown.value];
             float zPos = gameObject.transform.position.z;
             gameObject.transform.position = new Vector3(xPos, yPos, zPos);
+
+            float xPosVrm = _vrmObject.transform.position.x;
+            float yPosVrm = yPos;
+            float zPosVrm = _vrmObject.transform.position.z;
+            _vrmObject.transform.position = new Vector3(xPosVrm, yPosVrm, zPosVrm);
         }
     }
 }
