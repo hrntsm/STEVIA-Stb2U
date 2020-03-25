@@ -4,6 +4,7 @@ using SFB;
 
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 using Stevia.STB.Model;
 using Stevia.STB.Model.Member;
@@ -16,7 +17,7 @@ namespace Stevia {
         [SerializeField]
         Material _material;
         [SerializeField]
-        Dropdown dropdown;
+        Dropdown _dropdown;
 
         List<string> _xStName = new List<string>();
         List<float> _xStParamA = new List<float>();
@@ -47,11 +48,14 @@ namespace Stevia {
             _secBraceS.Load(xDoc);
             _stbSecSteel.Load(xDoc);
 
-            // ドロップダウンリストに階情報を追加
-            foreach (var name in _storys.Name) {
-                dropdown.options.Add(new Dropdown.OptionData { text = "階：" + name + " へ移動" });
+
+            // VRモードの場合、ドロップダウンリストに階情報を追加
+            if (SceneManager.GetActiveScene().name == "stb2U4VR") {
+                foreach (var name in _storys.Name) {
+                    _dropdown.options.Add(new Dropdown.OptionData { text = "階：" + name + " へ移動" });
+                }
+                _dropdown.RefreshShownValue();
             }
-            dropdown.RefreshShownValue();
 
             // TODO stb読み込み関連とほかの処理は分離する。
 
@@ -74,9 +78,9 @@ namespace Stevia {
 
         XDocument GetStbFileData() {
             var extensions = new[] {
-            new ExtensionFilter("ST-Bridge Files", "stb", "STB" ),
-            new ExtensionFilter("All Files", "*" ),
-        };
+                new ExtensionFilter("ST-Bridge Files", "stb", "STB" ),
+                new ExtensionFilter("All Files", "*" ),
+            };
             string paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, true)[0];
             XDocument xDoc = XDocument.Load(paths);
             return (xDoc);
