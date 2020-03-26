@@ -70,6 +70,9 @@ namespace Stevia.VR {
             _model.GetComponent<VRIK>().solver.locomotion.rootSpeed = 30f;
             _model.GetComponent<VRIK>().solver.plantFeet = false;
 
+            // キャリブレーションなくしたので足は地面につける
+            _model.GetComponent<VRIK>().solver.plantFeet = true;
+
             //自分のカメラに頭が映らないように VRMFirstPerson の設定
             _model.GetComponent<VRM.VRMFirstPerson>().Setup();
             foreach (var renderer in GetComponentsInChildren<SkinnedMeshRenderer>(true)) {

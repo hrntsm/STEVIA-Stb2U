@@ -50,7 +50,7 @@ namespace Stevia {
 
 
             // VRモードの場合、ドロップダウンリストに階情報を追加
-            if (SceneManager.GetActiveScene().name == "stb2U4VR") {
+            if (SceneManager.GetActiveScene().name == "Stb2U4VR") {
                 foreach (var name in _storys.Name) {
                     _dropdown.options.Add(new Dropdown.OptionData { text = "階：" + name + " へ移動" });
                 }
