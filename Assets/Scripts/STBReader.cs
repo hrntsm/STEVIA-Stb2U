@@ -25,29 +25,22 @@ namespace Stevia {
         List<string> _xStType = new List<string>();
         List<Mesh> _shapeMesh = new List<Mesh>();
 
-        public static StbNodes _nodes = new StbNodes();
-        public static StbStorys _storys = new StbStorys();
-        public static StbSlabs _slabs = new StbSlabs();
-        public static StbSecColRC _secColumnRC = new StbSecColRC();
-        public static StbSecBeamRC _secBeamRC = new StbSecBeamRC();
-        public static StbSecColumnS _secColumnS = new StbSecColumnS();
-        public static StbSecBeamS _secBeamS = new StbSecBeamS();
-        public static StbSecBraceS _secBraceS = new StbSecBraceS();
-        public static StbSecSteel _stbSecSteel = new StbSecSteel();
+        public static StbNodes _nodes;
+        public static StbStorys _storys;
+        public static StbSlabs _slabs;
+        public static StbSecColRC _secColumnRC;
+        public static StbSecBeamRC _secBeamRC;
+        public static StbSecColumnS _secColumnS;
+        public static StbSecBeamS _secBeamS;
+        public static StbSecBraceS _secBraceS;
+        public static StbSecSteel _stbSecSteel;
 
         void Start() {
-            // stbデータの読み込み
             XDocument xDoc = GetStbFileData();
-            _nodes.Load(xDoc);
-            _storys.Load(xDoc);
-            _slabs.Load(xDoc);
-            _secColumnRC.Load(xDoc);
-            _secColumnS.Load(xDoc);
-            _secBeamRC.Load(xDoc);
-            _secBeamS.Load(xDoc);
-            _secBraceS.Load(xDoc);
-            _stbSecSteel.Load(xDoc);
 
+            // 2回以上の起動を想定してここで初期化して各データを読み込み
+            Init();
+            Load(xDoc);
 
             // VRモードの場合、ドロップダウンリストに階情報を追加
             if (SceneManager.GetActiveScene().name == "Stb2U4VR") {
@@ -84,6 +77,30 @@ namespace Stevia {
             string paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, true)[0];
             XDocument xDoc = XDocument.Load(paths);
             return (xDoc);
+        }
+
+        void Init() {
+            _nodes = new StbNodes();
+            _storys = new StbStorys();
+            _slabs = new StbSlabs();
+            _secColumnRC = new StbSecColRC();
+            _secBeamRC = new StbSecBeamRC();
+            _secColumnS = new StbSecColumnS();
+            _secBeamS = new StbSecBeamS();
+            _secBraceS = new StbSecBraceS();
+            _stbSecSteel = new StbSecSteel();
+        }
+
+        void Load(XDocument xDoc) {
+            _nodes.Load(xDoc);
+            _storys.Load(xDoc);
+            _slabs.Load(xDoc);
+            _secColumnRC.Load(xDoc);
+            _secColumnS.Load(xDoc);
+            _secBeamRC.Load(xDoc);
+            _secBeamS.Load(xDoc);
+            _secBraceS.Load(xDoc);
+            _stbSecSteel.Load(xDoc);
         }
 
         string[,] GetSteelSecNameArray() {
