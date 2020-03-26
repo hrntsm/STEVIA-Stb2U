@@ -10,8 +10,8 @@ namespace Stevia {
                 var xSteelSections = xDoc.Root.Descendants(xDateTag);
                 foreach (var xSteelSection in xSteelSections) {
                     _xStName.Add((string)xSteelSection.Attribute("name"));
-                    _xStParamA.Add((float)xSteelSection.Attribute("D"));
-                    _xStParamB.Add((float)xSteelSection.Attribute("t"));
+                    _xStParamA.Add((float)xSteelSection.Attribute("t"));
+                    _xStParamB.Add((float)xSteelSection.Attribute("D"));
                     _xStType.Add(sectionType);
                 }
             }

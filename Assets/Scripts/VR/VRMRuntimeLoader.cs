@@ -22,7 +22,8 @@ namespace Stevia.VR {
                 new ExtensionFilter("VRM Files", "vrm", "VRM" ),
                 new ExtensionFilter("All Files", "*" ),
             };
-            string path = StandaloneFileBrowser.OpenFilePanel("Open VRM", "", extensions, true)[0]; if (string.IsNullOrEmpty(path)) {
+            string path = StandaloneFileBrowser.OpenFilePanel("Open VRM", "", extensions, true)[0];
+            if (string.IsNullOrEmpty(path)) {
                 return;
             }
 
