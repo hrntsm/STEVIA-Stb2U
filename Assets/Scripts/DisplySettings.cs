@@ -4,45 +4,68 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class DisplySettings : MonoBehaviour {
-    Toggle m_toggle;
-    GameObject m_dispObject;
-    string m_findName = "";
-    bool m_hasObj = false;
-    Animator animMenu;
+namespace Stevia {
 
-    void Start() {
-        m_toggle = GetComponent<Toggle>();
-        animMenu = gameObject.GetComponent<Animator>();
-    }
+    public class DisplySettings:MonoBehaviour {
 
-    public void ElementDisp(int index) {
-        switch (index) {
-            case 0: m_findName = "StbColumns"; break;
-            case 1: m_findName = "StbColumnBar"; break;
-            case 2: m_findName = "StbGirders"; break;
-            case 3: m_findName = "StbGirderBar"; break;
-            case 4: m_findName = "StbPosts"; break;
-            case 5: m_findName = "StbPostBar"; break;
-            case 6: m_findName = "StbBeams"; break;
-            case 7: m_findName = "StbBeamBar"; break;
-            case 8: m_findName = "StbBraces"; break;
-            case 9: m_findName = "StbBraceBar"; break;
-            case 10: m_findName = "StbSlabs"; break;
-            case 11: m_findName = "StbSlabBar"; break;
-            default: break;
+        Toggle _toggle;
+        GameObject _dispObject;
+        string _findName = "";
+        bool _hasObj = false;
+        Animator _animMenu;
+
+        void Start() {
+            _toggle = GetComponent<Toggle>();
+            _animMenu = gameObject.GetComponent<Animator>();
         }
-        if (m_hasObj == false) {
-            m_dispObject = GameObject.Find(m_findName);
-            m_hasObj = true;
-        }
-        m_dispObject.SetActive(m_toggle.isOn);
-    }
 
-    public void Hamburger() {
-        if (animMenu.GetInteger("MenuOpen") == 0)
-            animMenu.SetInteger("MenuOpen", 1);
-        else
-            animMenu.SetInteger("MenuOpen", 0);
+        public void ElementDisp(int index) {
+            switch (index) {
+                case 0: _findName = "StbColumns"; break;
+                case 1: _findName = "StbColumnBar"; break;
+                case 2: _findName = "StbGirders"; break;
+                case 3: _findName = "StbGirderBar"; break;
+                case 4: _findName = "StbPosts"; break;
+                case 5: _findName = "StbPostBar"; break;
+                case 6: _findName = "StbBeams"; break;
+                case 7: _findName = "StbBeamBar"; break;
+                case 8: _findName = "StbBraces"; break;
+                case 9: _findName = "StbBraceBar"; break;
+                case 10: _findName = "StbSlabs"; break;
+                case 11: _findName = "StbSlabBar"; break;
+                default: break;
+            }
+            if (_hasObj == false) {
+                var stbData = GameObject.Find("StbData");
+                _dispObject = stbData.transform.Find(_findName).gameObject;
+                _hasObj = true;
+            }
+            _dispObject.SetActive(_toggle.isOn);
+        }
+
+        public static void BarOff() {
+            string name;
+            for (int index = 0; index < 6; index++) {
+                switch (index) {
+                    case 0: name = "StbColumnBar"; break;
+                    case 1: name = "StbGirderBar"; break;
+                    case 2: name = "StbPostBar"; break;
+                    case 3: name = "StbBeamBar"; break;
+                    case 4: name = "StbBraceBar"; break;
+                    case 5: name = "StbSlabBar"; break;
+                    case 6: name = "StbSlabBar"; break;
+                    default: name = ""; break;
+                }
+                var barObject = GameObject.Find(name);
+                barObject.SetActive(false);
+            }
+        }
+
+        public void Hamburger() {
+            if (_animMenu.GetInteger("MenuOpen") == 0)
+                _animMenu.SetInteger("MenuOpen", 1);
+            else
+                _animMenu.SetInteger("MenuOpen", 0);
+        }
     }
 }

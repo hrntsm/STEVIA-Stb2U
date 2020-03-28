@@ -4,33 +4,36 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ColorInput:MonoBehaviour {
-    InputField m_inputField;
-    public int m_num;
-    public static Color[] m_memberColor = new Color[11];
-    public static SaveColor m_saveColor = new SaveColor();
+namespace Stevia {
 
-    void Start() {
-        m_inputField = GetComponent<InputField>();
+    public class ColorInput:MonoBehaviour {
 
-        if (PlayerPrefs.HasKey("UserColorData")) {
-            string json = PlayerPrefs.GetString(SaveColorData._SaveKey);
-            SaveColor loadColor = JsonUtility.FromJson<SaveColor>(json);
-            m_inputField.GetComponent<Image>().color = GetMemberColor(loadColor.rgba[m_num]);
+        InputField _inputField;
+        public int _num;
+        public static Color[] _memberColor = new Color[11];
+        public static SaveColor _saveColor = new SaveColor();
+
+        void Start() {
+            _inputField = GetComponent<InputField>();
+
+            if (PlayerPrefs.HasKey("UserColorData")) {
+                string json = PlayerPrefs.GetString(SaveColorData._SaveKey);
+                SaveColor loadColor = JsonUtility.FromJson<SaveColor>(json);
+                _inputField.GetComponent<Image>().color = GetMemberColor(loadColor.rgba[_num]);
+            }
+        }
+
+        public void ChangeColor(int i) {
+            _memberColor[i] = GetMemberColor(_inputField.text);
+            _inputField.GetComponent<Image>().color = _memberColor[i];
+            _saveColor.num[i] = i;
+            _saveColor.rgba[i] = _inputField.text;
+        }
+
+        public static Color GetMemberColor(string inputText) {
+            float[] inputRGBA = Array.ConvertAll<string, float>(inputText.Split(','), float.Parse);
+            Color color = new Color(inputRGBA[0], inputRGBA[1], inputRGBA[2], inputRGBA[3]);
+            return (color);
         }
     }
-
-    public void ChangeColor(int i) {
-        m_memberColor[i] = GetMemberColor(m_inputField.text);
-        m_inputField.GetComponent<Image>().color = m_memberColor[i];
-        m_saveColor.num[i] = i;
-        m_saveColor.rgba[i] = m_inputField.text;
-    }
-
-    public static Color GetMemberColor(string inputText) {
-        float[] inputRGBA = Array.ConvertAll<string, float>(inputText.Split(','), float.Parse);
-        Color color = new Color(inputRGBA[0], inputRGBA[1], inputRGBA[2], inputRGBA[3]);
-        return (color);
-    }
-
 }
