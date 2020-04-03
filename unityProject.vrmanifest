@@ -2,7 +2,7 @@
   "source": "Unity",
   "applications": [
     {
-      "app_key": "application.generated.unity.stevia.exe",
+      "app_key": "application.generated.unity.rhinoinside.unity.exe",
       "launch_type": "url",
       "url": "steam://launch/",
       "action_manifest_path": "D:\\Document\\unity\\StbUnity\\StbUnity\\Assets\\StreamingAssets\\SteamVR\\actions.json",
