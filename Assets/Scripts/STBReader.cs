@@ -28,6 +28,7 @@ namespace Stevia {
         public static StbNodes _nodes;
         public static StbStorys _storys;
         public static StbSlabs _slabs;
+        public static StbWalls _walls;
         public static StbSecColRC _secColumnRC;
         public static StbSecBeamRC _secBeamRC;
         public static StbSecColumnS _secColumnS;
@@ -59,7 +60,8 @@ namespace Stevia {
             }
 
             // meshの生成
-            MakeSlabObjs(_slabs);
+            MakeSlab(_slabs);
+            MakeWall(_walls);
             string[,] memberName = GetMemberNameArray();
             for (int i = 0; i < memberName.GetLength(0); i++) {
                 MakeElementMesh(xDoc, memberName[i, 0], memberName[i, 1]);
@@ -83,6 +85,7 @@ namespace Stevia {
             _nodes = new StbNodes();
             _storys = new StbStorys();
             _slabs = new StbSlabs();
+            _walls = new StbWalls();
             _secColumnRC = new StbSecColRC();
             _secBeamRC = new StbSecBeamRC();
             _secColumnS = new StbSecColumnS();
@@ -95,6 +98,7 @@ namespace Stevia {
             _nodes.Load(xDoc);
             _storys.Load(xDoc);
             _slabs.Load(xDoc);
+            _walls.Load(xDoc);
             _secColumnRC.Load(xDoc);
             _secColumnS.Load(xDoc);
             _secBeamRC.Load(xDoc);

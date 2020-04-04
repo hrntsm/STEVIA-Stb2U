@@ -8,9 +8,9 @@ namespace Stevia {
 
     public partial class STBReader:MonoBehaviour {
         /// <summary>
-        /// Make Slab GameObjects
+        /// スラブのオブジェクトの作成
         /// </summary>
-        void MakeSlabObjs(StbSlabs stbSlabs) {
+        void MakeSlab(StbSlabs stbSlabs) {
             int slabNum = 0;
 
             GameObject slabs = new GameObject("StbSlabs");
@@ -36,6 +36,37 @@ namespace Stevia {
                 slab.transform.localPosition = new Vector3(0, (float)stbSlabs.Level[slabNum], 0);
                 slab.transform.parent = slabs.transform;
                 slabNum++;
+            }
+        }
+
+        /// <summary>
+        /// 壁のオブジェクトの作成
+        /// </summary>
+        void MakeWall(StbWalls stbWalls) {
+            int wallNum = 0;
+
+            GameObject walls = new GameObject("StbWalls");
+            GameObject wallBar = new GameObject("StbWallBar");
+            walls.transform.parent = GameObject.Find("StbData").transform;
+            wallBar.transform.parent = GameObject.Find("StbData").transform;
+
+            foreach (var NodeIds in stbWalls.NodeIdList) {
+                int[] nodeIndex = new int[NodeIds.Count];
+                Mesh meshObj = new Mesh();
+
+                for (int i = 0; i < NodeIds.Count; i++) {
+                    nodeIndex[i] = _nodes.Id.IndexOf(NodeIds[i]);
+                }
+                meshObj = CreateMesh.Slab(_nodes.Vertex, nodeIndex);
+
+                var wallName = string.Format("Wall{0}", wallNum);
+                GameObject wall = new GameObject(wallName);
+                wall.AddComponent<MeshFilter>().mesh = meshObj;
+                wall.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
+                    color = GetMemberColor("RC", "Slab")
+                };
+                wall.transform.parent = walls.transform;
+                wallNum++;
             }
         }
 
