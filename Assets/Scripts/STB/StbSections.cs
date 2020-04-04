@@ -106,7 +106,7 @@ namespace Stevia.STB.Model.Section {
     /// <summary>
     /// RC柱断面
     /// </summary>
-    public class StbSecColRC {
+    public class StbSecColRC:StbData {
         /// <summary>
         /// 部材のID
         /// </summary>
@@ -152,7 +152,7 @@ namespace Stevia.STB.Model.Section {
         /// 与えられたstbデータからRC柱断面を取得する。
         /// </summary>
         /// <param name="stbData"></param>
-        public void Load(XDocument stbData) {
+        public override void Load(XDocument stbData) {
             var stbRcCols = stbData.Root.Descendants("StbSecColumn_RC");
             foreach (var stbRcCol in stbRcCols) {
 
@@ -302,7 +302,7 @@ namespace Stevia.STB.Model.Section {
     /// <summary>
     /// S柱断面
     /// </summary>
-    public class StbSecColumnS {
+    public class StbSecColumnS:StbData {
         /// <summary>
         /// 部材のID
         /// </summary>
@@ -344,7 +344,7 @@ namespace Stevia.STB.Model.Section {
         /// 与えられたstbデータからS柱断面を取得する。
         /// </summary>
         /// <param name="stbData"></param>
-        public void Load(XDocument stbData) {
+        public override void Load(XDocument stbData) {
             var stbStCols = stbData.Root.Descendants("StbSecColumn_S");
             foreach (var stbStCol in stbStCols) {
                 // 必須コード
@@ -452,7 +452,7 @@ namespace Stevia.STB.Model.Section {
     /// <summary>
     /// RC梁断面
     /// </summary>
-    public class StbSecBeamRC {
+    public class StbSecBeamRC:StbData {
         /// <summary>
         /// 部材のID
         /// </summary>
@@ -506,7 +506,7 @@ namespace Stevia.STB.Model.Section {
         /// 与えられたstbデータからRC梁断面を取得する。
         /// </summary>
         /// <param name="stbData"></param>
-        public void Load(XDocument stbData) {
+        public override void Load(XDocument stbData) {
             var stbRcBeams = stbData.Root.Descendants("StbSecBeam_RC");
             foreach (var stbRcBeam in stbRcBeams) {
                 // 必須コード
@@ -650,7 +650,7 @@ namespace Stevia.STB.Model.Section {
     /// <summary>
     /// S梁断面
     /// </summary>
-    public class StbSecBeamS {
+    public class StbSecBeamS:StbData {
         /// <summary>
         /// 部材のID
         /// </summary>
@@ -693,7 +693,7 @@ namespace Stevia.STB.Model.Section {
         /// 与えられたstbデータからS梁断面を取得する。
         /// </summary>
         /// <param name="stbData"></param>
-        public void Load(XDocument stbData) {
+        public override void Load(XDocument stbData) {
             var stbStBeams = stbData.Root.Descendants("StbSecBeam_S");
             foreach (var stbStBeam in stbStBeams) {
 
@@ -788,7 +788,7 @@ namespace Stevia.STB.Model.Section {
     /// <summary>
     /// Sブレース断面
     /// </summary>
-    public class StbSecBraceS {
+    public class StbSecBraceS:StbData {
         /// <summary>
         /// 部材のID
         /// </summary>
@@ -814,7 +814,7 @@ namespace Stevia.STB.Model.Section {
         /// 与えられたstbデータからSブレース断面を取得する。
         /// </summary>
         /// <param name="stbData"></param>
-        public void Load(XDocument stbData) {
+        public override void Load(XDocument stbData) {
             var stbStBraces = stbData.Root.Descendants("StbSecBrace_S");
             foreach (var stbStBrace in stbStBraces) {
 
@@ -902,7 +902,7 @@ namespace Stevia.STB.Model.Section {
     /// <summary>
     /// 鉄骨断面
     /// </summary>
-    public class StbSecSteel {
+    public class StbSecSteel:StbData {
         public StbSecRollH RollH { get; } = new StbSecRollH();
         public StbSecBuildH BuildH { get; } = new StbSecBuildH();
         public StbSecRollBOX RollBOX { get; } = new StbSecRollBOX();
@@ -919,7 +919,7 @@ namespace Stevia.STB.Model.Section {
         /// 属性情報の読み込み
         /// </summary>
         /// <param name="stbData"></param>
-        public void Load(XDocument stbData) {
+        public override void Load(XDocument stbData) {
             RollH.Load(stbData);
             BuildH.Load(stbData);
             RollBOX.Load(stbData);

@@ -6,14 +6,11 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace Stevia.STB.Model.Member {
-    public class StbMembers {
+    public class StbMembers:StbData {
         public List<int> Id { get; } = new List<int>();
         public List<string> Name { get; } = new List<string>();
         public List<string> IdSection { get; } = new List<string>();
         public List<KindsStructure> KindStructure { get; } = new List<KindsStructure>();
-
-        public virtual void Load(XDocument stbData) {
-        }
     }
 
     public class StbColumns:StbMembers {

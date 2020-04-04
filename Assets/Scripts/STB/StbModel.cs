@@ -19,7 +19,7 @@ namespace Stevia.STB.Model {
     /// <summary>
     /// 節点（複数） 各節点を管理
     /// </summary>
-    public class StbNodes {
+    public class StbNodes:StbData {
         public List<int> Id { get; } = new List<int>();
         public List<float> X { get; } = new List<float>();
         public List<float> Y { get; } = new List<float>();
@@ -28,7 +28,7 @@ namespace Stevia.STB.Model {
         public List<int> IdMember { get; } = new List<int>();
         public List<Vector3> Vertex { get; } = new List<Vector3>();
 
-        public void Load(XDocument stbDoc) {
+        public override void Load(XDocument stbDoc) {
             int index = 0;
             var stbNodes = stbDoc.Root.Descendants("StbNode");
             foreach (var stbNode in stbNodes) {
@@ -103,7 +103,7 @@ namespace Stevia.STB.Model {
     /// <summary>
     /// 階情報（複数）
     /// </summary>
-    public class StbStorys {
+    public class StbStorys:StbData {
         /// <summary>
         /// 階のID
         /// </summary>
@@ -126,7 +126,7 @@ namespace Stevia.STB.Model {
         public List<string> StrengthConcrete { get; } = new List<string>();
         public List<List<int>> NodeIdList { get; } = new List<List<int>>();
 
-        public void Load(XDocument stbData) {
+        public override void Load(XDocument stbData) {
             var stbStorys = stbData.Root.Descendants("StbStory");
             foreach (var stbStory in stbStorys) {
                 // 必須コード

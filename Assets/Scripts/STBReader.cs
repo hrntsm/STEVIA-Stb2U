@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+using Stevia.STB;
 using Stevia.STB.Model;
 using Stevia.STB.Model.Member;
 using Stevia.STB.Model.Section;
@@ -95,16 +96,14 @@ namespace Stevia {
         }
 
         void Load(XDocument xDoc) {
-            _nodes.Load(xDoc);
-            _storys.Load(xDoc);
-            _slabs.Load(xDoc);
-            _walls.Load(xDoc);
-            _secColumnRC.Load(xDoc);
-            _secColumnS.Load(xDoc);
-            _secBeamRC.Load(xDoc);
-            _secBeamS.Load(xDoc);
-            _secBraceS.Load(xDoc);
-            _stbSecSteel.Load(xDoc);
+            var members = new List<StbData>() {
+                _nodes, _storys, _slabs, _walls,
+                _secColumnRC, _secColumnS, _secBeamRC, _secBeamS, _secBraceS, _stbSecSteel
+            };
+
+            foreach (var member in members) {
+                member.Load(xDoc);
+            }
         }
 
         string[,] GetSteelSecNameArray() {
