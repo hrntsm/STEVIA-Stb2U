@@ -28,6 +28,11 @@ namespace Stevia {
 
         public static StbNodes _nodes;
         public static StbStorys _storys;
+        public static StbColumns _columns;
+        public static StbPosts _posts;
+        public static StbGirders _girders;
+        public static StbBeams _beams;
+        public static StbBraces _braces;
         public static StbSlabs _slabs;
         public static StbWalls _walls;
         public static StbSecColRC _secColumnRC;
@@ -63,10 +68,11 @@ namespace Stevia {
             // meshの生成
             MakeSlab(_slabs);
             MakeWall(_walls);
-            string[,] memberName = GetMemberNameArray();
-            for (int i = 0; i < memberName.GetLength(0); i++) {
-                MakeElementMesh(xDoc, memberName[i, 0], memberName[i, 1]);
-            }
+
+            List<StbFrame> stbFrames = new List<StbFrame>() {
+                _columns, _posts, _girders, _beams, _braces
+            };
+            MakeFrame(stbFrames);
 
             // 配筋表示は最初はオフにする
             DisplySettings.BarOff();
@@ -85,6 +91,11 @@ namespace Stevia {
         void Init() {
             _nodes = new StbNodes();
             _storys = new StbStorys();
+            _columns = new StbColumns();
+            _posts = new StbPosts();
+            _girders = new StbGirders();
+            _beams = new StbBeams();
+            _braces = new StbBraces();
             _slabs = new StbSlabs();
             _walls = new StbWalls();
             _secColumnRC = new StbSecColRC();
@@ -97,7 +108,8 @@ namespace Stevia {
 
         void Load(XDocument xDoc) {
             var members = new List<StbData>() {
-                _nodes, _storys, _slabs, _walls,
+                _nodes, _storys,
+                _columns, _posts, _girders, _beams, _braces, _slabs, _walls,
                 _secColumnRC, _secColumnS, _secBeamRC, _secBeamS, _secBraceS, _stbSecSteel
             };
 
@@ -117,17 +129,6 @@ namespace Stevia {
                 {"StbSecRoll-Bar", "Bar"}
             };
             return (steelSecNameArray);
-        }
-
-        string[,] GetMemberNameArray() {
-            string[,] memberNameArray = new string[5, 2] {
-                {"StbColumn", "Column"},
-                {"StbGirder", "Girder"},
-                {"StbPost", "Post"},
-                {"StbBeam", "Beam"},
-                {"StbBrace", "Brace"}
-            };
-            return (memberNameArray);
         }
     }
 }

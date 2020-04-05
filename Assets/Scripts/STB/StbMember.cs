@@ -9,22 +9,28 @@ namespace Stevia.STB.Model.Member {
     public class StbMembers:StbData {
         public List<int> Id { get; } = new List<int>();
         public List<string> Name { get; } = new List<string>();
-        public List<string> IdSection { get; } = new List<string>();
+        public List<int> IdSection { get; } = new List<int>();
         public List<KindsStructure> KindStructure { get; } = new List<KindsStructure>();
     }
 
-    public class StbColumns:StbMembers {
-        public string Tag { get; } = "StbColumn";
+    public class StbFrame:StbMembers {
+        public virtual string Tag { get; } = "StbFrame";
+        public virtual FrameType FrameType { get; } = FrameType.Any;
         public List<int> IdNodeStart { get; } = new List<int>();
         public List<int> IdNodeEnd { get; } = new List<int>();
         public List<float> Rotate { get; } = new List<float>();
+    }
+
+    public class StbColumns:StbFrame {
+        public override string Tag { get; } = "StbColumn";
+        public override FrameType FrameType { get; } = FrameType.Column;
 
         public override void Load(XDocument stbData) {
             var stbElems = stbData.Root.Descendants(Tag);
             foreach (var stbElem in stbElems) {
                 Id.Add((int)stbElem.Attribute("id"));
                 Name.Add((string)stbElem.Attribute("name"));
-                IdSection.Add((string)stbElem.Attribute("id_section"));
+                IdSection.Add((int)stbElem.Attribute("id_section"));
                 IdNodeStart.Add((int)stbElem.Attribute("idNode_bottom"));
                 IdNodeEnd.Add((int)stbElem.Attribute("idNode_top"));
                 Rotate.Add((float)stbElem.Attribute("rotate"));
@@ -52,18 +58,16 @@ namespace Stevia.STB.Model.Member {
     /// <summary>
     /// 間柱情報（複数）
     /// </summary>
-    public class StbPosts:StbMembers {
-        public string Tag { get; } = "StbPost";
-        public List<int> IdNodeStart { get; } = new List<int>();
-        public List<int> IdNodeEnd { get; } = new List<int>();
-        public List<float> Rotate { get; } = new List<float>();
+    public class StbPosts:StbFrame {
+        public override string Tag { get; } = "StbPost";
+        public override FrameType FrameType { get; } = FrameType.Post;
 
         public override void Load(XDocument stbData) {
             var stbElems = stbData.Root.Descendants(Tag);
             foreach (var stbElem in stbElems) {
                 Id.Add((int)stbElem.Attribute("id"));
                 Name.Add((string)stbElem.Attribute("name"));
-                IdSection.Add((string)stbElem.Attribute("id_section"));
+                IdSection.Add((int)stbElem.Attribute("id_section"));
                 IdNodeStart.Add((int)stbElem.Attribute("idNode_bottom"));
                 IdNodeEnd.Add((int)stbElem.Attribute("idNode_top"));
                 Rotate.Add((float)stbElem.Attribute("rotate"));
@@ -91,11 +95,9 @@ namespace Stevia.STB.Model.Member {
     /// <summary>
     /// 大梁情報（複数）
     /// </summary>
-    public class StbGirders:StbMembers {
-        public string Tag { get; } = "StbGirder";
-        public List<int> IdNodeStart { get; } = new List<int>();
-        public List<int> IdNodeEnd { get; } = new List<int>();
-        public List<float> Rotate { get; } = new List<float>();
+    public class StbGirders:StbFrame {
+        public override string Tag { get; } = "StbGirder";
+        public override FrameType FrameType { get; } = FrameType.Girder;
         public List<double> Level { get; } = new List<double>();
 
         public override void Load(XDocument stbData) {
@@ -103,7 +105,7 @@ namespace Stevia.STB.Model.Member {
             foreach (var stbElem in stbElems) {
                 Id.Add((int)stbElem.Attribute("id"));
                 Name.Add((string)stbElem.Attribute("name"));
-                IdSection.Add((string)stbElem.Attribute("id_section"));
+                IdSection.Add((int)stbElem.Attribute("id_section"));
                 IdNodeStart.Add((int)stbElem.Attribute("idNode_start"));
                 IdNodeEnd.Add((int)stbElem.Attribute("idNode_end"));
                 Rotate.Add((float)stbElem.Attribute("rotate"));
@@ -138,11 +140,9 @@ namespace Stevia.STB.Model.Member {
     /// <summary>
     /// 小梁情報（複数）
     /// </summary>
-    public class StbBeams:StbMembers {
-        public string Tag { get; } = "StbBeam";
-        public List<int> IdNodeStart { get; } = new List<int>();
-        public List<int> IdNodeEnd { get; } = new List<int>();
-        public List<float> Rotate { get; } = new List<float>();
+    public class StbBeams:StbFrame {
+        public override string Tag { get; } = "StbBeam";
+        public override FrameType FrameType { get; } = FrameType.Beam;
         public List<double> Level { get; } = new List<double>();
 
         public override void Load(XDocument stbData) {
@@ -150,7 +150,7 @@ namespace Stevia.STB.Model.Member {
             foreach (var stbElem in stbElems) {
                 Id.Add((int)stbElem.Attribute("id"));
                 Name.Add((string)stbElem.Attribute("name"));
-                IdSection.Add((string)stbElem.Attribute("id_section"));
+                IdSection.Add((int)stbElem.Attribute("id_section"));
                 IdNodeStart.Add((int)stbElem.Attribute("idNode_start"));
                 IdNodeEnd.Add((int)stbElem.Attribute("idNode_end"));
                 Rotate.Add((float)stbElem.Attribute("rotate"));
@@ -185,18 +185,16 @@ namespace Stevia.STB.Model.Member {
     /// <summary>
     /// ブレース情報（複数）
     /// </summary>
-    public class StbBraces:StbMembers {
-        public string Tag { get; } = "StbBraces";
-        public List<int> IdNodeStart { get; } = new List<int>();
-        public List<int> IdNodeEnd { get; } = new List<int>();
-        public List<float> Rotate { get; } = new List<float>();
+    public class StbBraces:StbFrame {
+        public override string Tag { get; } = "StbBrace";
+        public override FrameType FrameType { get; } = FrameType.Brace;
 
         public override void Load(XDocument stbData) {
             var stbElems = stbData.Root.Descendants(Tag);
             foreach (var stbElem in stbElems) {
                 Id.Add((int)stbElem.Attribute("id"));
                 Name.Add((string)stbElem.Attribute("name"));
-                IdSection.Add((string)stbElem.Attribute("id_section"));
+                IdSection.Add((int)stbElem.Attribute("id_section"));
                 IdNodeStart.Add((int)stbElem.Attribute("idNode_start"));
                 IdNodeEnd.Add((int)stbElem.Attribute("idNode_end"));
                 Rotate.Add((float)stbElem.Attribute("rotate"));
@@ -241,7 +239,7 @@ namespace Stevia.STB.Model.Member {
                 // 必須コード
                 Id.Add((int)stbElem.Attribute("id"));
                 Name.Add((string)stbElem.Attribute("name"));
-                IdSection.Add((string)stbElem.Attribute("id_section"));
+                IdSection.Add((int)stbElem.Attribute("id_section"));
                 KindStructure.Add(KindsStructure.RC); // スラブはRCのみ
 
                 // 必須ではないコード
@@ -279,7 +277,7 @@ namespace Stevia.STB.Model.Member {
                 // 必須コード
                 Id.Add((int)stbSlab.Attribute("id"));
                 Name.Add((string)stbSlab.Attribute("name"));
-                IdSection.Add((string)stbSlab.Attribute("id_section"));
+                IdSection.Add((int)stbSlab.Attribute("id_section"));
                 KindStructure.Add(KindsStructure.RC); // 壁はRCのみ
 
                 // 子要素 StbNodeid_List
@@ -303,5 +301,16 @@ namespace Stevia.STB.Model.Member {
         BOTH,
         TOP,
         BOTTOM
+    }
+
+    public enum FrameType {
+        Column,
+        Post,
+        Girder,
+        Beam,
+        Brace,
+        Slab,
+        Wall,
+        Any
     }
 }
