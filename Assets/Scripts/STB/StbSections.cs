@@ -94,6 +94,17 @@ namespace Stevia.STB.Model.Section {
         DoubleL
     }
 
+    public enum ShapeTypes {
+        H,
+        L,
+        T,
+        C,
+        FB,
+        BOX,
+        Bar,
+        Pipe,
+    }
+
     /// <summary>
     /// 断面情報
     /// </summary>
@@ -903,6 +914,11 @@ namespace Stevia.STB.Model.Section {
     /// 鉄骨断面
     /// </summary>
     public class StbSecSteel:StbData {
+        public List<string> Name { get; } = new List<string>();
+        public List<float> A { get; } = new List<float>();
+        public List<float> B { get; } = new List<float>();
+        public List<ShapeTypes> ShapeType { get; } = new List<ShapeTypes>();
+
         public StbSecRollH RollH { get; } = new StbSecRollH();
         public StbSecBuildH BuildH { get; } = new StbSecBuildH();
         public StbSecRollBOX RollBOX { get; } = new StbSecRollBOX();
@@ -920,17 +936,72 @@ namespace Stevia.STB.Model.Section {
         /// </summary>
         /// <param name="stbData"></param>
         public override void Load(XDocument stbData) {
+            // TODO 継承を使ってきれいに書き直す
             RollH.Load(stbData);
+            Name.AddRange(RollH.Name);
+            A.AddRange(RollH.A);
+            B.AddRange(RollH.B);
+            ShapeType.AddRange(RollH.ShapeType);
+
             BuildH.Load(stbData);
+            Name.AddRange(BuildH.Name);
+            A.AddRange(BuildH.A);
+            B.AddRange(BuildH.B);
+            ShapeType.AddRange(BuildH.ShapeType);
+
             RollBOX.Load(stbData);
+            Name.AddRange(RollBOX.Name);
+            A.AddRange(RollBOX.A);
+            B.AddRange(RollBOX.B);
+            ShapeType.AddRange(RollBOX.ShapeType);
+
             BuildBOX.Load(stbData);
+            Name.AddRange(BuildBOX.Name);
+            A.AddRange(BuildBOX.A);
+            B.AddRange(BuildBOX.B);
+            ShapeType.AddRange(BuildBOX.ShapeType);
+
             Pipe.Load(stbData);
+            Name.AddRange(Pipe.Name);
+            A.AddRange(Pipe.T);
+            B.AddRange(Pipe.D);
+            ShapeType.AddRange(Pipe.ShapeType);
+
             RollT.Load(stbData);
+            Name.AddRange(RollT.Name);
+            A.AddRange(RollT.A);
+            B.AddRange(RollT.B);
+            ShapeType.AddRange(RollT.ShapeType);
+
             RollC.Load(stbData);
+            Name.AddRange(RollC.Name);
+            A.AddRange(RollC.A);
+            B.AddRange(RollC.B);
+            ShapeType.AddRange(RollC.ShapeType);
+
             RollL.Load(stbData);
+            Name.AddRange(RollL.Name);
+            A.AddRange(RollL.A);
+            B.AddRange(RollL.B);
+            ShapeType.AddRange(RollL.ShapeType);
+
             RollLipC.Load(stbData);
+            Name.AddRange(RollLipC.Name);
+            A.AddRange(RollLipC.H);
+            B.AddRange(RollLipC.A);
+            ShapeType.AddRange(RollLipC.ShapeType);
+
             RollFB.Load(stbData);
+            Name.AddRange(RollFB.Name);
+            A.AddRange(RollFB.B);
+            B.AddRange(RollFB.T);
+            ShapeType.AddRange(RollFB.ShapeType);
+
             RollBar.Load(stbData);
+            Name.AddRange(RollBar.Name);
+            A.AddRange(RollBar.R);
+            B.AddRange(RollBar.R);
+            ShapeType.AddRange(RollBar.ShapeType);
         }
     }
 
@@ -966,6 +1037,10 @@ namespace Stevia.STB.Model.Section {
         /// フィレット半径
         /// </summary>
         public List<float> R { get; } = new  List<float>();
+        /// <summary>
+        /// 断面形状タイプ
+        /// </summary>
+        public List<ShapeTypes> ShapeType { get; } = new List<ShapeTypes>();
 
         /// <summary>
         /// 属性情報の読み込み
@@ -982,6 +1057,8 @@ namespace Stevia.STB.Model.Section {
                 T1.Add((float)StSection.Attribute("t1"));
                 T2.Add((float)StSection.Attribute("t2"));
                 R.Add((float)StSection.Attribute("r"));
+
+                ShapeType.Add(ShapeTypes.H);
             }
         }
     }
@@ -1010,6 +1087,10 @@ namespace Stevia.STB.Model.Section {
         /// フランジ厚
         /// </summary>
         public List<float> T2 { get; } = new List<float>();
+        /// <summary>
+        /// 断面形状タイプ
+        /// </summary>
+        public List<ShapeTypes> ShapeType { get; } = new List<ShapeTypes>();
 
         /// <summary>
         /// 属性情報の読み込み
@@ -1025,6 +1106,8 @@ namespace Stevia.STB.Model.Section {
                 B.Add((float)StSection.Attribute("B"));
                 T1.Add((float)StSection.Attribute("t1"));
                 T2.Add((float)StSection.Attribute("t2"));
+
+                ShapeType.Add(ShapeTypes.H);
             }
         }
     }
@@ -1057,6 +1140,10 @@ namespace Stevia.STB.Model.Section {
         /// コーナー半径
         /// </summary>
         public List<float> R { get; } = new List<float>();
+        /// <summary>
+        /// 断面形状タイプ
+        /// </summary>
+        public List<ShapeTypes> ShapeType { get; } = new List<ShapeTypes>();
 
         /// <summary>
         /// 属性情報の読み込み
@@ -1072,6 +1159,8 @@ namespace Stevia.STB.Model.Section {
                 B.Add((float)StSection.Attribute("B"));
                 T.Add((float)StSection.Attribute("t"));
                 R.Add((float)StSection.Attribute("R"));
+
+                ShapeType.Add(ShapeTypes.BOX);
             }
         }
     }
@@ -1100,6 +1189,10 @@ namespace Stevia.STB.Model.Section {
         /// フランジ厚
         /// </summary>
         public List<float> T2 { get; } = new List<float>();
+        /// <summary>
+        /// 断面形状タイプ
+        /// </summary>
+        public List<ShapeTypes> ShapeType { get; } = new List<ShapeTypes>();
 
         /// <summary>
         /// 属性情報の読み込み
@@ -1115,6 +1208,8 @@ namespace Stevia.STB.Model.Section {
                 B.Add((float)StSection.Attribute("B"));
                 T1.Add((float)StSection.Attribute("t1"));
                 T2.Add((float)StSection.Attribute("t2"));
+
+                ShapeType.Add(ShapeTypes.BOX);
             }
         }
     }
@@ -1135,6 +1230,10 @@ namespace Stevia.STB.Model.Section {
         /// 板厚
         /// </summary>
         public List<float> T { get; } = new List<float>();
+        /// <summary>
+        /// 断面形状タイプ
+        /// </summary>
+        public List<ShapeTypes> ShapeType { get; } = new List<ShapeTypes>();
 
         /// <summary>
         /// 属性情報の読み込み
@@ -1148,6 +1247,8 @@ namespace Stevia.STB.Model.Section {
                 Name.Add((string)StSection.Attribute("name"));
                 D.Add((float)StSection.Attribute("D"));
                 T.Add((float)StSection.Attribute("t"));
+
+                ShapeType.Add(ShapeTypes.Pipe);
             }
         }
     }
@@ -1184,6 +1285,10 @@ namespace Stevia.STB.Model.Section {
         /// フィレット半径
         /// </summary>
         public List<float> R { get; } = new List<float>();
+        /// <summary>
+        /// 断面形状タイプ
+        /// </summary>
+        public List<ShapeTypes> ShapeType { get; } = new List<ShapeTypes>();
 
         /// <summary>
         /// 属性情報の読み込み
@@ -1200,6 +1305,8 @@ namespace Stevia.STB.Model.Section {
                 T1.Add((float)StSection.Attribute("t1"));
                 T2.Add((float)StSection.Attribute("t2"));
                 R.Add((float)StSection.Attribute("r1"));
+
+                ShapeType.Add(ShapeTypes.T);
             }
         }
     }
@@ -1240,6 +1347,10 @@ namespace Stevia.STB.Model.Section {
         /// フランジ先端半径
         /// </summary>
         public List<float> R2 { get; } = new List<float>();
+        /// <summary>
+        /// 断面形状タイプ
+        /// </summary>
+        public List<ShapeTypes> ShapeType { get; } = new List<ShapeTypes>();
 
         /// <summary>
         /// 属性情報の読み込み
@@ -1257,6 +1368,8 @@ namespace Stevia.STB.Model.Section {
                 T2.Add((float)StSection.Attribute("t2"));
                 R1.Add((float)StSection.Attribute("r1"));
                 R2.Add((float)StSection.Attribute("r2"));
+
+                ShapeType.Add(ShapeTypes.C);
             }
         }
     }
@@ -1297,6 +1410,10 @@ namespace Stevia.STB.Model.Section {
         /// フランジ先端半径
         /// </summary>
         public List<float> R2 { get; } = new List<float>();
+        /// <summary>
+        /// 断面形状タイプ
+        /// </summary>
+        public List<ShapeTypes> ShapeType { get; } = new List<ShapeTypes>();
 
         /// <summary>
         /// 属性情報の読み込み
@@ -1314,6 +1431,8 @@ namespace Stevia.STB.Model.Section {
                 T2.Add((float)StSection.Attribute("t2"));
                 R1.Add((float)StSection.Attribute("r1"));
                 R2.Add((float)StSection.Attribute("r2"));
+
+                ShapeType.Add(ShapeTypes.L);
             }
         }
     }
@@ -1346,6 +1465,10 @@ namespace Stevia.STB.Model.Section {
         /// 板厚
         /// </summary>
         public List<float> T { get; } = new List<float>();
+        /// <summary>
+        /// 断面形状タイプ
+        /// </summary>
+        public List<ShapeTypes> ShapeType { get; } = new List<ShapeTypes>();
 
         /// <summary>
         /// 属性情報の読み込み
@@ -1361,6 +1484,8 @@ namespace Stevia.STB.Model.Section {
                 A.Add((float)StSection.Attribute("A"));
                 C.Add((float)StSection.Attribute("C"));
                 T.Add((float)StSection.Attribute("t"));
+
+                ShapeType.Add(ShapeTypes.C);
             }
         }
     }
@@ -1381,6 +1506,10 @@ namespace Stevia.STB.Model.Section {
         /// 板厚
         /// </summary>
         public List<float> T { get; } = new List<float>();
+        /// <summary>
+        /// 断面形状タイプ
+        /// </summary>
+        public List<ShapeTypes> ShapeType { get; } = new List<ShapeTypes>();
 
         /// <summary>
         /// 属性情報の読み込み
@@ -1394,6 +1523,8 @@ namespace Stevia.STB.Model.Section {
                 Name.Add((string)StSection.Attribute("name"));
                 B.Add((float)StSection.Attribute("B"));
                 T.Add((float)StSection.Attribute("t"));
+
+                ShapeType.Add(ShapeTypes.FB);
             }
         }
     }
@@ -1410,6 +1541,10 @@ namespace Stevia.STB.Model.Section {
         /// 直径
         /// </summary>
         public List<float> R { get; } = new List<float>();
+        /// <summary>
+        /// 断面形状タイプ
+        /// </summary>
+        public List<ShapeTypes> ShapeType { get; } = new List<ShapeTypes>();
 
         /// <summary>
         /// 属性情報の読み込み
@@ -1422,6 +1557,8 @@ namespace Stevia.STB.Model.Section {
                 // 必須コード
                 Name.Add((string)StSection.Attribute("name"));
                 R.Add((float)StSection.Attribute("R"));
+
+                ShapeType.Add(ShapeTypes.Bar);
             }
         }
     }

@@ -20,12 +20,6 @@ namespace Stevia {
         [SerializeField]
         Dropdown _dropdown;
 
-        List<string> _xStName = new List<string>();
-        List<float> _xStParamA = new List<float>();
-        List<float> _xStParamB = new List<float>();
-        List<string> _xStType = new List<string>();
-        List<Mesh> _shapeMesh = new List<Mesh>();
-
         public static StbNodes _nodes;
         public static StbStorys _storys;
         public static StbColumns _columns;
@@ -55,14 +49,6 @@ namespace Stevia {
                     _dropdown.options.Add(new Dropdown.OptionData { text = "階：" + name + " へ移動" });
                 }
                 _dropdown.RefreshShownValue();
-            }
-
-            // TODO stb読み込み関連とほかの処理は分離する。
-
-            // S断面形状の取得
-            string[,] SteelSecName = GetSteelSecNameArray();
-            for (int i = 0; i < SteelSecName.GetLength(0); i++) {
-                GetStbSteelSection(xDoc, SteelSecName[i, 0], SteelSecName[i, 1]);
             }
 
             // meshの生成
@@ -116,19 +102,6 @@ namespace Stevia {
             foreach (var member in members) {
                 member.Load(xDoc);
             }
-        }
-
-        string[,] GetSteelSecNameArray() {
-            string[,] steelSecNameArray = new string[7, 2] {
-                {"StbSecRoll-H", "H"},
-                {"StbSecBuild-H", "H"},
-                {"StbSecRoll-BOX", "BOX"},
-                {"StbSecBuild-BOX", "BOX"},
-                {"StbSecPipe", "Pipe"},
-                {"StbSecRoll-L", "L"},
-                {"StbSecRoll-Bar", "Bar"}
-            };
-            return (steelSecNameArray);
         }
     }
 }

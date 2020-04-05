@@ -6,6 +6,7 @@ using UnityEngine;
 
 using Stevia.STB.Model;
 using Stevia.STB.Model.Member;
+using Stevia.STB.Model.Section;
 
 namespace Stevia {
 
@@ -79,8 +80,8 @@ namespace Stevia {
             float width = 0;
             int secIndex = 0;
             int nodeIndexStart, nodeIndexEnd, idShape;
-            string shape;
-            string shapeType = "";
+            string shape = string.Empty;
+            ShapeTypes shapeType = ShapeTypes.H;
 
             foreach (var stbFrame in stbFrames) {
 
@@ -91,7 +92,7 @@ namespace Stevia {
 
                 for (int eNum = 0; eNum < stbFrame.Id.Count; eNum++) {
                     var idSection = stbFrame.IdSection[eNum];
-                    var xKind = stbFrame.KindStructure[eNum] ;
+                    var kind = stbFrame.KindStructure[eNum] ;
 
                     // 始点と終点の座標取得
                     nodeIndexStart = _nodes.Id.IndexOf(stbFrame.IdNodeStart[eNum]);
@@ -99,7 +100,7 @@ namespace Stevia {
                     nodeStart = _nodes.Vertex[nodeIndexStart];
                     nodeEnd = _nodes.Vertex[nodeIndexEnd];
 
-                    if (xKind == KindsStructure.RC) {
+                    if (kind == KindsStructure.RC) {
                         switch (stbFrame.FrameType) {
                             case FrameType.Column:
                             case FrameType.Post:
@@ -117,11 +118,11 @@ namespace Stevia {
                                 break;
                         }
                         if (height == 0)
-                            shapeType = "Pipe";
+                            shapeType = ShapeTypes.Pipe;
                         else
-                            shapeType = "BOX";
+                            shapeType = ShapeTypes.BOX;
                     }
-                    else if (xKind == KindsStructure.S) {
+                    else if (kind == KindsStructure.S) {
                         switch (stbFrame.FrameType) {
                             case FrameType.Column:
                             case FrameType.Post:
@@ -138,18 +139,18 @@ namespace Stevia {
                                 shape = _secBraceS.Shape[idShape];
                                 break;
                             default:
-                                shape = "";
                                 break;
                         }
-                        secIndex = _xStName.IndexOf(shape);
-                        height = _xStParamA[secIndex] / 1000f;
-                        width = _xStParamB[secIndex] / 1000f;
-                        shapeType = _xStType[secIndex];
+                        secIndex = _stbSecSteel.Name.IndexOf(shape);
+                        height = _stbSecSteel.A[secIndex] / 1000f;
+                        width = _stbSecSteel.B[secIndex] / 1000f;
+                        shapeType = _stbSecSteel.ShapeType[secIndex];
                     }
-                    _shapeMesh = MakeElementsMeshFromVertex(nodeStart, nodeEnd, height, width, shapeType, stbFrame.FrameType, eNum, elements, xKind);
+                    FrameVertex2Mesh(nodeStart, nodeEnd, height, width, shapeType, stbFrame.FrameType, eNum, elements, kind);
+                    
                     // 配筋の作成
-                    if (xKind == KindsStructure.RC) {
-                        if (shapeType == "BOX") {
+                    if (kind == KindsStructure.RC) {
+                        if (shapeType == ShapeTypes.BOX) {
                             switch (stbFrame.FrameType) {
                                 case FrameType.Column:
                                 case FrameType.Post:
@@ -166,10 +167,9 @@ namespace Stevia {
                     }
                 }
             }
-            _shapeMesh.Clear();
         }
 
-        public List<Mesh> MakeElementsMeshFromVertex(Vector3 nodeStart, Vector3 nodeEnd, float hight, float width, string shapeType, FrameType FrameType, int eNum, GameObject elements, KindsStructure kind) {
+        public void FrameVertex2Mesh(Vector3 nodeStart, Vector3 nodeEnd, float hight, float width, ShapeTypes shapeType, FrameType FrameType, int eNum, GameObject elements, KindsStructure kind) {
             Vector3[] vertexS = new Vector3[6];
             Vector3[] vertexE = new Vector3[6];
             Mesh meshObj = new Mesh();
@@ -199,13 +199,13 @@ namespace Stevia {
                 default: break;
             }
             switch (shapeType) {
-                case "H":
+                case ShapeTypes.H:
                     meshObj = CreateMesh.H(vertexS, vertexE); break;
-                case "BOX":
+                case ShapeTypes.BOX:
                     meshObj = CreateMesh.BOX(vertexS, vertexE); break;
-                case "Pipe":
+                case ShapeTypes.Pipe:
                     meshObj = CreateMesh.Pipe(nodeStart, nodeEnd, width / 2); break;
-                case "L":
+                case ShapeTypes.L:
                     meshObj = CreateMesh.L(vertexS, vertexE); break;
                 default: break;
             }
@@ -217,8 +217,6 @@ namespace Stevia {
                 color = GetMemberColor(kind, FrameType)
             };
             element.transform.parent = elements.transform;
-
-            return _shapeMesh;
         }
 
         Color GetMemberColor(KindsStructure kind, FrameType FrameType) {
