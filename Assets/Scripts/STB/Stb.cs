@@ -5,9 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace Stevia.STB {
-    public class StbData {
-        public virtual void Load(XDocument stbData) {
+namespace Stevia.STB 
+{
+    public class StbData 
+    {
+        public virtual void Load(XDocument stbData) 
+        {
         }
     }
 }

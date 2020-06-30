@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Stevia.VR {
-
-    public class Calibrator:MonoBehaviour {
-
+namespace Stevia.VR
+{
+    public class Calibrator:MonoBehaviour 
+    {
         [SerializeField]
         Transform cameraRig;
 
@@ -15,7 +15,8 @@ namespace Stevia.VR {
         [SerializeField, Range(0f, 3.0f)]
         float charaHeight;
 
-        public void Run() {
+        public void Run() 
+        {
             float xPos = cameraRig.position.x;
             float yPos = cameraRig.position.y + (charaHeight - hmdEye.transform.localPosition.y);
             float zPos = cameraRig.position.z;
