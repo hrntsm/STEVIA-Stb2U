@@ -6,11 +6,13 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Stevia.STB.Model {
+namespace Stevia.STB.Model
+{
     /// <summary>
     /// 位置・断面情報（節点・部材・階・軸）
     /// </summary>
-    public class StbModel {
+    public class StbModel
+    {
         // TODO 一括でStbModelに属するものを読み込めるようにする
         //public void LoadAll(XDocument stbData) {
         //}
@@ -19,7 +21,8 @@ namespace Stevia.STB.Model {
     /// <summary>
     /// 節点（複数） 各節点を管理
     /// </summary>
-    public class StbNodes:StbData {
+    public class StbNodes:StbData
+    {
         public List<int> Id { get; } = new List<int>();
         public List<float> X { get; } = new List<float>();
         public List<float> Y { get; } = new List<float>();
@@ -28,10 +31,12 @@ namespace Stevia.STB.Model {
         public List<int> IdMember { get; } = new List<int>();
         public List<Vector3> Vertex { get; } = new List<Vector3>();
 
-        public override void Load(XDocument stbDoc) {
+        public override void Load(XDocument stbDoc)
+        {
             int index = 0;
             var stbNodes = stbDoc.Root.Descendants("StbNode");
-            foreach (var stbNode in stbNodes) {
+            foreach (var stbNode in stbNodes)
+            {
                 // 必須コード
                 Id.Add((int)stbNode.Attribute("id"));
                 X.Add((float)stbNode.Attribute("x") / 1000f);
@@ -39,13 +44,16 @@ namespace Stevia.STB.Model {
                 Z.Add((float)stbNode.Attribute("y") / 1000f);
                 
                 // 必須ではないコード
-                if (stbNode.Attribute("id_member") != null) {
+                if (stbNode.Attribute("id_member") != null)
+                {
                     IdMember.Add((int)stbNode.Attribute("id_member"));
                 }
-                else {
+                else 
+                {
                     IdMember.Add(-1);
                 }
-                switch ((string)stbNode.Attribute("kind")) {
+                switch ((string)stbNode.Attribute("kind")) 
+                {
                     case "ON_BEAM":
                         Kind.Add(KindsNode.ON_BEAM); break;
                     case "ON_COLUMN":
@@ -68,7 +76,8 @@ namespace Stevia.STB.Model {
             }
         }
 
-        public enum KindsNode {
+        public enum KindsNode 
+        {
             ON_BEAM,
             ON_COLUMN,
             ON_GRID,
@@ -81,12 +90,15 @@ namespace Stevia.STB.Model {
     /// <summary>
     /// 節点IDリスト
     /// </summary>
-    public class StbNodeIdList {
-        public List<int> Load(XElement stbElem) {
+    public class StbNodeIdList 
+    {
+        public List<int> Load(XElement stbElem)
+        {
             List<int> idList = new List<int>();
 
             var xNodeIds = stbElem.Element("StbNodeid_List").Elements("StbNodeid");
-            foreach (var xNodeId in xNodeIds) {
+            foreach (var xNodeId in xNodeIds) 
+            {
                 idList.Add((int)xNodeId.Attribute("id"));
             }
             return idList;
@@ -96,14 +108,16 @@ namespace Stevia.STB.Model {
     /// <summary>
     /// 軸情報
     /// </summary>
-    public class StbAxes {
+    public class StbAxes 
+    {
     }
 
 
     /// <summary>
     /// 階情報（複数）
     /// </summary>
-    public class StbStorys:StbData {
+    public class StbStorys:StbData 
+    {
         /// <summary>
         /// 階のID
         /// </summary>
@@ -126,13 +140,16 @@ namespace Stevia.STB.Model {
         public List<string> StrengthConcrete { get; } = new List<string>();
         public List<List<int>> NodeIdList { get; } = new List<List<int>>();
 
-        public override void Load(XDocument stbData) {
+        public override void Load(XDocument stbData)
+        {
             var stbStorys = stbData.Root.Descendants("StbStory");
-            foreach (var stbStory in stbStorys) {
+            foreach (var stbStory in stbStorys)
+            {
                 // 必須コード
                 Id.Add((int)stbStory.Attribute("id"));
                 Height.Add((float)stbStory.Attribute("height") / 1000f);
-                switch ((string)stbStory.Attribute("kind")) {
+                switch ((string)stbStory.Attribute("kind")) 
+                {
                     case "GENERAL":
                         Kind.Add(KindsStory.GENERAL); break;
                     case "BASEMENT":
@@ -149,16 +166,20 @@ namespace Stevia.STB.Model {
                 
                 // 必須ではないコード
                 // リストの長さが合うように、空の場合はstring.Enpty
-                if (stbStory.Attribute("name") != null) {
+                if (stbStory.Attribute("name") != null) 
+                {
                     Name.Add((string)stbStory.Attribute("name"));
                 }
-                else {
+                else 
+                {
                     Name.Add(string.Empty);
                 }
-                if (stbStory.Attribute("concrete_strength") != null) {
+                if (stbStory.Attribute("concrete_strength") != null)
+                {
                     StrengthConcrete.Add((string)stbStory.Attribute("concrete_strength"));
                 }
-                else {
+                else 
+                {
                     StrengthConcrete.Add(string.Empty);
                 }
 
@@ -167,7 +188,8 @@ namespace Stevia.STB.Model {
             }
         }
 
-        public enum KindsStory { 
+        public enum KindsStory 
+        { 
             GENERAL,
             BASEMENT,
             ROOF,
@@ -179,22 +201,26 @@ namespace Stevia.STB.Model {
     /// <summary>
     /// 断面情報
     /// </summary>
-    public class StbSections {
+    public class StbSections 
+    {
     }
 
     /// <summary>
     /// 継手情報
     /// </summary>
-    public class StbJoints {
+    public class StbJoints 
+    {
     }
 
     /// <summary>
     /// 床組（複数）
     /// </summary>
-    public class StbSlabFrames {
+    public class StbSlabFrames
+    {
     }
 
-    public enum KindsStructure {
+    public enum KindsStructure 
+    {
         RC,
         S,
         SRC,

@@ -1,20 +1,23 @@
 ﻿using System.Collections.Generic;
 using System.Xml.Linq;
 using System;
-
+using System.Threading.Tasks;
 using UnityEngine;
 
 using Stevia.STB.Model;
 using Stevia.STB.Model.Member;
 using Stevia.STB.Model.Section;
+using Stevia.UI;
 
-namespace Stevia {
-
-    public partial class STBReader:MonoBehaviour {
+namespace Stevia.Model
+{
+    public partial class STBReader:MonoBehaviour
+    {
         /// <summary>
         /// スラブのオブジェクトの作成
         /// </summary>
-        void MakeSlab(StbSlabs stbSlabs) {
+        void MakeSlab(StbSlabs stbSlabs)
+        {
             int slabNum = 0;
 
             GameObject slabs = new GameObject("StbSlabs");
@@ -22,11 +25,13 @@ namespace Stevia {
             slabs.transform.parent = GameObject.Find("StbData").transform;
             slabBar.transform.parent = GameObject.Find("StbData").transform;
 
-            foreach (var NodeIds in stbSlabs.NodeIdList) {
+            foreach (var NodeIds in stbSlabs.NodeIdList)
+            {
                 int[] nodeIndex = new int[NodeIds.Count];
                 Mesh meshObj = new Mesh();
 
-                for (int i = 0; i < NodeIds.Count; i++) {
+                for (int i = 0; i < NodeIds.Count; i++)
+                {
                     nodeIndex[i] = _nodes.Id.IndexOf(NodeIds[i]);
                 }
                 meshObj = CreateMesh.Slab(_nodes.Vertex, nodeIndex);
@@ -34,7 +39,8 @@ namespace Stevia {
                 var slabName = string.Format("Slab{0}", slabNum);
                 GameObject slab = new GameObject(slabName);
                 slab.AddComponent<MeshFilter>().mesh = meshObj;
-                slab.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
+                slab.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader"))
+                {
                     color = GetMemberColor(KindsStructure.RC, FrameType.Slab)
                 };
                 slab.transform.localPosition = new Vector3(0, (float)stbSlabs.Level[slabNum], 0);
@@ -46,7 +52,8 @@ namespace Stevia {
         /// <summary>
         /// 壁のオブジェクトの作成
         /// </summary>
-        void MakeWall(StbWalls stbWalls) {
+        void MakeWall(StbWalls stbWalls) 
+        {
             int wallNum = 0;
 
             GameObject walls = new GameObject("StbWalls");
@@ -54,7 +61,8 @@ namespace Stevia {
             walls.transform.parent = GameObject.Find("StbData").transform;
             wallBar.transform.parent = GameObject.Find("StbData").transform;
 
-            foreach (var NodeIds in stbWalls.NodeIdList) {
+            foreach (var NodeIds in stbWalls.NodeIdList)
+            {
                 int[] nodeIndex = new int[NodeIds.Count];
                 Mesh meshObj = new Mesh();
 
@@ -66,7 +74,8 @@ namespace Stevia {
                 var wallName = string.Format("Wall{0}", wallNum);
                 GameObject wall = new GameObject(wallName);
                 wall.AddComponent<MeshFilter>().mesh = meshObj;
-                wall.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
+                wall.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader"))
+                {
                     color = GetMemberColor(KindsStructure.RC, FrameType.Wall)
                 };
                 wall.transform.parent = walls.transform;
@@ -74,7 +83,8 @@ namespace Stevia {
             }
         }
 
-        void MakeFrame(List<StbFrame> stbFrames) {
+        void MakeFrame(List<StbFrame> stbFrames)
+        {
             Vector3 nodeStart, nodeEnd;
             float height = 0;
             float width = 0;
@@ -83,14 +93,15 @@ namespace Stevia {
             string shape = string.Empty;
             ShapeTypes shapeType = ShapeTypes.H;
 
-            foreach (var stbFrame in stbFrames) {
-
+            foreach (var stbFrame in stbFrames)
+            {
                 GameObject elements = new GameObject(stbFrame.Tag + "s");
                 GameObject barObj = new GameObject(stbFrame.Tag + "Bar");
                 elements.transform.parent = GameObject.Find("StbData").transform;
                 barObj.transform.parent = GameObject.Find("StbData").transform;
 
-                for (int eNum = 0; eNum < stbFrame.Id.Count; eNum++) {
+                for (int eNum = 0; eNum < stbFrame.Id.Count; eNum++) 
+                {
                     var idSection = stbFrame.IdSection[eNum];
                     var kind = stbFrame.KindStructure[eNum] ;
 
@@ -100,8 +111,10 @@ namespace Stevia {
                     nodeStart = _nodes.Vertex[nodeIndexStart];
                     nodeEnd = _nodes.Vertex[nodeIndexEnd];
 
-                    if (kind == KindsStructure.RC) {
-                        switch (stbFrame.FrameType) {
+                    if (kind == KindsStructure.RC)
+                    {
+                        switch (stbFrame.FrameType) 
+                        {
                             case FrameType.Column:
                             case FrameType.Post:
                                 secIndex = _secColumnRC.Id.IndexOf(idSection);
@@ -122,8 +135,10 @@ namespace Stevia {
                         else
                             shapeType = ShapeTypes.BOX;
                     }
-                    else if (kind == KindsStructure.S) {
-                        switch (stbFrame.FrameType) {
+                    else if (kind == KindsStructure.S)
+                    {
+                        switch (stbFrame.FrameType)
+                        {
                             case FrameType.Column:
                             case FrameType.Post:
                                 idShape = _secColumnS.Id.IndexOf(idSection);
@@ -149,9 +164,12 @@ namespace Stevia {
                     FrameVertex2Mesh(nodeStart, nodeEnd, height, width, shapeType, stbFrame.FrameType, eNum, elements, kind);
                     
                     // 配筋の作成
-                    if (kind == KindsStructure.RC) {
-                        if (shapeType == ShapeTypes.BOX) {
-                            switch (stbFrame.FrameType) {
+                    if (kind == KindsStructure.RC) 
+                    {
+                        if (shapeType == ShapeTypes.BOX)
+                        {
+                            switch (stbFrame.FrameType)
+                            {
                                 case FrameType.Column:
                                 case FrameType.Post:
                                     CreateBar.Column(secIndex, nodeStart, nodeEnd, width, height, barObj, eNum);
@@ -169,7 +187,8 @@ namespace Stevia {
             }
         }
 
-        public void FrameVertex2Mesh(Vector3 nodeStart, Vector3 nodeEnd, float hight, float width, ShapeTypes shapeType, FrameType FrameType, int eNum, GameObject elements, KindsStructure kind) {
+        public void FrameVertex2Mesh(Vector3 nodeStart, Vector3 nodeEnd, float hight, float width, ShapeTypes shapeType, FrameType FrameType, int eNum, GameObject elements, KindsStructure kind)
+        {
             Vector3[] vertexS = new Vector3[6];
             Vector3[] vertexE = new Vector3[6];
             Mesh meshObj = new Mesh();
@@ -181,7 +200,8 @@ namespace Stevia {
             float angleZ = -1f * Mathf.Atan2(dz, dx);
 
             // 梁は部材天端の中心が起点に対して、柱・ブレースは部材芯が起点なので場合分け
-            switch (FrameType) {
+            switch (FrameType)
+            {
                 case FrameType.Column:
                 case FrameType.Post:
                     vertexS = GetColumnVertex(nodeStart, width, hight, angleY);
@@ -198,7 +218,8 @@ namespace Stevia {
                     break;
                 default: break;
             }
-            switch (shapeType) {
+            switch (shapeType)
+            {
                 case ShapeTypes.H:
                     meshObj = CreateMesh.H(vertexS, vertexE); break;
                 case ShapeTypes.BOX:
@@ -213,13 +234,15 @@ namespace Stevia {
             string name = string.Format(FrameType + "{0}", eNum);
             GameObject element = new GameObject(name);
             element.AddComponent<MeshFilter>().mesh = meshObj;
-            element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader")) {
+            element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader"))
+            {
                 color = GetMemberColor(kind, FrameType)
             };
             element.transform.parent = elements.transform;
         }
 
-        Color GetMemberColor(KindsStructure kind, FrameType FrameType) {
+        Color GetMemberColor(KindsStructure kind, FrameType FrameType)
+        {
             Color unexpected = new Color(1, 0, 1, 1);
 
             if (kind == KindsStructure.RC) {
@@ -234,8 +257,10 @@ namespace Stevia {
                     default: return unexpected;
                 }
             }
-            else if (kind == KindsStructure.S) {
-                switch (FrameType) {
+            else if (kind == KindsStructure.S) 
+            {
+                switch (FrameType)
+                {
                     case FrameType.Column: return ColorInput._memberColor[6];
                     case FrameType.Post: return ColorInput._memberColor[7];
                     case FrameType.Girder: return ColorInput._memberColor[8];
@@ -247,7 +272,8 @@ namespace Stevia {
             else return unexpected;
         }
 
-        Vector3[] GetGirderVertex(Vector3 node, float width, float hight, float angle) {
+        Vector3[] GetGirderVertex(Vector3 node, float width, float hight, float angle)
+        {
             //  Y        3 - 4 - 5 
             //  ^        |   |   |  
             //  o >  X   0 - 1 - 2
@@ -277,7 +303,8 @@ namespace Stevia {
             return (vertex);
         }
 
-        Vector3[] GetColumnVertex(Vector3 node, float width, float hight, float angle) {
+        Vector3[] GetColumnVertex(Vector3 node, float width, float hight, float angle) 
+        {
             //  Y        3 - 4 - 5 
             //  ^        |   |   |  
             //  o >  X   0 - 1 - 2
@@ -310,7 +337,8 @@ namespace Stevia {
             return (vertex);
         }
 
-        Vector3[] GetBraceVertex(Vector3 node, float width, float hight, float angle) {
+        Vector3[] GetBraceVertex(Vector3 node, float width, float hight, float angle)
+        {
             //  Y        3 - 4 - 5 
             //  ^        |   |   |  
             //  o >  X   0 - 1 - 2

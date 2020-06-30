@@ -2,24 +2,28 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Stevia {
+namespace Stevia.Model 
+{
     /// <summary>
     /// Create mesh from given data
     /// </summary>
-    public class CreateMesh:MonoBehaviour {
+    public class CreateMesh:MonoBehaviour 
+    {
         /// <summary>
         /// Create slab mesh
         /// </summary>
         /// <param name="stbNodes"></param>
         /// <param name="nodeIndex"></param>
         /// <returns></returns>
-        public static Mesh Slab(List<Vector3> stbNodes, int[] nodeIndex) {
+        public static Mesh Slab(List<Vector3> stbNodes, int[] nodeIndex)
+        {
             List<Vector3> vertices = new List<Vector3>();
             List<int> triangles = new List<int>();
             Mesh meshObj = new Mesh();
             int meshNum;
 
-            for (int i = 0; i < nodeIndex.Length; i++) {
+            for (int i = 0; i < nodeIndex.Length; i++)
+            {
                 vertices.Add(stbNodes[nodeIndex[i]]);
             }
             if (nodeIndex.Length == 4)
@@ -40,7 +44,8 @@ namespace Stevia {
         /// <param name="vertexS"></param>
         /// <param name="vertexE"></param>
         /// <returns></returns>
-        public static Mesh H(Vector3[] vertexS, Vector3[] vertexE) {
+        public static Mesh H(Vector3[] vertexS, Vector3[] vertexE)
+        {
             List<Vector3> vertices = new List<Vector3>();
             List<int> triangles = new List<int>();
             Mesh meshObj = new Mesh();
@@ -63,7 +68,8 @@ namespace Stevia {
         /// <param name="vertexS"></param>
         /// <param name="vertexE"></param>
         /// <returns></returns>
-        public static Mesh BOX(Vector3[] vertexS, Vector3[] vertexE) {
+        public static Mesh BOX(Vector3[] vertexS, Vector3[] vertexE) 
+        {
             List<Vector3> vertices = new List<Vector3>();
             List<int> triangles = new List<int>();
             Mesh meshObj = new Mesh();
@@ -87,7 +93,8 @@ namespace Stevia {
         /// <param name="vertexS"></param>
         /// <param name="vertexE"></param>
         /// <returns></returns>
-        public static Mesh L(Vector3[] vertexS, Vector3[] vertexE) {
+        public static Mesh L(Vector3[] vertexS, Vector3[] vertexE)
+        {
             List<Vector3> vertices = new List<Vector3>();
             List<int> triangles = new List<int>();
             Mesh meshObj = new Mesh();
@@ -112,7 +119,8 @@ namespace Stevia {
         /// <param name="divNum">Divide count of circle</param>
         /// <param name="isCap">Boolean of with or without cap</param>
         /// <returns></returns>
-        public static Mesh Pipe(Vector3 startPoint, Vector3 endPoint, float radious, int divNum = 24, bool isCap = false) {
+        public static Mesh Pipe(Vector3 startPoint, Vector3 endPoint, float radious, int divNum = 24, bool isCap = false)
+        {
             List<Vector3> vertices = new List<Vector3>();
             List<int> triangles = new List<int>();
             Mesh meshObj = new Mesh();
@@ -127,7 +135,8 @@ namespace Stevia {
             float startX, startY, startZ;
             float endX, endY, endZ;
 
-            while (i < divNum) {
+            while (i < divNum)
+            {
                 startX = startPoint.x + radious * Mathf.Cos(baseAngle * i) * Mathf.Cos(angleX);
                 startY = startPoint.y + radious * (Mathf.Cos(baseAngle * i) * Mathf.Sin(angleX) + Mathf.Sin(baseAngle * i) * Mathf.Sin(angleZ));
                 startZ = startPoint.z + radious * Mathf.Sin(baseAngle * i) * Mathf.Cos(angleZ);
@@ -139,7 +148,8 @@ namespace Stevia {
                 vertices.Add(new Vector3(startX, startY, startZ));
                 vertices.Add(new Vector3(endX, endY, endZ));
 
-                if (i != divNum - 1) {
+                if (i != divNum - 1) 
+                {
                     triangles.Add(2 * i);
                     triangles.Add(2 * i + 1);
                     triangles.Add(2 * i + 2);
@@ -147,7 +157,8 @@ namespace Stevia {
                     triangles.Add(2 * i + 1);
                     triangles.Add(2 * i + 3);
                 }
-                else {
+                else 
+                {
                     triangles.Add(2 * i);
                     triangles.Add(2 * i + 1);
                     triangles.Add(0);
@@ -158,9 +169,11 @@ namespace Stevia {
                 i++;
             }
 
-            if (isCap) {
+            if (isCap)
+            {
                 i = 0;
-                while (i < divNum) {
+                while (i < divNum) 
+                {
                     startX = startPoint.x + radious * Mathf.Cos(baseAngle * i) * Mathf.Cos(angleX);
                     startY = startPoint.y + radious * (Mathf.Cos(baseAngle * i) * Mathf.Sin(angleX) + Mathf.Sin(baseAngle * i) * Mathf.Sin(angleZ));
                     startZ = startPoint.z + radious * Mathf.Sin(baseAngle * i) * Mathf.Cos(angleZ);
@@ -177,7 +190,8 @@ namespace Stevia {
                 vertices.Add(endPoint);
 
                 i = 0;
-                while (i < divNum - 1) {
+                while (i < divNum - 1)
+                {
                     triangles.Add(2 * divNum + 2 * divNum);
                     triangles.Add(2 * divNum + 2 * i);
                     triangles.Add(2 * divNum + 2 * i + 2);
@@ -203,15 +217,19 @@ namespace Stevia {
         /// <summary>
         /// Get triangles vertex infomation
         /// </summary>
-        static List<int> GetTriangles(int meshNum) {
+        static List<int> GetTriangles(int meshNum)
+        {
             List<int> triangles = new List<int>();
-            if (meshNum == 0) {
+            if (meshNum == 0)
+            {
                 triangles.Add(0);
                 triangles.Add(1);
                 triangles.Add(2);
             }
-            else {
-                for (int i = 1; i <= meshNum; ++i) {
+            else 
+            {
+                for (int i = 1; i <= meshNum; ++i) 
+                {
                     triangles.Add(4 * i - 4);
                     triangles.Add(4 * i - 3);
                     triangles.Add(4 * i - 2);
@@ -222,35 +240,40 @@ namespace Stevia {
             }
             return (triangles);
         }
-        static List<Vector3> AddUpperFlangeVertices(List<Vector3> vertices, Vector3[] vertexS, Vector3[] vertexE) {
+        static List<Vector3> AddUpperFlangeVertices(List<Vector3> vertices, Vector3[] vertexS, Vector3[] vertexE) 
+        {
             vertices.Add(vertexS[3]);
             vertices.Add(vertexS[5]);
             vertices.Add(vertexE[5]);
             vertices.Add(vertexE[3]);
             return (vertices);
         }
-        static List<Vector3> AddBottomFlangeVertices(List<Vector3> vertices, Vector3[] vertexS, Vector3[] vertexE) {
+        static List<Vector3> AddBottomFlangeVertices(List<Vector3> vertices, Vector3[] vertexS, Vector3[] vertexE)
+        {
             vertices.Add(vertexS[0]);
             vertices.Add(vertexS[2]);
             vertices.Add(vertexE[2]);
             vertices.Add(vertexE[0]);
             return (vertices);
         }
-        static List<Vector3> AddCenterWebVertices(List<Vector3> vertices, Vector3[] vertexS, Vector3[] vertexE) {
+        static List<Vector3> AddCenterWebVertices(List<Vector3> vertices, Vector3[] vertexS, Vector3[] vertexE) 
+        {
             vertices.Add(vertexS[4]);
             vertices.Add(vertexS[1]);
             vertices.Add(vertexE[1]);
             vertices.Add(vertexE[4]);
             return (vertices);
         }
-        static List<Vector3> AddSide1WebVertices(List<Vector3> vertices, Vector3[] vertexS, Vector3[] vertexE) {
+        static List<Vector3> AddSide1WebVertices(List<Vector3> vertices, Vector3[] vertexS, Vector3[] vertexE) 
+        {
             vertices.Add(vertexS[3]);
             vertices.Add(vertexS[0]);
             vertices.Add(vertexE[0]);
             vertices.Add(vertexE[3]);
             return (vertices);
         }
-        static List<Vector3> AddSide2WebVertices(List<Vector3> vertices, Vector3[] vertexS, Vector3[] vertexE) {
+        static List<Vector3> AddSide2WebVertices(List<Vector3> vertices, Vector3[] vertexS, Vector3[] vertexE)
+        {
             vertices.Add(vertexS[5]);
             vertices.Add(vertexS[2]);
             vertices.Add(vertexE[2]);
@@ -258,18 +281,21 @@ namespace Stevia {
             return (vertices);
         }
 
-        public static void Conbine(GameObject parent, Color meshColor, string shaderName) {
+        public static void Conbine(GameObject parent, Color meshColor, string shaderName) 
+        {
             MeshFilter[] meshFilters = parent.GetComponentsInChildren<MeshFilter>();
             CombineInstance[] combine = new CombineInstance[meshFilters.Length];
             int count = 0;
-            while (count < meshFilters.Length) {
+            while (count < meshFilters.Length) 
+            {
                 combine[count].mesh = meshFilters[count].sharedMesh;
                 combine[count].transform = meshFilters[count].transform.localToWorldMatrix;
                 meshFilters[count].gameObject.SetActive(false);
                 count++;
             }
             parent.AddComponent<MeshFilter>().mesh.CombineMeshes(combine);
-            parent.AddComponent<MeshRenderer>().material = new Material(Shader.Find(shaderName)) {
+            parent.AddComponent<MeshRenderer>().material = new Material(Shader.Find(shaderName))
+            {
                 color = meshColor
             };
             parent.transform.gameObject.SetActive(true);

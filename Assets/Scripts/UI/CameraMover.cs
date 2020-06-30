@@ -8,9 +8,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SocialPlatforms;
 
-namespace Stevia {
-
-    public class CameraMover:MonoBehaviour {
+namespace Stevia.UI
+{
+    public class CameraMover:MonoBehaviour 
+    {
         // WASD：前後左右の移動
         // QE：上昇・降下
         // 右ドラッグ：カメラの回転
@@ -40,18 +41,20 @@ namespace Stevia {
         //UIメッセージの表示
         bool _uiMessageActiv;
 
-        void Start() {
+        void Start()
+        {
             _camTransform = this.gameObject.transform;
 
             //初期回転の保存
             _initialCamRotation = this.gameObject.transform.rotation;
         }
 
-        void Update() {
-
+        void Update()
+        {
             CamControlIsActive(); //カメラ操作の有効無効
 
-            if (_cameraMoveActive) {
+            if (_cameraMoveActive)
+            {
                 ResetCameraRotation(); //回転角度のみリセット
                 CameraRotationMouseControl(); //カメラの回転 マウス
                 CameraSlideMouseControl(); //カメラの縦横移動 マウス
@@ -60,34 +63,40 @@ namespace Stevia {
         }
 
         //カメラ操作の有効無効
-        public void CamControlIsActive() {
-            if (Input.GetKeyDown(KeyCode.Space)) {
+        public void CamControlIsActive()
+        {
+            if (Input.GetKeyDown(KeyCode.Space)) 
+            {
                 _cameraMoveActive = !_cameraMoveActive;
 
-                if (_uiMessageActiv == false) {
+                if (_uiMessageActiv == false)
+                {
                     StartCoroutine(DisplayUiMessage());
                 }
-                Debug.Log("CamControl : " + _cameraMoveActive);
             }
         }
 
         //回転を初期状態にする
-        private void ResetCameraRotation() {
-            if (Input.GetKeyDown(KeyCode.P)) {
+        private void ResetCameraRotation() 
+        {
+            if (Input.GetKeyDown(KeyCode.P))
+            {
                 this.gameObject.transform.rotation = _initialCamRotation;
-                Debug.Log("Cam Rotate : " + _initialCamRotation.ToString());
             }
         }
 
         //カメラの回転 マウス
-        private void CameraRotationMouseControl() {
-            if (Input.GetMouseButtonDown(0)) {
+        private void CameraRotationMouseControl() 
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
                 _startMousePos = Input.mousePosition;
                 _presentCamRotation.x = _camTransform.transform.eulerAngles.x;
                 _presentCamRotation.y = _camTransform.transform.eulerAngles.y;
             }
 
-            if (Input.GetMouseButton(0)) {
+            if (Input.GetMouseButton(0)) 
+            {
                 //(移動開始座標 - マウスの現在座標) / 解像度 で正規化
                 float x = (_startMousePos.x - Input.mousePosition.x) / Screen.width;
                 float y = (_startMousePos.y - Input.mousePosition.y) / Screen.height;
@@ -101,13 +110,16 @@ namespace Stevia {
         }
 
         //カメラの移動 マウス
-        private void CameraSlideMouseControl() {
-            if (Input.GetMouseButtonDown(1)) {
+        private void CameraSlideMouseControl() 
+        {
+            if (Input.GetMouseButtonDown(1)) 
+            {
                 _startMousePos = Input.mousePosition;
                 _presentCamPos = _camTransform.position;
             }
 
-            if (Input.GetMouseButton(1)) {
+            if (Input.GetMouseButton(1)) 
+            {
                 //(移動開始座標 - マウスの現在座標) / 解像度 で正規化
                 float x = (_startMousePos.x - Input.mousePosition.x) / Screen.width;
                 float y = (_startMousePos.y - Input.mousePosition.y) / Screen.height;
@@ -122,40 +134,49 @@ namespace Stevia {
         }
 
         //カメラのローカル移動 キー
-        private void CameraPositionKeyControl() {
+        private void CameraPositionKeyControl()
+        {
             Vector3 campos = _camTransform.position;
 
-            if (Input.GetKey(KeyCode.D)) { campos += _camTransform.right * Time.deltaTime * _positionStep; }
-            if (Input.GetKey(KeyCode.A)) { campos -= _camTransform.right * Time.deltaTime * _positionStep; }
-            if (Input.GetKey(KeyCode.E)) { campos += _camTransform.up * Time.deltaTime * _positionStep; }
-            if (Input.GetKey(KeyCode.Q)) { campos -= _camTransform.up * Time.deltaTime * _positionStep; }
-            if (Input.GetKey(KeyCode.W)) { campos += _camTransform.forward * Time.deltaTime * _positionStep; }
-            if (Input.GetKey(KeyCode.S)) { campos -= _camTransform.forward * Time.deltaTime * _positionStep; }
+            if (Input.GetKey(KeyCode.D))
+                campos += _camTransform.right * Time.deltaTime * _positionStep;
+            if (Input.GetKey(KeyCode.A))
+                campos -= _camTransform.right * Time.deltaTime * _positionStep;
+            if (Input.GetKey(KeyCode.E))
+                campos += _camTransform.up * Time.deltaTime * _positionStep;
+            if (Input.GetKey(KeyCode.Q))
+                campos -= _camTransform.up * Time.deltaTime * _positionStep;
+            if (Input.GetKey(KeyCode.W))
+                campos += _camTransform.forward * Time.deltaTime * _positionStep;
+            if (Input.GetKey(KeyCode.S))
+                campos -= _camTransform.forward * Time.deltaTime * _positionStep;
 
             _camTransform.position = campos;
         }
 
         //UIメッセージの表示
-        private IEnumerator DisplayUiMessage() {
+        private IEnumerator DisplayUiMessage()
+        {
             _uiMessageActiv = true;
             float time = 0;
-            while (time < 2) {
+            while (time < 2) 
+            {
                 time = time + Time.deltaTime;
                 yield return null;
             }
             _uiMessageActiv = false;
         }
 
-        void OnGUI() {
-            if (_uiMessageActiv == false) { return; }
+        void OnGUI()
+        {
+            if (_uiMessageActiv == false)
+                return;
             GUI.color = Color.black;
-            if (_cameraMoveActive == true) {
+            if (_cameraMoveActive == true)
                 GUI.Label(new Rect(Screen.width / 2 - 50, Screen.height - 30, 100, 20), "カメラ操作 有効");
-            }
 
-            if (_cameraMoveActive == false) {
+            if (_cameraMoveActive == false)
                 GUI.Label(new Rect(Screen.width / 2 - 50, Screen.height - 30, 100, 20), "カメラ操作 無効");
-            }
         }
     }
 }

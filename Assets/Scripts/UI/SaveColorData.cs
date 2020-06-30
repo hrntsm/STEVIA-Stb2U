@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Stevia {
-
-    public class SaveColorData:MonoBehaviour {
+namespace Stevia.UI
+{
+    public class SaveColorData:MonoBehaviour 
+    {
         public const string _SaveKey = "UserColorData";
 
-        public void Save() {
+        public void Save()
+        {
             string json = JsonUtility.ToJson(ColorInput._saveColor);
             print(json);
             PlayerPrefs.SetString(_SaveKey, json);
@@ -15,7 +17,8 @@ namespace Stevia {
     }
 
     [System.Serializable]
-    public class SaveColor {
+    public class SaveColor 
+    {
         public int[] num = new int[11];
         public string[] rgba = new string[11];
         public string[] kind = { "RC", "RC", "RC", "RC", "RC", "RC", "S", "S", "S", "S", "S" };

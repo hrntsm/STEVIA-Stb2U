@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+
 using SFB;
 
 using UnityEngine;
@@ -10,11 +13,13 @@ using Stevia.STB;
 using Stevia.STB.Model;
 using Stevia.STB.Model.Member;
 using Stevia.STB.Model.Section;
+using Stevia.UI;
 
 
-namespace Stevia {
-
-    public partial class STBReader:MonoBehaviour {
+namespace Stevia.Model
+{
+    public partial class STBReader:MonoBehaviour
+    {
         [SerializeField]
         Material _material;
         [SerializeField]
@@ -36,7 +41,8 @@ namespace Stevia {
         public static StbSecBraceS _secBraceS;
         public static StbSecSteel _stbSecSteel;
 
-        void Start() {
+        void Start()
+        {
             XDocument xDoc = GetStbFileData();
 
             // 2回以上の起動を想定してここで初期化して各データを読み込み
@@ -44,28 +50,26 @@ namespace Stevia {
             Load(xDoc);
 
             // VRモードの場合、ドロップダウンリストに階情報を追加
-            if (SceneManager.GetActiveScene().name == "Stb2U4VR") {
-                foreach (var name in _storys.Name) {
+            if (SceneManager.GetActiveScene().name == "Stb2U4VR")
+            {
+                foreach (var name in _storys.Name)
+                {
                     _dropdown.options.Add(new Dropdown.OptionData { text = "階：" + name + " へ移動" });
                 }
                 _dropdown.RefreshShownValue();
             }
 
             // meshの生成
-            MakeSlab(_slabs);
-            MakeWall(_walls);
-
-            List<StbFrame> stbFrames = new List<StbFrame>() {
-                _columns, _posts, _girders, _beams, _braces
-            };
-            MakeFrame(stbFrames);
+            MakeMesh();
 
             // 配筋表示は最初はオフにする
             DisplySettings.BarOff();
         }
 
-        XDocument GetStbFileData() {
-            var extensions = new[] {
+        XDocument GetStbFileData() 
+        {
+            var extensions = new[]
+            {
                 new ExtensionFilter("ST-Bridge Files", "stb", "STB" ),
                 new ExtensionFilter("All Files", "*" ),
             };
@@ -74,7 +78,8 @@ namespace Stevia {
             return (xDoc);
         }
 
-        void Init() {
+        void Init() 
+        {
             _nodes = new StbNodes();
             _storys = new StbStorys();
             _columns = new StbColumns();
@@ -92,16 +97,30 @@ namespace Stevia {
             _stbSecSteel = new StbSecSteel();
         }
 
-        void Load(XDocument xDoc) {
-            var members = new List<StbData>() {
+        void Load(XDocument xDoc)
+        {
+            var members = new List<StbData>()
+            {
                 _nodes, _storys,
                 _columns, _posts, _girders, _beams, _braces, _slabs, _walls,
                 _secColumnRC, _secColumnS, _secBeamRC, _secBeamS, _secBraceS, _stbSecSteel
             };
 
-            foreach (var member in members) {
+            foreach (var member in members)
+            {
                 member.Load(xDoc);
             }
+        }
+
+        void MakeMesh() {
+            List<StbFrame> stbFrames = new List<StbFrame>()
+            {
+                _columns, _posts, _girders, _beams, _braces
+            };
+
+            MakeSlab(_slabs);
+            MakeWall(_walls);
+            MakeFrame(stbFrames);
         }
     }
 }

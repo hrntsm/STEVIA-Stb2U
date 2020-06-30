@@ -8,24 +8,27 @@ using SFB;
 using RootMotion.FinalIK;
 using AniLipSync.VRM;
 
-namespace Stevia.VR {
-
-    public class VRMRuntimeLoader:MonoBehaviour {
+namespace Stevia.VR
+{
+    public class VRMRuntimeLoader:MonoBehaviour
+    {
         GameObject _model;
 
-        void Start() {
+        void Start()
+        {
             LoadVRM();
         }
 
-        void LoadVRM() {
-            var extensions = new[] {
+        void LoadVRM() 
+        {
+            var extensions = new[]
+            {
                 new ExtensionFilter("VRM Files", "vrm", "VRM" ),
                 new ExtensionFilter("All Files", "*" ),
             };
             string path = StandaloneFileBrowser.OpenFilePanel("Open VRM", "", extensions, true)[0];
-            if (string.IsNullOrEmpty(path)) {
+            if (string.IsNullOrEmpty(path))
                 return;
-            }
 
             var bytes = File.ReadAllBytes(path);
             // なんらかの方法でByte列を得た
@@ -44,10 +47,10 @@ namespace Stevia.VR {
             context.LoadAsync(() => OnLoaded(context));
         }
 
-        void OnLoaded(VRMImporterContext context) {
-            if (_model != null) {
+        void OnLoaded(VRMImporterContext context)
+        {
+            if (_model != null)
                 GameObject.Destroy(_model.gameObject);
-            }
 
             _model = context.Root;
             _model.transform.position = new Vector3(-10, 0, 0);
@@ -85,7 +88,8 @@ namespace Stevia.VR {
             _model.AddComponent<VRM.Blinker>();
         }
 
-        void ShowMetaInfo(VRMMetaObject meta) {
+        void ShowMetaInfo(VRMMetaObject meta)
+        {
             var uiObject = GameObject.Find("VRM meta");
 
             #region Model Infomation

@@ -1,12 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Stevia.Model;
 using UnityEngine;
 using UnityEngine.UI;
 using Valve.VR;
 
-namespace Stevia.VR {
-
-    public class ToUpperFloor:MonoBehaviour {
+namespace Stevia.VR
+{
+    public class ToUpperFloor:MonoBehaviour
+    {
         [SerializeField]
         GameObject _gameObject;
         
@@ -18,19 +20,21 @@ namespace Stevia.VR {
         SteamVR_Input_Sources _srcAny = SteamVR_Input_Sources.Any;
         SteamVR_Action_Boolean _actionBoolean;
 
-        void Start() {
+        void Start() 
+        {
             _actionBoolean = SteamVR_Actions._default.InteractUI;
         }
 
-        private void Update() {
+        private void Update()
+        {
             _isClicked = _actionBoolean.GetState(_srcAny);
         }
 
-        private void OnTriggerEnter(Collider other) {
+        private void OnTriggerEnter(Collider other)
+        {
             int floorNum = _gameObject.GetComponent<Dropdown>().value;
-            if (_isClicked && floorNum < STBReader._storys.Height.Count - 1) {
+            if (_isClicked && floorNum < STBReader._storys.Height.Count - 1)
                 _gameObject.GetComponent<Dropdown>().value += 1;
-            }
         }
     }
 }

@@ -4,23 +4,26 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-namespace Stevia {
-
-    public class DisplySettings:MonoBehaviour {
-
+namespace Stevia.UI
+{
+    public class DisplySettings:MonoBehaviour
+    {
         Toggle _toggle;
         GameObject _dispObject;
         string _findName = "";
         bool _hasObj = false;
         Animator _animMenu;
 
-        void Start() {
+        void Start() 
+        {
             _toggle = GetComponent<Toggle>();
             _animMenu = gameObject.GetComponent<Animator>();
         }
 
-        public void ElementDisp(int index) {
-            switch (index) {
+        public void ElementDisp(int index) 
+        {
+            switch (index)
+            {
                 case 0: _findName = "StbColumns"; break;
                 case 1: _findName = "StbColumnBar"; break;
                 case 2: _findName = "StbGirders"; break;
@@ -35,7 +38,8 @@ namespace Stevia {
                 case 11: _findName = "StbSlabBar"; break;
                 default: break;
             }
-            if (_hasObj == false) {
+            if (_hasObj == false) 
+            {
                 var stbData = GameObject.Find("StbData");
                 _dispObject = stbData.transform.Find(_findName).gameObject;
                 _hasObj = true;
@@ -43,10 +47,13 @@ namespace Stevia {
             _dispObject.SetActive(_toggle.isOn);
         }
 
-        public static void BarOff() {
+        public static void BarOff()
+        {
             string name;
-            for (int index = 0; index < 6; index++) {
-                switch (index) {
+            for (int index = 0; index < 6; index++) 
+            {
+                switch (index) 
+                {
                     case 0: name = "StbColumnBar"; break;
                     case 1: name = "StbGirderBar"; break;
                     case 2: name = "StbPostBar"; break;
@@ -61,7 +68,8 @@ namespace Stevia {
             }
         }
 
-        public void Hamburger() {
+        public void Hamburger() 
+        {
             if (_animMenu.GetInteger("MenuOpen") == 0)
                 _animMenu.SetInteger("MenuOpen", 1);
             else
