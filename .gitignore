@@ -10,6 +10,7 @@
 
 # Visual Studio cache directory
 .vs/
+.idea/
 
 # Gradle cache directory
 .gradle/
@@ -58,6 +59,7 @@ Assets/VRM/
 Assets/_TerrainAutoUpgrade/
 Assets/StreamingAssets/
 Assets/ExternalPlugins/
+!Assets/ExternalPlugins/StbReader
 /Archive/
 sky5X.meta
 Standard Assets.meta

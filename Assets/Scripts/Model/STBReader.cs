@@ -20,10 +20,8 @@ namespace Stevia.Model
 {
     public partial class STBReader:MonoBehaviour
     {
-        [SerializeField]
-        Material _material;
-        [SerializeField]
-        Dropdown _dropdown;
+        [SerializeField] Material _material;
+        [SerializeField] Dropdown _dropdown;
 
         public static StbNodes _nodes;
         public static StbStorys _storys;
@@ -50,7 +48,7 @@ namespace Stevia.Model
             Load(xDoc);
 
             // VRモードの場合、ドロップダウンリストに階情報を追加
-            if (SceneManager.GetActiveScene().name == "Stb2U4VR")
+            if (SceneManager.GetActiveScene().name == "SteviaVR")
             {
                 foreach (var name in _storys.Name)
                 {

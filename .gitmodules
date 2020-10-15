@@ -1,0 +1,3 @@
+[submodule "Assets/ExternalPlugins/StbReader"]
+	path = Assets/ExternalPlugins/StbReader
+	url = https://github.com/hrntsm/STBReader
