@@ -1761,8 +1761,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f27fb5086a843064491e47c3042c56f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _positionStep: 10
-  _mouseSensitive: 90
+  positionStep: 7
+  mouseSensitive: 90
 --- !u!45 &534669907
 Skybox:
   m_ObjectHideFlags: 0
@@ -5983,8 +5983,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84e2fde1d281b9d459e969aac8318f61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _material: {fileID: 2100000, guid: d2e69c6d641bcf3468f427589e480c1e, type: 2}
-  _dropdown: {fileID: 0}
+  material: {fileID: 0}
+  dropdown: {fileID: 0}
 --- !u!4 &1921808707
 Transform:
   m_ObjectHideFlags: 0

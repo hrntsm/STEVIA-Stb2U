@@ -1,43 +1,39 @@
-﻿using System.Collections.Generic;
-using System.Xml.Linq;
-using System;
-using System.Threading.Tasks;
-using UnityEngine;
-
+﻿using System;
+using System.Collections.Generic;
 using Stevia.STB.Model;
 using Stevia.STB.Model.Member;
 using Stevia.STB.Model.Section;
-using Stevia.UI;
+using UI;
+using UnityEngine;
 
-namespace Stevia.Model
+namespace Model
 {
-    public partial class STBReader:MonoBehaviour
+    public partial class StbReader
     {
         /// <summary>
         /// スラブのオブジェクトの作成
         /// </summary>
-        void MakeSlab(StbSlabs stbSlabs)
+        private void MakeSlab(StbSlabs stbSlabs)
         {
-            int slabNum = 0;
+            var slabNum = 0;
 
-            GameObject slabs = new GameObject("StbSlabs");
-            GameObject slabBar = new GameObject("StbSlabBar");
+            var slabs = new GameObject("StbSlabs");
+            var slabBar = new GameObject("StbSlabBar");
             slabs.transform.parent = GameObject.Find("StbData").transform;
             slabBar.transform.parent = GameObject.Find("StbData").transform;
 
-            foreach (var NodeIds in stbSlabs.NodeIdList)
+            foreach (List<int> nodeIds in stbSlabs.NodeIdList)
             {
-                int[] nodeIndex = new int[NodeIds.Count];
-                Mesh meshObj = new Mesh();
+                var nodeIndex = new int[nodeIds.Count];
 
-                for (int i = 0; i < NodeIds.Count; i++)
+                for (var i = 0; i < nodeIds.Count; i++)
                 {
-                    nodeIndex[i] = _nodes.Id.IndexOf(NodeIds[i]);
+                    nodeIndex[i] = StbReader.Nodes.Id.IndexOf(nodeIds[i]);
                 }
-                meshObj = CreateMesh.Slab(_nodes.Vertex, nodeIndex);
+                Mesh meshObj = CreateMesh.Slab(StbReader.Nodes.Vertex, nodeIndex);
 
-                var slabName = string.Format("Slab{0}", slabNum);
-                GameObject slab = new GameObject(slabName);
+                var slabName = $"Slab{slabNum}";
+                var slab = new GameObject(slabName);
                 slab.AddComponent<MeshFilter>().mesh = meshObj;
                 slab.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader"))
                 {
@@ -52,27 +48,27 @@ namespace Stevia.Model
         /// <summary>
         /// 壁のオブジェクトの作成
         /// </summary>
-        void MakeWall(StbWalls stbWalls) 
+        private void MakeWall(StbWalls stbWalls) 
         {
-            int wallNum = 0;
+            var wallNum = 0;
 
-            GameObject walls = new GameObject("StbWalls");
-            GameObject wallBar = new GameObject("StbWallBar");
+            var walls = new GameObject("StbWalls");
+            var wallBar = new GameObject("StbWallBar");
             walls.transform.parent = GameObject.Find("StbData").transform;
             wallBar.transform.parent = GameObject.Find("StbData").transform;
 
-            foreach (var NodeIds in stbWalls.NodeIdList)
+            foreach (List<int> nodeIds in stbWalls.NodeIdList)
             {
-                int[] nodeIndex = new int[NodeIds.Count];
-                Mesh meshObj = new Mesh();
+                var nodeIndex = new int[nodeIds.Count];
 
-                for (int i = 0; i < NodeIds.Count; i++) {
-                    nodeIndex[i] = _nodes.Id.IndexOf(NodeIds[i]);
+                for (var i = 0; i < nodeIds.Count; i++)
+                {
+                    nodeIndex[i] = StbReader.Nodes.Id.IndexOf(nodeIds[i]);
                 }
-                meshObj = CreateMesh.Slab(_nodes.Vertex, nodeIndex);
+                Mesh meshObj = CreateMesh.Slab(StbReader.Nodes.Vertex, nodeIndex);
 
-                var wallName = string.Format("Wall{0}", wallNum);
-                GameObject wall = new GameObject(wallName);
+                var wallName = $"Wall{wallNum}";
+                var wall = new GameObject(wallName);
                 wall.AddComponent<MeshFilter>().mesh = meshObj;
                 wall.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader"))
                 {
@@ -83,115 +79,138 @@ namespace Stevia.Model
             }
         }
 
-        void MakeFrame(List<StbFrame> stbFrames)
+        private void MakeFrame(IEnumerable<StbFrame> stbFrames)
         {
-            Vector3 nodeStart, nodeEnd;
-            float height = 0;
-            float width = 0;
-            int secIndex = 0;
-            int nodeIndexStart, nodeIndexEnd, idShape;
-            string shape = string.Empty;
-            ShapeTypes shapeType = ShapeTypes.H;
+            var height = 0f;
+            var width = 0f;
+            var secIndex = 0;
+            var shape = string.Empty;
+            var shapeType = ShapeTypes.H;
 
-            foreach (var stbFrame in stbFrames)
+            foreach (StbFrame stbFrame in stbFrames)
             {
-                GameObject elements = new GameObject(stbFrame.Tag + "s");
-                GameObject barObj = new GameObject(stbFrame.Tag + "Bar");
+                var elements = new GameObject(stbFrame.Tag + "s");
+                var barObj = new GameObject(stbFrame.Tag + "Bar");
                 elements.transform.parent = GameObject.Find("StbData").transform;
                 barObj.transform.parent = GameObject.Find("StbData").transform;
 
-                for (int eNum = 0; eNum < stbFrame.Id.Count; eNum++) 
+                for (var eNum = 0; eNum < stbFrame.Id.Count; eNum++) 
                 {
-                    var idSection = stbFrame.IdSection[eNum];
-                    var kind = stbFrame.KindStructure[eNum] ;
+                    int idSection = stbFrame.IdSection[eNum];
+                    KindsStructure kind = stbFrame.KindStructure[eNum] ;
 
                     // 始点と終点の座標取得
-                    nodeIndexStart = _nodes.Id.IndexOf(stbFrame.IdNodeStart[eNum]);
-                    nodeIndexEnd = _nodes.Id.IndexOf(stbFrame.IdNodeEnd[eNum]);
-                    nodeStart = _nodes.Vertex[nodeIndexStart];
-                    nodeEnd = _nodes.Vertex[nodeIndexEnd];
+                    int nodeIndexStart = StbReader.Nodes.Id.IndexOf(stbFrame.IdNodeStart[eNum]);
+                    int nodeIndexEnd = StbReader.Nodes.Id.IndexOf(stbFrame.IdNodeEnd[eNum]);
+                    Vector3 nodeStart = StbReader.Nodes.Vertex[nodeIndexStart];
+                    Vector3 nodeEnd = StbReader.Nodes.Vertex[nodeIndexEnd];
 
-                    if (kind == KindsStructure.RC)
+                    switch (kind)
                     {
-                        switch (stbFrame.FrameType) 
+                        case KindsStructure.RC:
                         {
-                            case FrameType.Column:
-                            case FrameType.Post:
-                                secIndex = _secColumnRC.Id.IndexOf(idSection);
-                                height = _secColumnRC.Height[secIndex];
-                                width = _secColumnRC.Width[secIndex];
-                                break;
-                            case FrameType.Girder:
-                            case FrameType.Beam:
-                                secIndex = _secBeamRC.Id.IndexOf(idSection);
-                                height = _secBeamRC.Depth[secIndex];
-                                width = _secBeamRC.Width[secIndex];
-                                break;
-                            default:
-                                break;
+                            switch (stbFrame.FrameType) 
+                            {
+                                case FrameType.Column:
+                                case FrameType.Post:
+                                    secIndex = StbReader.SecColumnRc.Id.IndexOf(idSection);
+                                    height = StbReader.SecColumnRc.Height[secIndex];
+                                    width = StbReader.SecColumnRc.Width[secIndex];
+                                    break;
+                                case FrameType.Girder:
+                                case FrameType.Beam:
+                                    secIndex = StbReader.SecBeamRc.Id.IndexOf(idSection);
+                                    height = StbReader.SecBeamRc.Depth[secIndex];
+                                    width = StbReader.SecBeamRc.Width[secIndex];
+                                    break;
+                                case FrameType.Brace:
+                                    break;
+                                case FrameType.Slab:
+                                    break;
+                                case FrameType.Wall:
+                                    break;
+                                case FrameType.Any:
+                                    break;
+                            }
+                            shapeType = height == 0 ? ShapeTypes.Pipe : ShapeTypes.BOX;
+                            break;
                         }
-                        if (height == 0)
-                            shapeType = ShapeTypes.Pipe;
-                        else
-                            shapeType = ShapeTypes.BOX;
+                        case KindsStructure.S:
+                        {
+                            int idShape;
+                            switch (stbFrame.FrameType)
+                            {
+                                case FrameType.Column:
+                                case FrameType.Post:
+                                    idShape = StbReader.SecColumnS.Id.IndexOf(idSection);
+                                    shape = StbReader.SecColumnS.Shape[idShape];
+                                    break;
+                                case FrameType.Girder:
+                                case FrameType.Beam:
+                                    idShape = StbReader.SecBeamS.Id.IndexOf(idSection);
+                                    shape = StbReader.SecBeamS.Shape[idShape];
+                                    break;
+                                case FrameType.Brace:
+                                    idShape = StbReader.SecBraceS.Id.IndexOf(idSection);
+                                    shape = StbReader.SecBraceS.Shape[idShape];
+                                    break;
+                                case FrameType.Slab:
+                                    break;
+                                case FrameType.Wall:
+                                    break;
+                                case FrameType.Any:
+                                    break;
+                            }
+                            secIndex = StbReader.StbSecSteel.Name.IndexOf(shape);
+                            height = StbReader.StbSecSteel.A[secIndex] / 1000f;
+                            width = StbReader.StbSecSteel.B[secIndex] / 1000f;
+                            shapeType = StbReader.StbSecSteel.ShapeType[secIndex];
+                            break;
+                        }
+                        case KindsStructure.SRC:
+                            break;
+                        case KindsStructure.CFT:
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
                     }
-                    else if (kind == KindsStructure.S)
+                    FrameVertex2Mesh(nodeStart, nodeEnd, height, width, shapeType, stbFrame.FrameType, eNum, elements, kind);
+                    
+                    // 配筋の作成
+                    if (kind != KindsStructure.RC)
+                        continue;
+                    if (shapeType == ShapeTypes.BOX)
                     {
                         switch (stbFrame.FrameType)
                         {
                             case FrameType.Column:
                             case FrameType.Post:
-                                idShape = _secColumnS.Id.IndexOf(idSection);
-                                shape = _secColumnS.Shape[idShape];
+                                CreateBar.Column(secIndex, nodeStart, nodeEnd, width, height, barObj, eNum);
                                 break;
                             case FrameType.Girder:
                             case FrameType.Beam:
-                                idShape = _secBeamS.Id.IndexOf(idSection);
-                                shape = _secBeamS.Shape[idShape];
+                                CreateBar.Beam(secIndex, nodeStart, nodeEnd, width, height, barObj, eNum);
                                 break;
                             case FrameType.Brace:
-                                idShape = _secBraceS.Id.IndexOf(idSection);
-                                shape = _secBraceS.Shape[idShape];
                                 break;
-                            default:
+                            case FrameType.Slab:
                                 break;
-                        }
-                        secIndex = _stbSecSteel.Name.IndexOf(shape);
-                        height = _stbSecSteel.A[secIndex] / 1000f;
-                        width = _stbSecSteel.B[secIndex] / 1000f;
-                        shapeType = _stbSecSteel.ShapeType[secIndex];
-                    }
-                    FrameVertex2Mesh(nodeStart, nodeEnd, height, width, shapeType, stbFrame.FrameType, eNum, elements, kind);
-                    
-                    // 配筋の作成
-                    if (kind == KindsStructure.RC) 
-                    {
-                        if (shapeType == ShapeTypes.BOX)
-                        {
-                            switch (stbFrame.FrameType)
-                            {
-                                case FrameType.Column:
-                                case FrameType.Post:
-                                    CreateBar.Column(secIndex, nodeStart, nodeEnd, width, height, barObj, eNum);
-                                    break;
-                                case FrameType.Girder:
-                                case FrameType.Beam:
-                                    CreateBar.Beam(secIndex, nodeStart, nodeEnd, width, height, barObj, eNum);
-                                    break;
-                                default:
-                                    break;
-                            }
+                            case FrameType.Wall:
+                                break;
+                            case FrameType.Any:
+                                break;
                         }
                     }
                 }
             }
         }
 
-        public void FrameVertex2Mesh(Vector3 nodeStart, Vector3 nodeEnd, float hight, float width, ShapeTypes shapeType, FrameType FrameType, int eNum, GameObject elements, KindsStructure kind)
+        private void FrameVertex2Mesh(Vector3 nodeStart, Vector3 nodeEnd, float height, float width, ShapeTypes shapeType,
+                                      FrameType frameType, int eNum, GameObject elements, KindsStructure kind)
         {
-            Vector3[] vertexS = new Vector3[6];
-            Vector3[] vertexE = new Vector3[6];
-            Mesh meshObj = new Mesh();
+            var vertexS = new Vector3[6];
+            var vertexE = new Vector3[6];
+            var meshObj = new Mesh();
 
             float dx = nodeEnd.x - nodeStart.x;
             float dy = nodeEnd.y - nodeStart.y;
@@ -200,95 +219,122 @@ namespace Stevia.Model
             float angleZ = -1f * Mathf.Atan2(dz, dx);
 
             // 梁は部材天端の中心が起点に対して、柱・ブレースは部材芯が起点なので場合分け
-            switch (FrameType)
+            switch (frameType)
             {
                 case FrameType.Column:
                 case FrameType.Post:
-                    vertexS = GetColumnVertex(nodeStart, width, hight, angleY);
-                    vertexE = GetColumnVertex(nodeEnd, width, hight, angleY);
+                    vertexS = GetColumnVertex(nodeStart, width, height, angleY);
+                    vertexE = GetColumnVertex(nodeEnd, width, height, angleY);
                     break;
                 case FrameType.Girder:
                 case FrameType.Beam:
-                    vertexS = GetGirderVertex(nodeStart, width, hight, angleZ);
-                    vertexE = GetGirderVertex(nodeEnd, width, hight, angleZ);
+                    vertexS = GetGirderVertex(nodeStart, width, height, angleZ);
+                    vertexE = GetGirderVertex(nodeEnd, width, height, angleZ);
                     break;
                 case FrameType.Brace:
-                    vertexS = GetBraceVertex(nodeStart, width, hight, angleZ);
-                    vertexE = GetBraceVertex(nodeEnd, width, hight, angleZ);
+                    vertexS = GetBraceVertex(nodeStart, width, height, angleZ);
+                    vertexE = GetBraceVertex(nodeEnd, width, height, angleZ);
                     break;
-                default: break;
+                case FrameType.Slab:
+                    break;
+                case FrameType.Wall:
+                    break;
+                case FrameType.Any:
+                    break;
             }
             switch (shapeType)
             {
                 case ShapeTypes.H:
                     meshObj = CreateMesh.H(vertexS, vertexE); break;
                 case ShapeTypes.BOX:
-                    meshObj = CreateMesh.BOX(vertexS, vertexE); break;
+                    meshObj = CreateMesh.Box(vertexS, vertexE); break;
                 case ShapeTypes.Pipe:
                     meshObj = CreateMesh.Pipe(nodeStart, nodeEnd, width / 2); break;
                 case ShapeTypes.L:
                     meshObj = CreateMesh.L(vertexS, vertexE); break;
-                default: break;
+                case ShapeTypes.T:
+                    break;
+                case ShapeTypes.C:
+                    break;
+                case ShapeTypes.FB:
+                    break;
+                case ShapeTypes.Bar:
+                    break;
             }
 
-            string name = string.Format(FrameType + "{0}", eNum);
-            GameObject element = new GameObject(name);
+            string elemName = string.Format(frameType + "{0}", eNum);
+            var element = new GameObject(elemName);
             element.AddComponent<MeshFilter>().mesh = meshObj;
             element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Custom/CulloffSurfaceShader"))
             {
-                color = GetMemberColor(kind, FrameType)
+                color = GetMemberColor(kind, frameType)
             };
             element.transform.parent = elements.transform;
         }
 
-        Color GetMemberColor(KindsStructure kind, FrameType FrameType)
+        private static Color GetMemberColor(KindsStructure kind, FrameType frameType)
         {
-            Color unexpected = new Color(1, 0, 1, 1);
+            var unexpected = new Color(1, 0, 1, 1);
 
-            if (kind == KindsStructure.RC) {
-                switch (FrameType) {
-                    case FrameType.Column: return ColorInput._memberColor[0];
-                    case FrameType.Post: return ColorInput._memberColor[1];
-                    case FrameType.Girder: return ColorInput._memberColor[2];
-                    case FrameType.Beam: return ColorInput._memberColor[3];
-                    case FrameType.Brace: return ColorInput._memberColor[4];
-                    case FrameType.Slab: return ColorInput._memberColor[5];
-                    case FrameType.Wall: return ColorInput._memberColor[5];
-                    default: return unexpected;
-                }
-            }
-            else if (kind == KindsStructure.S) 
+            switch (kind)
             {
-                switch (FrameType)
-                {
-                    case FrameType.Column: return ColorInput._memberColor[6];
-                    case FrameType.Post: return ColorInput._memberColor[7];
-                    case FrameType.Girder: return ColorInput._memberColor[8];
-                    case FrameType.Beam: return ColorInput._memberColor[9];
-                    case FrameType.Brace: return ColorInput._memberColor[10];
-                    default: return unexpected;
-                }
+                case KindsStructure.RC:
+                    switch (frameType) {
+                        case FrameType.Column:
+                            return ColorInput.MemberColor[0];
+                        case FrameType.Post:
+                            return ColorInput.MemberColor[1];
+                        case FrameType.Girder:
+                            return ColorInput.MemberColor[2];
+                        case FrameType.Beam:
+                            return ColorInput.MemberColor[3];
+                        case FrameType.Brace:
+                            return ColorInput.MemberColor[4];
+                        case FrameType.Slab:
+                            return ColorInput.MemberColor[5];
+                        case FrameType.Wall:
+                            return ColorInput.MemberColor[5];
+                        default:
+                            return unexpected;
+                    }
+                case KindsStructure.S:
+                    switch (frameType)
+                    {
+                        case FrameType.Column:
+                            return ColorInput.MemberColor[6];
+                        case FrameType.Post:
+                            return ColorInput.MemberColor[7];
+                        case FrameType.Girder:
+                            return ColorInput.MemberColor[8];
+                        case FrameType.Beam: 
+                            return ColorInput.MemberColor[9];
+                        case FrameType.Brace:
+                            return ColorInput.MemberColor[10];
+                        default:
+                            return unexpected;
+                    }
+                default:
+                    return unexpected;
             }
-            else return unexpected;
         }
 
-        Vector3[] GetGirderVertex(Vector3 node, float width, float hight, float angle)
+        private static Vector3[] GetGirderVertex(Vector3 node, float width, float height, float angle)
         {
             //  Y        3 - 4 - 5 
             //  ^        |   |   |  
             //  o >  X   0 - 1 - 2
-            Vector3[] vertex = new Vector3[6];
+            var vertex = new Vector3[6];
 
             vertex[0] = new Vector3(node.x + width / 2 * (float)Math.Sin(angle),
-                                    node.y - hight,
+                                    node.y - height,
                                     node.z + width / 2 * (float)Math.Cos(angle)
                                     );
             vertex[1] = new Vector3(node.x,
-                                    node.y - hight,
+                                    node.y - height,
                                     node.z
                                     );
             vertex[2] = new Vector3(node.x - width / 2 * (float)Math.Sin(angle),
-                                    node.y - hight,
+                                    node.y - height,
                                     node.z - width / 2 * (float)Math.Cos(angle)
                                     );
             vertex[3] = new Vector3(node.x + width / 2 * (float)Math.Sin(angle),
@@ -303,7 +349,7 @@ namespace Stevia.Model
             return (vertex);
         }
 
-        Vector3[] GetColumnVertex(Vector3 node, float width, float hight, float angle) 
+        Vector3[] GetColumnVertex(Vector3 node, float width, float height, float angle) 
         {
             //  Y        3 - 4 - 5 
             //  ^        |   |   |  
@@ -312,32 +358,32 @@ namespace Stevia.Model
 
             vertex[0] = new Vector3(node.x - width / 2 * (float)Math.Sin(angle),
                                     node.y - width / 2 * (float)Math.Cos(angle),
-                                    node.z - hight / 2
+                                    node.z - height / 2
                                     );
             vertex[1] = new Vector3(node.x,
                                     node.y,
-                                    node.z + hight / 2
+                                    node.z + height / 2
                                     );
             vertex[2] = new Vector3(node.x + width / 2 * (float)Math.Sin(angle),
                                     node.y + width / 2 * (float)Math.Cos(angle),
-                                    node.z - hight / 2
+                                    node.z - height / 2
                                     );
             vertex[3] = new Vector3(node.x - width / 2 * (float)Math.Sin(angle),
                                     node.y - width / 2 * (float)Math.Cos(angle),
-                                    node.z + hight / 2
+                                    node.z + height / 2
                                     );
             vertex[4] = new Vector3(node.x,
                                     node.y,
-                                    node.z - hight / 2
+                                    node.z - height / 2
                                     );
             vertex[5] = new Vector3(node.x + width / 2 * (float)Math.Sin(angle),
                                     node.y + width / 2 * (float)Math.Cos(angle),
-                                    node.z + hight / 2
+                                    node.z + height / 2
                                     );
             return (vertex);
         }
 
-        Vector3[] GetBraceVertex(Vector3 node, float width, float hight, float angle)
+        private static Vector3[] GetBraceVertex(Vector3 node, float width, float height, float angle)
         {
             //  Y        3 - 4 - 5 
             //  ^        |   |   |  

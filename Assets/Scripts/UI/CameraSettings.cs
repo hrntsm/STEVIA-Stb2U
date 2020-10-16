@@ -1,23 +1,22 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace Stevia.UI 
+namespace UI 
 {
     public class CameraSettings:MonoBehaviour 
     {
-        InputField _inputField;
+        private InputField inputField;
 
-        void Start()
+        private void Start()
         {
-            _inputField = GetComponent<InputField>();
+            inputField = GetComponent<InputField>();
         }
 
-        public void SetLensLength() 
+        public void SetLensLength()
         {
             Camera cam = Camera.main;
-            cam.focalLength = float.Parse(_inputField.text);
+            if (!(cam is null)) 
+                cam.focalLength = float.Parse(inputField.text);
         }
     }
 }

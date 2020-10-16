@@ -1,25 +1,24 @@
-﻿using System.IO;
-using System.Collections;
-using System.Collections.Generic;
-using VRM;
+﻿using System;
+using System.IO;
+using AniLipSync.VRM;
+using RootMotion.FinalIK;
+using SFB;
 using UnityEngine;
 using UnityEngine.UI;
-using SFB;
-using RootMotion.FinalIK;
-using AniLipSync.VRM;
+using VRM;
 
-namespace Stevia.VR
+namespace VR
 {
-    public class VRMRuntimeLoader:MonoBehaviour
+    public class VrmRuntimeLoader:MonoBehaviour
     {
-        GameObject _model;
+        private GameObject model;
 
-        void Start()
+        private void Start()
         {
-            LoadVRM();
+            LoadVrm();
         }
 
-        void LoadVRM() 
+        private void LoadVrm() 
         {
             var extensions = new[]
             {
@@ -30,7 +29,7 @@ namespace Stevia.VR
             if (string.IsNullOrEmpty(path))
                 return;
 
-            var bytes = File.ReadAllBytes(path);
+            byte[] bytes = File.ReadAllBytes(path);
             // なんらかの方法でByte列を得た
 
             var context = new VRMImporterContext();
@@ -39,7 +38,7 @@ namespace Stevia.VR
             context.ParseGlb(bytes);
 
             // metaを取得(todo: thumbnailテクスチャのロード)
-            var meta = context.ReadMeta(true);
+            VRMMetaObject meta = context.ReadMeta(true);
             Debug.LogFormat("meta: title:{0}", meta.Title);
             ShowMetaInfo(meta); // UIに表示する
 
@@ -47,77 +46,78 @@ namespace Stevia.VR
             context.LoadAsync(() => OnLoaded(context));
         }
 
-        void OnLoaded(VRMImporterContext context)
+        private void OnLoaded(VRMImporterContext context)
         {
-            if (_model != null)
-                GameObject.Destroy(_model.gameObject);
+            if (model != null)
+                Destroy(model.gameObject);
 
-            _model = context.Root;
-            _model.transform.position = new Vector3(-10, 0, 0);
-            _model.transform.rotation = Quaternion.Euler(0, 270, 0);
+            model = context.Root;
+            model.transform.position = new Vector3(-10, 0, 0);
+            model.transform.rotation = Quaternion.Euler(0, 270, 0);
 
             context.ShowMeshes();
             context.EnableUpdateWhenOffscreen();
 
             // VR化用に追記
-            _model.AddComponent<VRIK>();
-            _model.GetComponent<VRIK>().solver.spine.headTarget = GameObject.Find("Head_Target").transform;
-            _model.GetComponent<VRIK>().solver.leftArm.target = GameObject.Find("Hand_L_Target").transform;
-            _model.GetComponent<VRIK>().solver.rightArm.target = GameObject.Find("Hand_R_Target").transform;
+            model.AddComponent<VRIK>();
+            model.GetComponent<VRIK>().solver.spine.headTarget = GameObject.Find("Head_Target").transform;
+            model.GetComponent<VRIK>().solver.leftArm.target = GameObject.Find("Hand_L_Target").transform;
+            model.GetComponent<VRIK>().solver.rightArm.target = GameObject.Find("Hand_R_Target").transform;
 
             // akiraさんのQiitaよりがに股を直すように設定
-            _model.GetComponent<VRIK>().solver.leftLeg.swivelOffset = 15f;
-            _model.GetComponent<VRIK>().solver.rightLeg.swivelOffset = -15f;
-            _model.GetComponent<VRIK>().solver.locomotion.footDistance = 0.4f;
-            _model.GetComponent<VRIK>().solver.locomotion.stepThreshold = 0.3f;
-            _model.GetComponent<VRIK>().solver.locomotion.maxVelocity = 0.3f;
-            _model.GetComponent<VRIK>().solver.locomotion.rootSpeed = 30f;
-            _model.GetComponent<VRIK>().solver.plantFeet = false;
+            model.GetComponent<VRIK>().solver.leftLeg.swivelOffset = 15f;
+            model.GetComponent<VRIK>().solver.rightLeg.swivelOffset = -15f;
+            model.GetComponent<VRIK>().solver.locomotion.footDistance = 0.4f;
+            model.GetComponent<VRIK>().solver.locomotion.stepThreshold = 0.3f;
+            model.GetComponent<VRIK>().solver.locomotion.maxVelocity = 0.3f;
+            model.GetComponent<VRIK>().solver.locomotion.rootSpeed = 30f;
+            model.GetComponent<VRIK>().solver.plantFeet = false;
 
             //自分のカメラに頭が映らないように VRMFirstPerson の設定
-            _model.GetComponent<VRM.VRMFirstPerson>().Setup();
-            foreach (var renderer in GetComponentsInChildren<SkinnedMeshRenderer>(true)) {
-                renderer.updateWhenOffscreen = true;
+            model.GetComponent<VRMFirstPerson>().Setup();
+            foreach (SkinnedMeshRenderer meshRenderer in GetComponentsInChildren<SkinnedMeshRenderer>(true))
+            {
+                meshRenderer.updateWhenOffscreen = true;
             }
 
             // リップシンクのターゲット指定
-            var aniLipSync = GameObject.Find("AniLipSync-VRM");
-            aniLipSync.GetComponent<AnimMorphTarget>().blendShapeProxy = _model.GetComponent<VRMBlendShapeProxy>();
+            GameObject aniLipSync = GameObject.Find("AniLipSync-VRM");
+            aniLipSync.GetComponent<AnimMorphTarget>().blendShapeProxy = model.GetComponent<VRMBlendShapeProxy>();
 
             // まばたきをする設定
-            _model.AddComponent<VRM.Blinker>();
+            model.AddComponent<Blinker>();
         }
 
-        void ShowMetaInfo(VRMMetaObject meta)
+        private static void ShowMetaInfo(VRMMetaObject meta)
         {
-            var uiObject = GameObject.Find("VRM meta");
+            GameObject uiObject = GameObject.Find("VRM meta");
 
             #region Model Infomation
-            Text title = uiObject.transform.Find("Model Info/Title/Meta").gameObject.GetComponent<Text>();
-            Text auther = uiObject.transform.Find("Model Info/Auther/Meta").gameObject.GetComponent<Text>();
-            Text contact = uiObject.transform.Find("Model Info/Contact/Meta").gameObject.GetComponent<Text>();
-            Text reference = uiObject.transform.Find("Model Info/Reference/Meta").gameObject.GetComponent<Text>();
-            Text version = uiObject.transform.Find("Model Info/Version/Meta").gameObject.GetComponent<Text>();
-            Image thumbnail = uiObject.transform.Find("Model Info/Thumbnail/Meta").gameObject.GetComponent<Image>();
+            var title = uiObject.transform.Find("Model Info/Title/Meta").gameObject.GetComponent<Text>();
+            var author = uiObject.transform.Find("Model Info/Auther/Meta").gameObject.GetComponent<Text>();
+            var contact = uiObject.transform.Find("Model Info/Contact/Meta").gameObject.GetComponent<Text>();
+            var reference = uiObject.transform.Find("Model Info/Reference/Meta").gameObject.GetComponent<Text>();
+            var version = uiObject.transform.Find("Model Info/Version/Meta").gameObject.GetComponent<Text>();
+            var thumbnail = uiObject.transform.Find("Model Info/Thumbnail/Meta").gameObject.GetComponent<Image>();
 
             title.text = meta.Title;
-            auther.text = meta.Author;
+            author.text = meta.Author;
             contact.text = meta.ContactInformation;
             reference.text = meta.Reference;
             version.text = meta.Version;
 
             if (meta.Thumbnail != null) {
-                Sprite thumbnail_sprite = Sprite.Create(meta.Thumbnail, new Rect(0, 0, meta.Thumbnail.width, meta.Thumbnail.height), Vector2.zero);
-                thumbnail.sprite = thumbnail_sprite;
+                var thumbnailSprite = Sprite.Create(meta.Thumbnail, new Rect(0, 0, meta.Thumbnail.width, meta.Thumbnail.height), Vector2.zero);
+                thumbnail.sprite = thumbnailSprite;
             }
             #endregion
 
             #region Personation/Charaterization Permission
-            Text allowedUser = uiObject.transform.Find("License/Personation/allowedUserName/Meta").gameObject.GetComponent<Text>();
-            Text violentUssage = uiObject.transform.Find("License/Personation/violentUssageName/Meta").gameObject.GetComponent<Text>();
-            Text sexualUssage = uiObject.transform.Find("License/Personation/sexualUssageName/Meta").gameObject.GetComponent<Text>();
-            Text commercialUssage = uiObject.transform.Find("License/Personation/commercialUssageName/Meta").gameObject.GetComponent<Text>();
-            Text otherPermissionUrl = uiObject.transform.Find("License/Personation/otherPermissionUrl/Meta").gameObject.GetComponent<Text>();
+            var allowedUser = uiObject.transform.Find("License/Personation/allowedUserName/Meta").gameObject.GetComponent<Text>();
+            var violentUsage = uiObject.transform.Find("License/Personation/violentUssageName/Meta").gameObject.GetComponent<Text>();
+            var sexualUsage = uiObject.transform.Find("License/Personation/sexualUssageName/Meta").gameObject.GetComponent<Text>();
+            var commercialUsage = uiObject.transform.Find("License/Personation/commercialUssageName/Meta").gameObject.GetComponent<Text>();
+            var otherPermissionUrl = uiObject.transform.Find("License/Personation/otherPermissionUrl/Meta").gameObject.GetComponent<Text>();
 
             switch (meta.AllowedUser) {
                 case AllowedUser.OnlyAuthor:
@@ -130,44 +130,44 @@ namespace Stevia.VR
                     allowedUser.text = "全員に許可";
                     break;
                 default:
-                    break;
+                    throw new ArgumentOutOfRangeException();
             }
             switch (meta.ViolentUssage) {
                 case UssageLicense.Disallow:
-                    violentUssage.text = "不許可";
+                    violentUsage.text = "不許可";
                     break;
                 case UssageLicense.Allow:
-                    violentUssage.text = "許可";
+                    violentUsage.text = "許可";
                     break;
                 default:
-                    break;
+                    throw new ArgumentOutOfRangeException();
             }
             switch (meta.SexualUssage) {
                 case UssageLicense.Disallow:
-                    sexualUssage.text = "不許可";
+                    sexualUsage.text = "不許可";
                     break;
                 case UssageLicense.Allow:
-                    sexualUssage.text = "許可";
+                    sexualUsage.text = "許可";
                     break;
                 default:
-                    break;
+                    throw new ArgumentOutOfRangeException();
             }
             switch (meta.CommercialUssage) {
                 case UssageLicense.Disallow:
-                    commercialUssage.text = "不許可";
+                    commercialUsage.text = "不許可";
                     break;
                 case UssageLicense.Allow:
-                    commercialUssage.text = "許可";
+                    commercialUsage.text = "許可";
                     break;
                 default:
-                    break;
+                    throw new ArgumentOutOfRangeException();
             }
             otherPermissionUrl.text = meta.OtherPermissionUrl;
             #endregion
 
             #region Redistribution
-            Text licenseName = uiObject.transform.Find("License/Redistribution/licenseName/Meta").gameObject.GetComponent<Text>();
-            Text otherLicenseUrl = uiObject.transform.Find("License/Redistribution/otherLicenseUrl/Meta").gameObject.GetComponent<Text>();
+            var licenseName = uiObject.transform.Find("License/Redistribution/licenseName/Meta").gameObject.GetComponent<Text>();
+            var otherLicenseUrl = uiObject.transform.Find("License/Redistribution/otherLicenseUrl/Meta").gameObject.GetComponent<Text>();
 
             switch (meta.LicenseType) {
                 case LicenseType.Redistribution_Prohibited:
@@ -198,7 +198,7 @@ namespace Stevia.VR
                     licenseName.text = "その他";
                     break;
                 default:
-                    break;
+                    throw new ArgumentOutOfRangeException();
             }
             otherLicenseUrl.text = meta.OtherLicenseUrl;
             #endregion

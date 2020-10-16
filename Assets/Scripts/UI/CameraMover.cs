@@ -1,14 +1,12 @@
-﻿/* thanks Nekomasu-San
+﻿/* Special thanks Nekomasu-San
  * https://qiita.com/Nekomasu/items/f195db36a2516e0dd460
  */
- 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.SocialPlatforms;
 
-namespace Stevia.UI
+using System.Collections;
+using UnityEngine;
+using UnityEngine.Serialization;
+
+namespace UI
 {
     public class CameraMover:MonoBehaviour 
     {
@@ -20,69 +18,64 @@ namespace Stevia.UI
         // P：回転を実行時の状態に初期化する
 
         //カメラの移動量
-        [SerializeField, Range(0.1f, 10.0f)]
-        float _positionStep = 2.0f;
+        [FormerlySerializedAs("_positionStep")] [SerializeField, Range(0.1f, 10.0f)]
+        private float positionStep = 2.0f;
 
         //マウス感度
-        [SerializeField, Range(30.0f, 150.0f)]
-        float _mouseSensitive = 90.0f;
+        [FormerlySerializedAs("_mouseSensitive")] [SerializeField, Range(30.0f, 150.0f)]
+        private float mouseSensitive = 90.0f;
 
         //カメラ操作の有効無効
-        bool _cameraMoveActive = true;
+        private bool cameraMoveActive = true;
         //カメラのtransform  
-        Transform _camTransform;
+        private Transform camTransform;
         //マウスの始点 
-        Vector3 _startMousePos;
+        private Vector3 startMousePos;
         //カメラ回転の始点情報
-        Vector3 _presentCamRotation;
-        Vector3 _presentCamPos;
-        //初期状態 Rotation
-        Quaternion _initialCamRotation;
-        //UIメッセージの表示
-        bool _uiMessageActiv;
+        private Vector3 presentCamRotation;
 
-        void Start()
+        private Vector3 presentCamPos;
+        //初期状態 Rotation
+        private Quaternion initialCamRotation;
+        //UIメッセージの表示
+        private bool uiMessageActive;
+
+        private void Start()
         {
-            _camTransform = this.gameObject.transform;
+            GameObject obj = gameObject;
+            camTransform = obj.transform;
 
             //初期回転の保存
-            _initialCamRotation = this.gameObject.transform.rotation;
+            initialCamRotation = obj.transform.rotation;
         }
 
-        void Update()
+        private void Update()
         {
             CamControlIsActive(); //カメラ操作の有効無効
 
-            if (_cameraMoveActive)
-            {
-                ResetCameraRotation(); //回転角度のみリセット
-                CameraRotationMouseControl(); //カメラの回転 マウス
-                CameraSlideMouseControl(); //カメラの縦横移動 マウス
-                CameraPositionKeyControl(); //カメラのローカル移動 キー
-            }
+            if (!cameraMoveActive)
+                return;
+            ResetCameraRotation(); //回転角度のみリセット
+            CameraRotationMouseControl(); //カメラの回転 マウス
+            CameraSlideMouseControl(); //カメラの縦横移動 マウス
+            CameraPositionKeyControl(); //カメラのローカル移動 キー
         }
 
         //カメラ操作の有効無効
-        public void CamControlIsActive()
+        private void CamControlIsActive()
         {
-            if (Input.GetKeyDown(KeyCode.Space)) 
-            {
-                _cameraMoveActive = !_cameraMoveActive;
-
-                if (_uiMessageActiv == false)
-                {
-                    StartCoroutine(DisplayUiMessage());
-                }
-            }
+            if (!Input.GetKeyDown(KeyCode.Space))
+                return;
+            cameraMoveActive = !cameraMoveActive;
+            if (uiMessageActive == false)
+                StartCoroutine(DisplayUiMessage());
         }
 
         //回転を初期状態にする
         private void ResetCameraRotation() 
         {
             if (Input.GetKeyDown(KeyCode.P))
-            {
-                this.gameObject.transform.rotation = _initialCamRotation;
-            }
+                gameObject.transform.rotation = initialCamRotation;
         }
 
         //カメラの回転 マウス
@@ -90,23 +83,23 @@ namespace Stevia.UI
         {
             if (Input.GetMouseButtonDown(0))
             {
-                _startMousePos = Input.mousePosition;
-                _presentCamRotation.x = _camTransform.transform.eulerAngles.x;
-                _presentCamRotation.y = _camTransform.transform.eulerAngles.y;
+                startMousePos = Input.mousePosition;
+                Vector3 eulerAngles = camTransform.transform.eulerAngles;
+                presentCamRotation.x = eulerAngles.x;
+                presentCamRotation.y = eulerAngles.y;
             }
 
-            if (Input.GetMouseButton(0)) 
-            {
-                //(移動開始座標 - マウスの現在座標) / 解像度 で正規化
-                float x = (_startMousePos.x - Input.mousePosition.x) / Screen.width;
-                float y = (_startMousePos.y - Input.mousePosition.y) / Screen.height;
+            if (!Input.GetMouseButton(0))
+                return;
+            //(移動開始座標 - マウスの現在座標) / 解像度 で正規化
+            float x = (startMousePos.x - Input.mousePosition.x) / Screen.width;
+            float y = (startMousePos.y - Input.mousePosition.y) / Screen.height;
 
-                //回転開始角度 ＋ マウスの変化量 * マウス感度
-                float eulerX = _presentCamRotation.x + y * _mouseSensitive;
-                float eulerY = _presentCamRotation.y - x * _mouseSensitive;
+            //回転開始角度 ＋ マウスの変化量 * マウス感度
+            float eulerX = presentCamRotation.x + y * mouseSensitive;
+            float eulerY = presentCamRotation.y - x * mouseSensitive;
 
-                _camTransform.rotation = Quaternion.Euler(eulerX, eulerY, 0);
-            }
+            camTransform.rotation = Quaternion.Euler(eulerX, eulerY, 0);
         }
 
         //カメラの移動 マウス
@@ -114,69 +107,72 @@ namespace Stevia.UI
         {
             if (Input.GetMouseButtonDown(1)) 
             {
-                _startMousePos = Input.mousePosition;
-                _presentCamPos = _camTransform.position;
+                startMousePos = Input.mousePosition;
+                presentCamPos = camTransform.position;
             }
 
-            if (Input.GetMouseButton(1)) 
-            {
-                //(移動開始座標 - マウスの現在座標) / 解像度 で正規化
-                float x = (_startMousePos.x - Input.mousePosition.x) / Screen.width;
-                float y = (_startMousePos.y - Input.mousePosition.y) / Screen.height;
+            if (!Input.GetMouseButton(1))
+                return;
+            //(移動開始座標 - マウスの現在座標) / 解像度 で正規化
+            float x = (startMousePos.x - Input.mousePosition.x) / Screen.width;
+            float y = (startMousePos.y - Input.mousePosition.y) / Screen.height;
 
-                x = x * _positionStep;
-                y = y * _positionStep;
+            x *= positionStep;
+            y *= positionStep;
 
-                Vector3 velocity = _camTransform.rotation * new Vector3(x, y, 0);
-                velocity = velocity + _presentCamPos;
-                _camTransform.position = velocity;
-            }
+            Vector3 velocity = camTransform.rotation * new Vector3(x, y, 0);
+            velocity += presentCamPos;
+            camTransform.position = velocity;
         }
 
         //カメラのローカル移動 キー
         private void CameraPositionKeyControl()
         {
-            Vector3 campos = _camTransform.position;
+            Vector3 campos = camTransform.position;
 
             if (Input.GetKey(KeyCode.D))
-                campos += _camTransform.right * Time.deltaTime * _positionStep;
+                campos += camTransform.right * (Time.deltaTime * positionStep);
             if (Input.GetKey(KeyCode.A))
-                campos -= _camTransform.right * Time.deltaTime * _positionStep;
+                campos -= camTransform.right * (Time.deltaTime * positionStep);
             if (Input.GetKey(KeyCode.E))
-                campos += _camTransform.up * Time.deltaTime * _positionStep;
+                campos += camTransform.up * (Time.deltaTime * positionStep);
             if (Input.GetKey(KeyCode.Q))
-                campos -= _camTransform.up * Time.deltaTime * _positionStep;
+                campos -= camTransform.up * (Time.deltaTime * positionStep);
             if (Input.GetKey(KeyCode.W))
-                campos += _camTransform.forward * Time.deltaTime * _positionStep;
+                campos += camTransform.forward * (Time.deltaTime * positionStep);
             if (Input.GetKey(KeyCode.S))
-                campos -= _camTransform.forward * Time.deltaTime * _positionStep;
+                campos -= camTransform.forward * (Time.deltaTime * positionStep);
 
-            _camTransform.position = campos;
+            camTransform.position = campos;
         }
 
         //UIメッセージの表示
         private IEnumerator DisplayUiMessage()
         {
-            _uiMessageActiv = true;
+            uiMessageActive = true;
             float time = 0;
             while (time < 2) 
             {
                 time = time + Time.deltaTime;
                 yield return null;
             }
-            _uiMessageActiv = false;
+            uiMessageActive = false;
         }
 
-        void OnGUI()
+        private void OnGUI()
         {
-            if (_uiMessageActiv == false)
+            if (uiMessageActive == false)
                 return;
             GUI.color = Color.black;
-            if (_cameraMoveActive == true)
-                GUI.Label(new Rect(Screen.width / 2 - 50, Screen.height - 30, 100, 20), "カメラ操作 有効");
-
-            if (_cameraMoveActive == false)
-                GUI.Label(new Rect(Screen.width / 2 - 50, Screen.height - 30, 100, 20), "カメラ操作 無効");
+            switch (cameraMoveActive)
+            {
+                case true:
+                    GUI.Label(new Rect(Screen.width / 2 - 50, Screen.height - 30, 100, 20), "カメラ操作 有効");
+                    break;
+                case false:
+                    GUI.Label(new Rect(Screen.width / 2 - 50, Screen.height - 30, 100, 20), "カメラ操作 無効");
+                    break;
+            }
         }
     }
 }

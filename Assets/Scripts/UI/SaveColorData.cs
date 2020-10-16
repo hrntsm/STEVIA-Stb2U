@@ -1,18 +1,16 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Stevia.UI
+namespace UI
 {
     public class SaveColorData:MonoBehaviour 
     {
-        public const string _SaveKey = "UserColorData";
+        public const string saveKey = "UserColorData";
 
         public void Save()
         {
-            string json = JsonUtility.ToJson(ColorInput._saveColor);
+            string json = JsonUtility.ToJson(ColorInput.SaveColor);
             print(json);
-            PlayerPrefs.SetString(_SaveKey, json);
+            PlayerPrefs.SetString(saveKey, json);
         }
     }
 

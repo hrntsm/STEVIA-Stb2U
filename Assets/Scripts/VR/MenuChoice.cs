@@ -1,47 +1,47 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Valve.VR;
 
-namespace Stevia.VR 
+namespace VR 
 {
     public class MenuChoice:MonoBehaviour
     {
-        [SerializeField]
-        List<GameObject> _gameObject;
+        [FormerlySerializedAs("_gameObject")] [SerializeField]
+        private List<GameObject> objList;
 
-        bool _isClicked;
-        bool _isActiveVR = true;
+        private bool isClicked;
+        private bool isActiveVR = true;
 
-        SteamVR_Input_Sources _srcAny = SteamVR_Input_Sources.Any;
-        SteamVR_Action_Boolean _actionBoolean;
-        
-        void Start()
+        private const SteamVR_Input_Sources SrcAny = SteamVR_Input_Sources.Any;
+        private SteamVR_Action_Boolean actionBoolean;
+
+        private void Start()
         {
-            _actionBoolean = SteamVR_Actions._default.InteractUI;
+            actionBoolean = SteamVR_Actions._default.InteractUI;
         }
 
         private void Update()
         {
-            _isClicked = _actionBoolean.GetState(_srcAny);
+            isClicked = actionBoolean.GetState(SrcAny);
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            if (_isActiveVR && _isClicked)
+            if (isActiveVR && isClicked)
             {
-                foreach (var obj in _gameObject)
+                foreach (GameObject obj in objList)
                     obj.GetComponent<Toggle>().isOn = false;
 
-                _isActiveVR = false;
+                isActiveVR = false;
             }
-            else if ((_isActiveVR == false) && _isClicked)
+            else if ((isActiveVR == false) && isClicked)
             {
-                foreach (var obj in _gameObject)
+                foreach (GameObject obj in objList)
                     obj.GetComponent<Toggle>().isOn = true;
 
-                _isActiveVR = true;
+                isActiveVR = true;
             }
         }
     }

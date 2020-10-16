@@ -1,26 +1,25 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace Stevia.Model
+namespace Model
 {
     public class CreateBar:MonoBehaviour
     {
-        static int[] GetColMainNum(int index)
+        private static int[] GetColMainNum(int index)
         {
-            int[] mainBar = new int[5];
+            var mainBar = new int[5];
 
-            for (int i = 0; i < 5; i++)
-                mainBar[i] = STBReader._secColumnRC.BarList[index][i];
+            for (var i = 0; i < 5; i++)
+                mainBar[i] = StbReader.SecColumnRc.BarList[index][i];
             return (mainBar);
         }
 
-        static int[] GetBeamMainNum(int index)
+        private static int[] GetBeamMainNum(int index)
         {
-            int[] mainBar = new int[5];
+            var mainBar = new int[5];
 
-            for (int i = 0; i < 5; i++)
-                mainBar[i] = STBReader._secBeamRC.BarList[index][i];
+            for (var i = 0; i < 5; i++)
+                mainBar[i] = StbReader.SecBeamRc.BarList[index][i];
             return (mainBar);
         }
 
@@ -41,20 +40,20 @@ namespace Stevia.Model
             Vector3[,] mainX2Pos = GetColumnCorner(nodeStart, nodeEnd, width - main1Space, hight - main2Space);
             Vector3[,] mainY2Pos = GetColumnCorner(nodeStart, nodeEnd, width - main2Space, hight - main1Space);
 
-            string name = string.Format("Bar" + "{0}", elemNum);
-            GameObject barObj = new GameObject(name);
+            string name = "Bar" + $"{elemNum}";
+            var barObj = new GameObject(name);
             barObj.transform.parent = parent.transform;
 
-            CreateBar.Hoop(hoopPos, bandD, index, barObj);
-            CreateBar.ColumnMainBar(main1Pos, mainX2Pos, mainY2Pos, barSpace, mainD, index, barObj);
+            Hoop(hoopPos, bandD, index, barObj);
+            ColumnMainBar(main1Pos, mainX2Pos, mainY2Pos, barSpace, mainD, index, barObj);
         }
 
-        static Vector3[,] GetColumnCorner(Vector3 nodeStart, Vector3 nodeEnd, float width, float hight)
+        private static Vector3[,] GetColumnCorner(Vector3 nodeStart, Vector3 nodeEnd, float width, float hight)
         {
             //  Z        4 - 3
             //  ^        | 0 |
             //  o >  X   1 - 2
-            Vector3[,] cornerPoint = new Vector3[2, 5];
+            var cornerPoint = new Vector3[2, 5];
             Vector3 node = nodeStart;
             float dx = nodeEnd.x - nodeStart.x;
             float dy = nodeEnd.y - nodeStart.y;
@@ -62,7 +61,7 @@ namespace Stevia.Model
             float angleX = -1f * Mathf.Atan2(dx, dy);
             float angleZ = -1f * Mathf.Atan2(dz, dy);
 
-            for (int i = 0; i < 2; i++)
+            for (var i = 0; i < 2; i++)
             {
                 cornerPoint[i, 0] = node;
                 cornerPoint[i, 1] = new Vector3(node.x - width / 2f * Mathf.Cos(angleX),
@@ -86,33 +85,34 @@ namespace Stevia.Model
             return (cornerPoint);
         }
 
-        static void Hoop(Vector3[,] cornerPos, float bandD, int index, GameObject parent)
+        private static void Hoop(Vector3[,] cornerPos, float bandD, int index, GameObject parent)
         {
             // メッシュ結合用に親のオブジェクト作成
             var hoops = new GameObject("Hoops");
             hoops.transform.parent = parent.transform;
 
-            float pitch = STBReader._secColumnRC.BarList[index][5] / 1000f;
-            int dirXNum = STBReader._secColumnRC.BarList[index][6];
-            int dirYNum = STBReader._secColumnRC.BarList[index][7];
+            float pitch = StbReader.SecColumnRc.BarList[index][5] / 1000f;
+            int dirXNum = StbReader.SecColumnRc.BarList[index][6];
+            int dirYNum = StbReader.SecColumnRc.BarList[index][7];
             int sumBar = dirXNum + dirYNum;
             float distance = Vector3.Distance(cornerPos[0, 0], cornerPos[1, 0]);
-            List<Vector3> vertex = new List<Vector3>();
-            int i = 0;
+            var vertex = new List<Vector3>();
+            var i = 0;
 
 
             Vector3[,] hoopPos = GetBandPos(cornerPos, dirXNum, dirYNum);
 
             while ((pitch * i) / distance < 1) 
             {
-                for (int j = 0; j < 2 * sumBar; j++)
+                for (var j = 0; j < 2 * sumBar; j++)
                 {
-                    vertex.Add(Vector3.Lerp(hoopPos[0, j], hoopPos[1, j], (float)(pitch * i) / distance));
+                    vertex.Add(Vector3.Lerp(hoopPos[0, j], hoopPos[1, j], (pitch * i) / distance));
                 }
-                for (int j = 0; j < sumBar; j++) 
+                for (var j = 0; j < sumBar; j++) 
                 {
-                    Mesh meshObj = CreateMesh.Pipe(vertex[2 * j + (i * 2 * sumBar)], vertex[2 * j + 1 + (i * 2 * sumBar)], bandD / 2f, 12, true);
-                    GameObject element = new GameObject("hoop");
+                    Mesh meshObj = CreateMesh.Pipe(vertex[2 * j + (i * 2 * sumBar)], vertex[2 * j + 1 + (i * 2 * sumBar)],
+                        bandD / 2f, 12, true);
+                    var element = new GameObject("hoop");
                     element.AddComponent<MeshFilter>().mesh = meshObj;
                     element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Standard"))
                     {
@@ -125,10 +125,10 @@ namespace Stevia.Model
 
             // ドローコール削減のため、作成したフープを一つのメッシュに結合
             var color = new Color(1, 0, 1, 1);
-            CreateMesh.Conbine(hoops, color, "Standard");
+            CreateMesh.Combine(hoops, color, "Standard");
         }
 
-        static void ColumnMainBar(Vector3[,] mainPos, Vector3[,] mainX2Pos, Vector3[,] mainY2Pos, float barSpace, float mainD, int index, GameObject parent)
+        private static void ColumnMainBar(Vector3[,] mainPos, Vector3[,] mainX2Pos, Vector3[,] mainY2Pos, float barSpace, float mainD, int index, GameObject parent)
         {
             // メッシュ結合用に親のオブジェクト作成
             var mainBars = new GameObject("MainBars");
@@ -141,11 +141,11 @@ namespace Stevia.Model
             if (mainBarNum[3] > 1)
                 hasMain2[1] = true;
 
-            for (int i = 1; i < 5; i++) 
+            for (var i = 1; i < 5; i++) 
             {
                 // コーナーの主筋
                 Mesh meshObj = CreateMesh.Pipe(mainPos[0, i], mainPos[1, i], mainD / 2f, 12, true);
-                GameObject element = new GameObject("MainBar");
+                var element = new GameObject("MainBar");
                 element.AddComponent<MeshFilter>().mesh = meshObj;
                 element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Standard")) 
                 {
@@ -160,8 +160,8 @@ namespace Stevia.Model
             float posY2Ratio = 1f / (mainBarNum[3] - 1);
             float distanceX = Vector3.Distance(mainPos[0, 1], mainPos[0, 2]);
             float distanceY = Vector3.Distance(mainPos[0, 2], mainPos[0, 3]);
-            int barCount = 0;
-            List<Vector3> vertex = new List<Vector3>();
+            var barCount = 0;
+            var vertex = new List<Vector3>();
 
             if (hasMain2[1])
             {
@@ -176,7 +176,7 @@ namespace Stevia.Model
                 vertex.Add(Vector3.Lerp(mainPos[1, 3], mainPos[1, 4], 1f - (barSpace + mainD) / distanceX));
                 barCount += 4;
                 // 1st_X
-                for (int j = 2; j <= mainBarNum[0] - 3; j++) 
+                for (var j = 2; j <= mainBarNum[0] - 3; j++) 
                 {
                     vertex.Add(Vector3.Lerp(mainPos[0, 1], mainPos[0, 2], posX1Ratio * j));
                     vertex.Add(Vector3.Lerp(mainPos[1, 1], mainPos[1, 2], posX1Ratio * j));
@@ -185,7 +185,7 @@ namespace Stevia.Model
                     barCount += 2;
                 }
                 // 2nd_X
-                for (int j = 1; j <= mainBarNum[2] - 2; j++) 
+                for (var j = 1; j <= mainBarNum[2] - 2; j++) 
                 {
                     vertex.Add(Vector3.Lerp(mainX2Pos[0, 1], mainX2Pos[0, 2], posX2Ratio * j));
                     vertex.Add(Vector3.Lerp(mainX2Pos[1, 1], mainX2Pos[1, 2], posX2Ratio * j));
@@ -196,7 +196,7 @@ namespace Stevia.Model
             }
             else
             {
-                for (int j = 1; j <= mainBarNum[0] - 2; j++) 
+                for (var j = 1; j <= mainBarNum[0] - 2; j++) 
                 {
                     vertex.Add(Vector3.Lerp(mainPos[0, 1], mainPos[0, 2], posX1Ratio * j));
                     vertex.Add(Vector3.Lerp(mainPos[1, 1], mainPos[1, 2], posX1Ratio * j));
@@ -218,7 +218,7 @@ namespace Stevia.Model
                 vertex.Add(Vector3.Lerp(mainPos[1, 4], mainPos[1, 1], 1f - (barSpace + mainD) / distanceY));
                 barCount += 4;
                 // 1st_Y
-                for (int j = 2; j <= mainBarNum[0] - 3; j++)
+                for (var j = 2; j <= mainBarNum[0] - 3; j++)
                 {
                     vertex.Add(Vector3.Lerp(mainPos[0, 2], mainPos[0, 3], posY1Ratio * j));
                     vertex.Add(Vector3.Lerp(mainPos[1, 2], mainPos[1, 3], posY1Ratio * j));
@@ -227,7 +227,7 @@ namespace Stevia.Model
                     barCount += 2;
                 }
                 // 2nd_Y
-                for (int j = 1; j <= mainBarNum[3] - 2; j++)
+                for (var j = 1; j <= mainBarNum[3] - 2; j++)
                 {
                     vertex.Add(Vector3.Lerp(mainY2Pos[0, 2], mainY2Pos[0, 3], posY2Ratio * j));
                     vertex.Add(Vector3.Lerp(mainY2Pos[1, 2], mainY2Pos[1, 3], posY2Ratio * j));
@@ -238,7 +238,7 @@ namespace Stevia.Model
             }
             else
             {
-                for (int j = 1; j <= mainBarNum[1] - 2; j++)
+                for (var j = 1; j <= mainBarNum[1] - 2; j++)
                 {
                     vertex.Add(Vector3.Lerp(mainPos[0, 2], mainPos[0, 3], posY1Ratio * j));
                     vertex.Add(Vector3.Lerp(mainPos[1, 2], mainPos[1, 3], posY1Ratio * j));
@@ -247,10 +247,10 @@ namespace Stevia.Model
                     barCount += 2;
                 }
             }
-            for (int i = 0; i < barCount; i++)
+            for (var i = 0; i < barCount; i++)
             {
                 Mesh meshObj = CreateMesh.Pipe(vertex[2 * i], vertex[2 * i + 1], mainD / 2f, 12, true);
-                GameObject element = new GameObject("mainBars");
+                var element = new GameObject("mainBars");
                 element.AddComponent<MeshFilter>().mesh = meshObj;
                 element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Standard")) 
                 {
@@ -261,7 +261,7 @@ namespace Stevia.Model
 
             // ドローコール削減のため、作成したフープを一つのメッシュに結合
             var color = new Color(1, 1, 0, 1);
-            CreateMesh.Conbine(mainBars, color, "Standard");
+            CreateMesh.Combine(mainBars, color, "Standard");
         }
 
         public static void Beam(int index, Vector3 nodeStart, Vector3 nodeEnd, float width, float hight, GameObject parent, int elemNum)
@@ -276,25 +276,25 @@ namespace Stevia.Model
             float main2Space = main1Space + 2 * (mainD + barSpace);
             float main3Space = main2Space + 2 * (mainD + barSpace);
 
-            Vector3[,] strupPos = GetBeamCorner(nodeStart, nodeEnd, width - bandSpace, hight, bandSpace / 2);
+            Vector3[,] stirrupPos = GetBeamCorner(nodeStart, nodeEnd, width - bandSpace, hight, bandSpace / 2);
             Vector3[,] main1Pos = GetBeamCorner(nodeStart, nodeEnd, width - main1Space, hight, main1Space / 2);
             Vector3[,] main2Pos = GetBeamCorner(nodeStart, nodeEnd, width - main1Space, hight, main2Space / 2);
             Vector3[,] main3Pos = GetBeamCorner(nodeStart, nodeEnd, width - main1Space, hight, main3Space / 2);
 
-            string name = string.Format("Bar" + "{0}", elemNum);
-            GameObject barObj = new GameObject(name);
+            string name = "Bar" + $"{elemNum}";
+            var barObj = new GameObject(name);
             barObj.transform.parent = parent.transform;
 
-            CreateBar.Stirrup(strupPos, bandD, index, barObj);
-            CreateBar.BeamMainBar(main1Pos, main2Pos, main3Pos, barSpace, mainD, index, barObj);
+            Stirrup(stirrupPos, bandD, index, barObj);
+            BeamMainBar(main1Pos, main2Pos, main3Pos, mainD, index, barObj);
         }
 
-        static Vector3[,] GetBeamCorner(Vector3 nodeStart, Vector3 nodeEnd, float width, float height, float space) 
+        private static Vector3[,] GetBeamCorner(Vector3 nodeStart, Vector3 nodeEnd, float width, float height, float space) 
         {
             //  Z        4 - 0 - 3
             //  ^        |       |
             //  o >  X   1 - - - 2
-            Vector3[,] cornerPoint = new Vector3[2, 5];
+            var cornerPoint = new Vector3[2, 5];
             Vector3 node = nodeStart;
             float dx = nodeEnd.x - nodeStart.x;
             float dy = nodeEnd.y - nodeStart.y;
@@ -302,7 +302,7 @@ namespace Stevia.Model
             float angleY = -1f * Mathf.Atan2(dy, dx);
             float angleZ = -1f * Mathf.Atan2(dz, dx);
 
-            for (int i = 0; i < 2; i++) 
+            for (var i = 0; i < 2; i++) 
             {
                 cornerPoint[i, 0] = node;
                 cornerPoint[i, 1] = new Vector3(node.x + width / 2f * Mathf.Sin(angleZ),
@@ -326,31 +326,31 @@ namespace Stevia.Model
             return (cornerPoint);
         }
 
-        static void Stirrup(Vector3[,] cornerPos, float bandD, int index, GameObject parent)
+        private static void Stirrup(Vector3[,] cornerPos, float bandD, int index, GameObject parent)
         {
             // メッシュ結合用に親のオブジェクト作成
             var stirrups = new GameObject("Stirrups");
             stirrups.transform.parent = parent.transform;
 
-            float pitch = STBReader._secBeamRC.BarList[index][6] / 1000f;
-            int strupNum = STBReader._secBeamRC.BarList[index][7];
-            int sumBar = strupNum + 2;
+            float pitch = StbReader.SecBeamRc.BarList[index][6] / 1000f;
+            int stirrupNum = StbReader.SecBeamRc.BarList[index][7];
+            int sumBar = stirrupNum + 2;
             float distance = Vector3.Distance(cornerPos[0, 0], cornerPos[1, 0]);
-            List<Vector3> vertex = new List<Vector3>();
-            int i = 0;
+            var vertex = new List<Vector3>();
+            var i = 0;
 
-            Vector3[,] stirrupPos = GetBandPos(cornerPos, 2, strupNum);
+            Vector3[,] stirrupPos = GetBandPos(cornerPos, 2, stirrupNum);
 
             while ((pitch * i) / distance < 1)
             {
-                for (int j = 0; j < 2 * sumBar; j++) 
+                for (var j = 0; j < 2 * sumBar; j++) 
                 {
-                    vertex.Add(Vector3.Lerp(stirrupPos[0, j], stirrupPos[1, j], (float)(pitch * i) / distance));
+                    vertex.Add(Vector3.Lerp(stirrupPos[0, j], stirrupPos[1, j], pitch * i / distance));
                 }
-                for (int j = 0; j < sumBar; j++)
+                for (var j = 0; j < sumBar; j++)
                 {
                     Mesh meshObj = CreateMesh.Pipe(vertex[2 * j + (i * 2 * sumBar)], vertex[2 * j + 1 + (i * 2 * sumBar)], bandD / 2f, 12, true);
-                    GameObject element = new GameObject("Stirrup");
+                    var element = new GameObject("Stirrup");
                     element.AddComponent<MeshFilter>().mesh = meshObj;
                     element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Standard"))
                     {
@@ -363,22 +363,21 @@ namespace Stevia.Model
 
             // ドローコール削減のため、作成したフープを一つのメッシュに結合
             var color = new Color(0, 0, 1, 1);
-            CreateMesh.Conbine(stirrups, color, "Standard");
+            CreateMesh.Combine(stirrups, color, "Standard");
         }
 
-        static void BeamMainBar(Vector3[,] main1Pos, Vector3[,] main2Pos, Vector3[,] main3Pos, float barSpace, float mainD, int index, GameObject parent)
+        private static void BeamMainBar(Vector3[,] main1Pos, Vector3[,] main2Pos, Vector3[,] main3Pos, float mainD, int index, GameObject parent)
         {
             // メッシュ結合用に親のオブジェクト作成
             var mainBars = new GameObject("MainBars");
             mainBars.transform.parent = parent.transform;
 
             int[] mainBarNum = GetBeamMainNum(index);
-            bool[] hasMain = new bool[6]; // {Main1_Top, Main1_bottom, Main2_Top, Main2_bottom, Main3_Top, Main3_bottom}
-            float distance = Vector3.Distance(main1Pos[0, 1], main1Pos[0, 2]);
-            int barCount = 0;
-            List<Vector3> vertex = new List<Vector3>();
+            var hasMain = new bool[6]; // {Main1_Top, Main1_bottom, Main2_Top, Main2_bottom, Main3_Top, Main3_bottom}
+            var barCount = 0;
+            var vertex = new List<Vector3>();
 
-            for (int i = 0; i < 5; i++) 
+            for (var i = 0; i < 5; i++) 
             {
                 if (mainBarNum[i] > 1)
                     hasMain[i] = true;
@@ -390,7 +389,7 @@ namespace Stevia.Model
             {
                 float posRatio = 1f / (mainBarNum[0] - 1);
 
-                for (int j = 0; j < mainBarNum[0]; j++) 
+                for (var j = 0; j < mainBarNum[0]; j++) 
                 {
                     vertex.Add(Vector3.Lerp(main1Pos[0, 1], main1Pos[0, 2], posRatio * j));
                     vertex.Add(Vector3.Lerp(main1Pos[1, 1], main1Pos[1, 2], posRatio * j));
@@ -401,7 +400,7 @@ namespace Stevia.Model
             {
                 float posRatio = 1f / (mainBarNum[1] - 1);
 
-                for (int j = 0; j < mainBarNum[1]; j++) 
+                for (var j = 0; j < mainBarNum[1]; j++) 
                 {
                     vertex.Add(Vector3.Lerp(main1Pos[0, 3], main1Pos[0, 4], posRatio * j));
                     vertex.Add(Vector3.Lerp(main1Pos[1, 3], main1Pos[1, 4], posRatio * j));
@@ -412,7 +411,7 @@ namespace Stevia.Model
             {
                 float posRatio = 1f / (mainBarNum[2] - 1);
 
-                for (int j = 0; j < mainBarNum[2]; j++)
+                for (var j = 0; j < mainBarNum[2]; j++)
                 {
                     vertex.Add(Vector3.Lerp(main2Pos[0, 1], main2Pos[0, 2], posRatio * j));
                     vertex.Add(Vector3.Lerp(main2Pos[1, 1], main2Pos[1, 2], posRatio * j));
@@ -423,7 +422,7 @@ namespace Stevia.Model
             {
                 float posRatio = 1f / (mainBarNum[3] - 1);
 
-                for (int j = 0; j < mainBarNum[3]; j++)
+                for (var j = 0; j < mainBarNum[3]; j++)
                 {
                     vertex.Add(Vector3.Lerp(main2Pos[0, 3], main2Pos[0, 4], posRatio * j));
                     vertex.Add(Vector3.Lerp(main2Pos[1, 3], main2Pos[1, 4], posRatio * j));
@@ -434,7 +433,7 @@ namespace Stevia.Model
             {
                 float posRatio = 1f / (mainBarNum[4] - 1);
 
-                for (int j = 0; j < mainBarNum[4]; j++)
+                for (var j = 0; j < mainBarNum[4]; j++)
                 {
                     vertex.Add(Vector3.Lerp(main3Pos[0, 1], main3Pos[0, 2], posRatio * j));
                     vertex.Add(Vector3.Lerp(main3Pos[1, 1], main3Pos[1, 2], posRatio * j));
@@ -445,7 +444,7 @@ namespace Stevia.Model
             {
                 float posRatio = 1f / (mainBarNum[5] - 1);
 
-                for (int j = 0; j < mainBarNum[5]; j++) 
+                for (var j = 0; j < mainBarNum[5]; j++) 
                 {
                     vertex.Add(Vector3.Lerp(main3Pos[0, 3], main3Pos[0, 4], posRatio * j));
                     vertex.Add(Vector3.Lerp(main3Pos[1, 3], main3Pos[1, 4], posRatio * j));
@@ -453,10 +452,10 @@ namespace Stevia.Model
                 }
             }
 
-            for (int i = 0; i < barCount; i++) 
+            for (var i = 0; i < barCount; i++) 
             {
                 Mesh meshObj = CreateMesh.Pipe(vertex[2 * i], vertex[2 * i + 1], mainD / 2f, 12, true);
-                GameObject element = new GameObject("MainBar");
+                var element = new GameObject("MainBar");
                 element.AddComponent<MeshFilter>().mesh = meshObj;
                 element.AddComponent<MeshRenderer>().material = new Material(Shader.Find("Standard")) {
                     color = new Color(0, 1, 0, 1)
@@ -466,16 +465,16 @@ namespace Stevia.Model
 
             // ドローコール削減のため、作成したフープを一つのメッシュに結合
             var color = new Color(0, 1, 0, 1);
-            CreateMesh.Conbine(mainBars, color, "Standard");
+            CreateMesh.Combine(mainBars, color, "Standard");
         }
 
-        static Vector3[,] GetBandPos(Vector3[,] cornerPos, int dirXNum, int dirYNum) 
+        private static Vector3[,] GetBandPos(Vector3[,] cornerPos, int dirXNum, int dirYNum) 
         {
-            Vector3[,] bandPos = new Vector3[2, 2 * (dirXNum + dirYNum)];
+            var bandPos = new Vector3[2, 2 * (dirXNum + dirYNum)];
             // dir_X
-            for (int i = 0; i < dirXNum; i++) 
+            for (var i = 0; i < dirXNum; i++) 
             {
-                for (int j = 0; j < 2; j++) 
+                for (var j = 0; j < 2; j++) 
                 {
                     if (i == 0) 
                     {
@@ -497,7 +496,7 @@ namespace Stevia.Model
             // dir_Y
             for (int i = dirXNum; i < dirXNum + dirYNum; i++)
             {
-                for (int j = 0; j < 2; j++)
+                for (var j = 0; j < 2; j++)
                 {
                     if (i == 0) 
                     {

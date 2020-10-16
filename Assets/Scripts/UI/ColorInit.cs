@@ -1,34 +1,29 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Stevia.UI
+namespace UI
 {
     public class ColorInit:MonoBehaviour
     {
-        void Start()
+        private void Start()
         {
-            if (PlayerPrefs.HasKey("UserColorData"))
-                InitMemberColor(true);
-            else
-                InitMemberColor(false);
+            InitMemberColor(PlayerPrefs.HasKey("UserColorData"));
         }
 
-        void InitMemberColor(bool init)
+        private static void InitMemberColor(bool init)
         {
-            int i = 0;
+            var i = 0;
 
             if (init)
             {
-                string json = PlayerPrefs.GetString(SaveColorData._SaveKey);
+                string json = PlayerPrefs.GetString(SaveColorData.saveKey);
                 print(json);
-                SaveColor loadColor = JsonUtility.FromJson<SaveColor>(json);
+                var loadColor = JsonUtility.FromJson<SaveColor>(json);
                 while (i < 11)
                 {
                     string inputText = loadColor.rgba[i];
-                    ColorInput._memberColor[i] = ColorInput.GetMemberColor(inputText);
-                    ColorInput._saveColor.num[i] = loadColor.num[i];
-                    ColorInput._saveColor.rgba[i] = loadColor.rgba[i];
+                    ColorInput.MemberColor[i] = ColorInput.GetMemberColor(inputText);
+                    ColorInput.SaveColor.num[i] = loadColor.num[i];
+                    ColorInput.SaveColor.rgba[i] = loadColor.rgba[i];
                     i++;
                 }
             }
@@ -36,9 +31,9 @@ namespace Stevia.UI
             {
                 while (i < 11)
                 {
-                    ColorInput._memberColor[i] = new Color(0.5f, 0.5f, 0.5f, 1);
-                    ColorInput._saveColor.num[i] = i;
-                    ColorInput._saveColor.rgba[i] = "0.5,0.5,0.5,1";
+                    ColorInput.MemberColor[i] = new Color(0.5f, 0.5f, 0.5f, 1);
+                    ColorInput.SaveColor.num[i] = i;
+                    ColorInput.SaveColor.rgba[i] = "0.5,0.5,0.5,1";
                     i++;
                 }
             }
